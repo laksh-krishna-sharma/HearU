@@ -5,7 +5,9 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
+
     "fastapi>=0.116.1",
+
     "uvicorn[standard]>=0.35.0",
 ]
 
@@ -14,4 +16,11 @@ dev = [
     "black>=25.1.0",
     "mypy>=1.17.1",
     "ruff>=0.12.8",
+]
+
+[tool.uv]
+dev-dependencies = [
+    "black>=25.1.0",
+    "mypy>=1.17.1",
+    "ruff>=0.12.9",
 ]
