@@ -1,5 +1,5 @@
 import time
-from typing import Any, Callable, TypeVar
+from typing import Any, Callable, TypeVar, Dict, AsyncGenerator
 from contextlib import asynccontextmanager
 
 import uvicorn
@@ -21,7 +21,7 @@ log = logger()
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
     log.info("Starting HearU API...")
     await init_models()
@@ -61,7 +61,7 @@ app.include_router(chat_router)
 
 
 @app.get("/", tags=["Health"])
-async def health_check():
+async def health_check() -> Dict[str, str]:
     return {"status": "ok", "message": "HearU API is running"}
 
 
@@ -69,7 +69,9 @@ F = TypeVar("F", bound=Callable[..., Any])
 
 
 @app.middleware("http")
-async def process_time_log_middleware(request: Request, call_next: F) -> Response:
+async def process_time_log_middleware(
+    request: Request, call_next: Callable[[Request], Any]
+) -> Response:
     start_time = time.time()
     response: Response = await call_next(request)
     process_time = str(round(time.time() - start_time, 3))

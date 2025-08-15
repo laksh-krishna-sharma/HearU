@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import List, Optional, Protocol
+from typing import List, Optional, Protocol, Any, Callable
 
 from pydantic import BaseModel
 
@@ -81,7 +81,11 @@ class GeminiProvider:
 
 
 class ChatService:
-    def __init__(self, provider: ChatProvider, db_session_factory=async_session):
+    def __init__(
+        self,
+        provider: ChatProvider,
+        db_session_factory: Callable[[], Any] = async_session,
+    ) -> None:
         self.provider = provider
         self.db_session_factory = db_session_factory
 
