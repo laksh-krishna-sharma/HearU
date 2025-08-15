@@ -1,0 +1,22 @@
+headers {
+  Content-Type: application/json
+  Accept: application/json
+}
+
+auth {
+  mode: none
+}
+
+script:pre-request {
+  // Collection-level pre-request script
+  console.log(`Making request to: ${req.getUrl()}`);
+}
+
+script:post-response {
+  // Collection-level post-response script
+  console.log(`Response status: ${res.getStatus()}`);
+  
+  if (res.getStatus() >= 400) {
+    console.log(`Error response: ${JSON.stringify(res.getBody())}`);
+  }
+}

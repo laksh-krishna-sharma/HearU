@@ -1,0 +1,36 @@
+meta {
+  name: Agent Chat Existing Session
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/api/chat/agent
+  body: json
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+body:json {
+  {
+    "text": "Can you tell me more about machine learning?",
+    "session_id": {{sessionId}}
+  }
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Agent chat with existing session", function() {
+    const response = res.getBody();
+    expect(response).to.have.property('reply');
+    expect(response).to.have.property('session_id');
+    expect(response.reply).to.be.a('string');
+    expect(response.reply.length).to.be.greaterThan(0);
+    expect(response.session_id).to.eq(parseInt(bru.getVar("sessionId")));
+  });
+}

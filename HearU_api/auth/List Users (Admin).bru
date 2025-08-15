@@ -1,0 +1,25 @@
+meta {
+  name: List Users (Admin)
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/api/admin/users
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+tests {
+  test("List users (may require admin privileges)", function() {
+    // This test may fail with 403 if user is not admin
+    if (res.getStatus() === 200) {
+      const users = res.getBody();
+      expect(users).to.be.an('array');
+    } else if (res.getStatus() === 403) {
+      expect(res.getBody().detail).to.include('Admin privileges required');
+    }
+  });
+}

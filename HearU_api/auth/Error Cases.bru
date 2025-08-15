@@ -1,0 +1,29 @@
+meta {
+  name: Error Cases
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/api/login
+  body: json
+}
+
+body:json {
+  {
+    "email": "invalid@example.com",
+    "password": "wrongpassword"
+  }
+}
+
+assert {
+  res.status: eq 401
+  res.body.detail: eq Invalid email or password
+}
+
+tests {
+  test("Invalid login credentials", function() {
+    expect(res.getStatus()).to.eq(401);
+    expect(res.getBody().detail).to.eq('Invalid email or password');
+  });
+}
