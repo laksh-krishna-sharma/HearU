@@ -1,0 +1,33 @@
+meta {
+  name: Login User
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/login
+  body: json
+}
+
+body:json {
+  {
+    "email": "john.doe@example.com",
+    "password": "securepassword123"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.message: eq Login successful
+}
+
+tests {
+  test("Login successful", function() {
+    const responseBody = res.getBody();
+    expect(responseBody).to.have.property('access_token');
+    expect(responseBody.user.email).to.eq('john.doe@example.com');
+    
+    // Store auth token for authenticated requests
+    bru.setVar("authToken", responseBody.access_token);
+  });
+}
