@@ -4,13 +4,16 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from models.user import User
 
+
 # ----------------- async DB service functions -----------------
 async def create_default_admin_if_missing(db: AsyncSession) -> User:
     """
     Create a default admin user if it doesn't exist.
     Use environment variables to configure credentials for production.
     """
-    admin_email = os.environ.get("DEFAULT_ADMIN_EMAIL", "23f3002362@ds.study.iitm.ac.in")
+    admin_email = os.environ.get(
+        "DEFAULT_ADMIN_EMAIL", "23f3002362@ds.study.iitm.ac.in"
+    )
     stmt = select(User).filter_by(email=admin_email)
     res = await db.execute(stmt)
     user = res.scalar_one_or_none()
@@ -21,7 +24,7 @@ async def create_default_admin_if_missing(db: AsyncSession) -> User:
         name=os.environ.get("DEFAULT_ADMIN_NAME", "Laksh Krishna Sharma"),
         email=admin_email,
         username=os.environ.get("DEFAULT_ADMIN_USERNAME", "admin"),
-        is_admin=True
+        is_admin=True,
     )
     admin.set_password(os.environ.get("DEFAULT_ADMIN_PASSWORD", "admin123"))
     db.add(admin)
@@ -61,7 +64,9 @@ async def register_user(
     return user
 
 
-async def authenticate_user(db: AsyncSession, email: str, password: str) -> Optional[User]:
+async def authenticate_user(
+    db: AsyncSession, email: str, password: str
+) -> Optional[User]:
     """
     Return the User if authentication succeeds, else None.
     """

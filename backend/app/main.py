@@ -22,8 +22,8 @@ app = FastAPI(
     title="HearU",
     description=description,
     version="1.0.0",
-    docs_url="/docs",   # Swagger at /docs
-    redoc_url="/redoc", # Redoc at /redoc
+    docs_url="/docs",  # Swagger at /docs
+    redoc_url="/redoc",  # Redoc at /redoc
     root_path=settings.root_path,
 )
 
@@ -41,6 +41,7 @@ app.add_middleware(
 # Routers
 app.include_router(auth_router)
 
+
 # Health check
 @app.get("/", tags=["Health"])
 async def health_check():
@@ -48,6 +49,7 @@ async def health_check():
 
 
 F = TypeVar("F", bound=Callable[..., Any])
+
 
 @app.middleware("http")
 async def process_time_log_middleware(request: Request, call_next: F) -> Response:
