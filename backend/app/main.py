@@ -19,9 +19,10 @@ HearU API's
 
 log = logger()
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    
+
     log.info("Starting HearU API...")
     await init_models()
     async with async_session() as session:
@@ -33,6 +34,7 @@ async def lifespan(app: FastAPI):
     log.info("Shutting down HearU API...")
     await async_session().close_all()
     log.info("Shutdown complete.")
+
 
 app = FastAPI(
     title="HearU",
@@ -57,11 +59,14 @@ app.add_middleware(
 app.include_router(auth_router)
 app.include_router(chat_router)
 
+
 @app.get("/", tags=["Health"])
 async def health_check():
     return {"status": "ok", "message": "HearU API is running"}
 
+
 F = TypeVar("F", bound=Callable[..., Any])
+
 
 @app.middleware("http")
 async def process_time_log_middleware(request: Request, call_next: F) -> Response:
@@ -77,6 +82,7 @@ async def process_time_log_middleware(request: Request, call_next: F) -> Respons
         process_time,
     )
     return response
+
 
 if __name__ == "__main__":
     uvicorn.run(
