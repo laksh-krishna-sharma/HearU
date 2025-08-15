@@ -6,8 +6,10 @@ from sqlalchemy import select
 
 from utilities.db import get_db
 from services.auth.auth import (
-    create_access_token, decode_token, revoke_jti,
     register_user, authenticate_user, create_default_admin_if_missing
+)
+from utilities.jwt import (
+    create_access_token, decode_token, revoke_jti
 )
 from models.user import User
 from routes.auth.schema.auth import RegisterRequest, LoginRequest, UserOut
