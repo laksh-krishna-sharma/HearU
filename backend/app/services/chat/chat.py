@@ -5,17 +5,25 @@ from typing import List, Optional, Protocol
 import httpx
 from pydantic import BaseModel
 
-from sqlalchemy.ext.asyncio import AsyncSession
+import google.generativeai as genai
 from sqlalchemy import select
-
+from dotenv import load_dotenv
+import os
+import sys
 from utilities.logger import logger
 from utilities.db import async_session
 from models.chat import ChatSession, Message, Role
+from static_values import SYSTEM_PROMPT
 
 from config import settings
+load_dotenv()
+
+os.environ["GEMINI_API_KEY"] = settings.gemini_api_key
 
 log = logger(__name__)
 
+# Correct way to configure the API key
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
 class ChatMessage(BaseModel):
     role: Role
@@ -29,33 +37,47 @@ class ChatProvider(Protocol):
 
 class GeminiProvider:
     def __init__(self, model: str = "gemini-2.0-flash"):
-        self.api_key = settings.gemini_api_key
         self.model = model
-        self._endpoint = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model}:generateContent"
-
+        
     async def generate_response(self, prompt: str, history: List[ChatMessage]) -> str:
-        messages_text = "\n".join(f"{m.role.value}: {m.content}" for m in history if m.content)
-        full_prompt = f"{messages_text}\nuser: {prompt}\nassistant:"
-        payload = {
-            "prompt": {"text": full_prompt},
-            "temperature": 0.7,
-            "maxOutputTokens": 512
-        }
-        async with httpx.AsyncClient(timeout=30.0) as client:
-            resp = await client.post(
-                self._endpoint,
-                params={"key": self.api_key},
-                json=payload
+        try:
+            # Correctly convert history to the format Gemini expects
+            chat_history = []
+            for msg in history:
+                chat_history.append({
+                    "role": msg.role.value,
+                    "parts": [{"text": msg.content}]
+                })
+            
+            # Create model instance
+            model = genai.GenerativeModel(self.model)
+            
+            # Start chat with the correctly formatted history
+            chat = model.start_chat(history=chat_history)
+            
+            # The prompt is part of the first message, not sent separately
+            # It should be added to the history before starting the chat
+            # Let's send the prompt directly as the first message instead
+            response = chat.send_message(
+                f"{SYSTEM_PROMPT}\n\nUser: {prompt}",
+                generation_config={
+                    "temperature": 0.7,
+                    "top_p": 0.8,
+                    "top_k": 40,
+                    "max_output_tokens": 1024,
+                }
             )
-            resp.raise_for_status()
-            data = resp.json()
-
-        if "candidates" in data and data["candidates"]:
-            return data["candidates"][0].get("output", "") or data["candidates"][0].get("content", "")
-        if "output" in data and isinstance(data["output"], dict):
-            return data["output"].get("text", "")
-        return str(data)
-
+            
+            if response.text:
+                return response.text
+            else:
+                return "I apologize, I was unable to generate a response."
+                
+        except Exception as e:
+            log.error(f"Error generating response: {str(e)}")
+            print(f"Error generating response: {str(e)}", file=sys.stderr)
+            return "Sorry, there was an error generating the response."
+        
 
 class ChatService:
     def __init__(self, provider: ChatProvider, db_session_factory=async_session):

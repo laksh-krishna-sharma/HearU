@@ -23,7 +23,7 @@ from routes.chat.schema.chat import (
 
 router = APIRouter(prefix="/api/chat", tags=["chat"])
 
-_provider = GeminiProvider(model="gemini-pro")
+_provider = GeminiProvider(model="gemini-2.0-flash")
 _chat_service = ChatService(provider=_provider, db_session_factory=async_session)
 
 
@@ -87,8 +87,5 @@ async def agent_endpoint(payload: AgentRequest, current_user: User = Depends(get
         cs = await _chat_service.create_session(user_id=current_user.id, title=payload.title)
         session_id = cs.id
 
-    await _chat_service.add_message(session_id=session_id, role=Role.user, content=payload.text)
-    history = await _chat_service.get_history(session_id=session_id)
-    reply = await _provider.generate_response(payload.text, history)
-    await _chat_service.add_message(session_id=session_id, role=Role.assistant, content=reply)
+    reply = await _chat_service.send_user_message_and_get_reply(session_id=session_id, user_text=payload.text)
     return AgentResponse(reply=reply, session_id=session_id)

@@ -10,3 +10,4 @@ asyncpg
 PyJWT
 google-genai
 httpx
+google-generativeai
