@@ -1,5 +1,6 @@
 import os
 from datetime import datetime, timedelta
+from typing import Dict, Any
 import jwt
 
 
@@ -34,7 +35,7 @@ def create_access_token(identity: str) -> str:
     return token
 
 
-def decode_token(token: str) -> dict:
+def decode_token(token: str) -> Dict[str, Any]:
     """
     Decode and verify token. Raises jwt exceptions on invalid/expired token.
     Also checks blacklist.
@@ -46,5 +47,5 @@ def decode_token(token: str) -> dict:
     return payload
 
 
-def revoke_jti(jti: str):
+def revoke_jti(jti: str) -> None:
     BLACKLIST.add(jti)

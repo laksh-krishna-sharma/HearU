@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Dict, Any
 
 from sqlalchemy import Column, String, Integer, DateTime, Boolean, LargeBinary, func
 from utilities.db import Base
@@ -56,7 +56,7 @@ class User(Base):
             return False
         return pwd_context.verify(raw_password, self.hashed_password)
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> Dict[str, Any]:
         """
         Minimal public representation (no hashed password).
         """

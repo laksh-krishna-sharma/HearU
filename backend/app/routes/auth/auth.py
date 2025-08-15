@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Header
-from typing import Optional, List
+from typing import Optional, List, Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
@@ -61,7 +61,7 @@ async def get_current_user(
     return user
 
 
-async def admin_required(user: User = Depends(get_current_user)):
+async def admin_required(user: User = Depends(get_current_user)) -> User:
     if not user.is_admin:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail="Admin privileges required"
@@ -71,7 +71,9 @@ async def admin_required(user: User = Depends(get_current_user)):
 
 # ----- endpoints -----
 @router.post("/register", status_code=status.HTTP_201_CREATED)
-async def register(req: RegisterRequest, db: AsyncSession = Depends(get_db)):
+async def register(
+    req: RegisterRequest, db: AsyncSession = Depends(get_db)
+) -> dict[str, Any]:
     try:
         user = await register_user(
             db,
@@ -92,7 +94,9 @@ async def register(req: RegisterRequest, db: AsyncSession = Depends(get_db)):
 
 
 @router.post("/login")
-async def login(req: LoginRequest, db: AsyncSession = Depends(get_db)):
+async def login(
+    req: LoginRequest, db: AsyncSession = Depends(get_db)
+) -> dict[str, Any]:
     user = await authenticate_user(db, req.email, req.password)
     if not user:
         raise HTTPException(
@@ -108,7 +112,7 @@ async def login(req: LoginRequest, db: AsyncSession = Depends(get_db)):
 
 
 @router.post("/logout")
-async def logout(current_user: User = Depends(get_current_user)):
+async def logout(current_user: User = Depends(get_current_user)) -> dict[str, str]:
     jti = getattr(current_user, "_token_jti", None)
     if not jti:
         raise HTTPException(
@@ -119,14 +123,14 @@ async def logout(current_user: User = Depends(get_current_user)):
 
 
 @router.get("/me", response_model=UserOut)
-async def me(current_user: User = Depends(get_current_user)):
+async def me(current_user: User = Depends(get_current_user)) -> UserOut:
     return UserOut(**current_user.to_dict())
 
 
 @router.get("/admin/users", response_model=List[UserOut])
 async def list_users(
     admin: User = Depends(admin_required), db: AsyncSession = Depends(get_db)
-):
+) -> List[UserOut]:
     stmt = select(User).where(User.is_admin.is_(False))
     res = await db.execute(stmt)
     users = res.scalars().all()
@@ -134,6 +138,6 @@ async def list_users(
 
 
 @router.post("/setup/create-default-admin", status_code=status.HTTP_201_CREATED)
-async def ensure_admin(db: AsyncSession = Depends(get_db)):
+async def ensure_admin(db: AsyncSession = Depends(get_db)) -> dict[str, Any]:
     admin = await create_default_admin_if_missing(db)
     return {"message": "Default admin ensured", "admin": admin.to_dict()}

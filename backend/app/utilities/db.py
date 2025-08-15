@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
     create_async_engine,
 )
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, Engine
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.pool import NullPool
 
@@ -79,7 +79,7 @@ async def init_models(engine: Optional[AsyncEngine] = None) -> None:
     log.info("Database tables created (if they did not exist).")
 
 
-def get_sync_engine(db_uri: Optional[str] = None):
+def get_sync_engine(db_uri: Optional[str] = None) -> Engine:
     """
     Return a synchronous SQLAlchemy Engine. Useful for Alembic or scripts that are sync-only.
     Converts a +asyncpg URI back to a sync form if necessary.

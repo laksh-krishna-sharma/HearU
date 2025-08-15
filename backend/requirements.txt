@@ -8,3 +8,6 @@ jwt
 asyncpg
 'pydantic[email]'
 PyJWT
+google-genai
+httpx
+google-generativeai
