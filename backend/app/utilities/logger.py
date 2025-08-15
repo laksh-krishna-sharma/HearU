@@ -3,7 +3,9 @@ import sys
 
 from config import settings
 
-LOG_FORMAT = "[%(asctime)s] %(levelname)s [%(name)s.%(funcName)s:%(lineno)d] %(message)s"
+LOG_FORMAT = (
+    "[%(asctime)s] %(levelname)s [%(name)s.%(funcName)s:%(lineno)d] %(message)s"
+)
 DATEFMT = "%d/%b/%Y %H:%M:%S"
 
 

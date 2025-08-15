@@ -1,10 +1,11 @@
 from pydantic import BaseModel, EmailStr, Field
 from typing import Optional
 
+
 class RegisterRequest(BaseModel):
     name: str
     email: EmailStr
-    password: str = Field(..., min_length=6) 
+    password: str = Field(..., min_length=6)
     username: Optional[str] = None
     age: Optional[int] = None
     gender: Optional[str] = None

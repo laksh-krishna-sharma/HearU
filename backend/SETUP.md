@@ -9,7 +9,7 @@ source .venv/bin/activate
 ### install dependencies
 
 ```zsh
-uv add fastapi 'uvicorn[standard]'
+uv add fastapi 'uvicorn[standard]' passlib sqlalchemy pydantic_settings pydantic jwt asyncpg 'pydantic[email]' PyJWT
 ```
 
 ```zsh

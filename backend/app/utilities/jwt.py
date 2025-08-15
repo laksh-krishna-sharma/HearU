@@ -12,6 +12,7 @@ BLACKLIST = set()
 
 def _make_jti() -> str:
     import uuid
+
     return str(uuid.uuid4())
 
 
