@@ -1,2 +1,10 @@
 fastapi
 'uvicorn[standard]'
+passlib
+sqlalchemy
+pydantic_settings
+pydantic
+jwt
+asyncpg
+'pydantic[email]'
+PyJWT
