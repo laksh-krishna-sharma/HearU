@@ -1,10 +1,8 @@
 import uuid
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Dict, Any
 
-from sqlalchemy import (
-    Column, String, Integer, DateTime, Boolean, LargeBinary, func
-)
+from sqlalchemy import Column, String, Integer, DateTime, Boolean, LargeBinary, func
 from utilities.db import Base
 
 # password hashing
@@ -26,16 +24,22 @@ class User(Base):
     # basic profile fields
     name: Optional[str] = Column(String(255), nullable=True)
     age: Optional[int] = Column(Integer, nullable=True)
-    photo: Optional[bytes] = Column(LargeBinary, nullable=True)  # or switch to photo_url:string if storing outside DB
+    photo: Optional[bytes] = Column(
+        LargeBinary, nullable=True
+    )  # or switch to photo_url:string if storing outside DB
     gender: Optional[str] = Column(String(32), nullable=True)
 
-    username: Optional[str] = Column(String(128), nullable=True, unique=True, index=True)
+    username: Optional[str] = Column(
+        String(128), nullable=True, unique=True, index=True
+    )
     email: str = Column(String(255), nullable=False, unique=True, index=True)
 
     hashed_password: str = Column(String(255), nullable=False)
 
     is_admin: bool = Column(Boolean, default=False, nullable=False)
-    created_at: datetime = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    created_at: datetime = Column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
 
     # ---------- convenience methods ----------
     def set_password(self, raw_password: str) -> None:
@@ -52,7 +56,7 @@ class User(Base):
             return False
         return pwd_context.verify(raw_password, self.hashed_password)
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> Dict[str, Any]:
         """
         Minimal public representation (no hashed password).
         """
