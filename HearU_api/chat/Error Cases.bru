@@ -1,0 +1,25 @@
+meta {
+  name: Error Cases
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/api/chat/99999
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+assert {
+  res.status: eq 404
+  res.body.detail: eq session not found
+}
+
+tests {
+  test("Non-existent session", function() {
+    expect(res.getStatus()).to.eq(404);
+    expect(res.getBody().detail).to.eq('session not found');
+  });
+}

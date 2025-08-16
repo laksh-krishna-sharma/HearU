@@ -1,12 +1,13 @@
 import uuid
 from datetime import datetime
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, TYPE_CHECKING
 
-from sqlalchemy import Column, String, Integer, DateTime, Boolean, LargeBinary, func
-from utilities.db import Base
-
-# password hashing
+from sqlmodel import SQLModel, Field, Relationship
+from sqlalchemy import Column, LargeBinary, DateTime, func
 from passlib.context import CryptContext
+
+if TYPE_CHECKING:
+    from models.chat import ChatSession
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -15,51 +16,49 @@ def gen_uuid() -> str:
     return str(uuid.uuid4())
 
 
-class User(Base):
+class User(SQLModel, table=True):
     __tablename__ = "users"
 
-    # string primary key (UUID stored as string)
-    id: str = Column(String(36), primary_key=True, default=gen_uuid)
+    id: str = Field(default_factory=gen_uuid, primary_key=True, max_length=36)
 
-    # basic profile fields
-    name: Optional[str] = Column(String(255), nullable=True)
-    age: Optional[int] = Column(Integer, nullable=True)
-    photo: Optional[bytes] = Column(
-        LargeBinary, nullable=True
-    )  # or switch to photo_url:string if storing outside DB
-    gender: Optional[str] = Column(String(32), nullable=True)
+    name: Optional[str] = Field(default=None, max_length=255)
+    age: Optional[int] = Field(default=None)
+    photo: Optional[bytes] = Field(default=None, sa_column=Column(LargeBinary))
+    gender: Optional[str] = Field(default=None, max_length=32)
 
-    username: Optional[str] = Column(
-        String(128), nullable=True, unique=True, index=True
+    username: Optional[str] = Field(
+        default=None, max_length=128, unique=True, index=True
     )
-    email: str = Column(String(255), nullable=False, unique=True, index=True)
+    email: str = Field(max_length=255, unique=True, index=True)
 
-    hashed_password: str = Column(String(255), nullable=False)
+    hashed_password: str = Field(max_length=255)
 
-    is_admin: bool = Column(Boolean, default=False, nullable=False)
-    created_at: datetime = Column(
-        DateTime(timezone=True), server_default=func.now(), nullable=False
+    is_admin: bool = Field(default=False)
+    created_at: datetime = Field(
+        sa_column=Column(
+            "created_at",
+            DateTime(timezone=True),
+            server_default=func.now(),
+            nullable=False,
+        )
     )
 
-    # ---------- convenience methods ----------
+    chat_sessions: list["ChatSession"] = Relationship(
+        back_populates="user", cascade_delete=True
+    )
+
     def set_password(self, raw_password: str) -> None:
-        """
-        Hash and store password.
-        """
+        """Hash and store password."""
         self.hashed_password = pwd_context.hash(raw_password)
 
     def verify_password(self, raw_password: str) -> bool:
-        """
-        Verify provided password against stored hash.
-        """
+        """Verify provided password against stored hash."""
         if not self.hashed_password:
             return False
         return pwd_context.verify(raw_password, self.hashed_password)
 
     def to_dict(self) -> Dict[str, Any]:
-        """
-        Minimal public representation (no hashed password).
-        """
+        """Minimal public representation (no hashed password)."""
         return {
             "id": self.id,
             "name": self.name,

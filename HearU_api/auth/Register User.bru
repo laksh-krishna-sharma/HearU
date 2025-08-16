@@ -1,0 +1,40 @@
+meta {
+  name: Register User
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/register
+  body: json
+}
+
+body:json {
+  {
+    "name": "John Doe",
+    "email": "john.doe@example.com",
+    "password": "securepassword123",
+    "username": "johndoe",
+    "age": 25,
+    "gender": "male"
+  }
+}
+
+assert {
+  res.status: eq 201
+  res.body.message: eq User registered successfully
+}
+
+tests {
+  test("User registration successful", function() {
+    const user = res.getBody().user;
+    expect(user).to.have.property('id');
+    expect(user.email).to.eq('john.doe@example.com');
+    expect(user.name).to.eq('John Doe');
+    expect(user.username).to.eq('johndoe');
+    expect(user.is_admin).to.be.false;
+    
+    // Store user ID for future tests
+    bru.setVar("userId", user.id);
+  });
+}

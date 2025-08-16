@@ -1,8 +1,9 @@
-from pydantic import BaseModel, EmailStr, Field
+from sqlmodel import SQLModel, Field
+from pydantic import EmailStr
 from typing import Optional
 
 
-class RegisterRequest(BaseModel):
+class RegisterRequest(SQLModel):
     name: str
     email: EmailStr
     password: str = Field(..., min_length=6)
@@ -11,12 +12,12 @@ class RegisterRequest(BaseModel):
     gender: Optional[str] = None
 
 
-class LoginRequest(BaseModel):
+class LoginRequest(SQLModel):
     email: EmailStr
     password: str
 
 
-class UserOut(BaseModel):
+class UserOut(SQLModel):
     id: str
     name: Optional[str]
     email: EmailStr

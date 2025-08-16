@@ -1,41 +1,40 @@
 from typing import List, Optional
+from sqlmodel import SQLModel
 
-from pydantic import BaseModel
 
-
-class CreateSessionRequest(BaseModel):
+class CreateSessionRequest(SQLModel):
     title: Optional[str] = None
 
 
-class SessionOut(BaseModel):
+class SessionOut(SQLModel):
     session_id: int
     user_id: Optional[str] = None
     title: Optional[str] = None
 
 
-class SendMessageRequest(BaseModel):
+class SendMessageRequest(SQLModel):
     text: str
 
 
-class MessageOut(BaseModel):
+class MessageOut(SQLModel):
     id: int
     role: str
     content: str
     created_at: str
 
 
-class ChatHistoryResponse(BaseModel):
+class ChatHistoryResponse(SQLModel):
     session_id: int
     messages: List[MessageOut]
 
 
-class AgentRequest(BaseModel):
+class AgentRequest(SQLModel):
     text: str
     session_id: Optional[int] = None
     create_session_if_missing: bool = False
     title: Optional[str] = None
 
 
-class AgentResponse(BaseModel):
+class AgentResponse(SQLModel):
     reply: str
     session_id: Optional[int] = None

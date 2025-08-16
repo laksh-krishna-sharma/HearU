@@ -22,7 +22,7 @@ def create_access_token(identity: str) -> str:
     Create a JWT with 'sub' and 'jti' claims and expiry.
     Returns a string token.
     """
-    now = datetime.utcnow()
+    now = datetime.now()
     exp = now + timedelta(hours=ACCESS_TOKEN_EXPIRE_HOURS)
     jti = _make_jti()
     payload = {

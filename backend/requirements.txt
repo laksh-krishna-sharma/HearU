@@ -1,7 +1,7 @@
 fastapi
 'uvicorn[standard]'
 passlib
-sqlalchemy
+sqlmodel
 pydantic_settings
 pydantic
 jwt
