@@ -17,6 +17,7 @@ dependencies = [
     "httpx>=0.28.1",
     "google-genai>=1.30.0",
     "google-generativeai>=0.8.5",
+    "bcrypt>=4.3.0",
 ]
 
 [dependency-groups]
@@ -25,4 +26,11 @@ dev = [
     "mypy>=1.17.1",
     "ruff>=0.12.8",
     "sqlalchemy-stubs>=0.4",
+]
+
+[tool.uv]
+dev-dependencies = [
+    "black>=25.1.0",
+    "mypy>=1.17.1",
+    "ruff>=0.12.9",
 ]
