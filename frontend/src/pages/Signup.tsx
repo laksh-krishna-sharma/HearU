@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { logout, clearError, login, signup } from '../store/slices/authSlice';
-import type { User } from '../store/slices/authSlice';
+import { useAppDispatch } from '@/hooks/hooks';
 
 
 interface FormData {
@@ -10,7 +10,7 @@ interface FormData {
   firstName: string;
   lastName: string;
   username: string;
-  age: string;
+  age: number;
   gender: string;
   // Step 2
   email: string;
@@ -21,14 +21,14 @@ interface FormData {
 }
 
 const Signup = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const authState = useSelector((state: any) => state.auth);
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<FormData>({
     firstName: '',
     lastName: '',
     username: '',
-    age: '',
+    age: 13,
     gender: '',
     email: '',
     password: '',
@@ -37,17 +37,21 @@ const Signup = () => {
     agreeToTerms: false
   });
 
-
-  const handlesignup = () => {
-    // Handle signup logic here
-    dispatch(signup(formData));
-  };
+  const payload = {
+      name: `${formData.firstName} ${formData.lastName}`.trim(),
+      email: formData.email,
+      password: formData.password,
+      username: formData.username,
+      age: formData.age, // Already converted to number in handleChange
+      gender: formData.gender,
+    };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     setFormData({
       ...formData,
-      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
+      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : 
+              name === 'age' ? parseInt(value) || 0 : value
     });
   };
 
@@ -75,16 +79,34 @@ const Signup = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle signup logic here
+    
+    // Validate step 2 fields
+    if (!formData.email || !formData.password || !formData.confirmPassword) {
+      alert('Please fill in all required fields');
+      return;
+    }
+    
+    // Validate password length
+    if (formData.password.length < 6) {
+      alert('Password must be at least 6 characters long');
+      return;
+    }
+    
+    // Validate password confirmation
     if (formData.password !== formData.confirmPassword) {
       alert('Passwords do not match');
       return;
     }
+    
+    // Validate terms agreement
     if (!formData.agreeToTerms) {
-      alert('Please agree to the Terms of Service');
+      alert('Please agree to the Terms of Service and Privacy Policy');
       return;
     }
-    console.log('Signup attempt:', formData);
+    
+    console.log('Submitting form with data:', formData);
+    console.log('Payload for signup:', payload);
+    dispatch(signup(payload));
   };
 
   return (
@@ -364,12 +386,19 @@ const Signup = () => {
                 <button
                   type="submit"
                   className="flex-1 flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-white bg-ocean-accent hover:bg-ocean-accent-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ocean-accent transition-all duration-300 font-medium"
-                  onClick={handlesignup}
+                  disabled={authState.loading}
                 >
-                  Create Account
+                  {authState.loading ? 'Creating Account...' : 'Create Account'}
                 </button>
               </div>
             </form>
+          )}
+
+          {/* Display error message */}
+          {authState.error && (
+            <div className="mt-4 p-3 bg-red-100 text-red-700 rounded-lg text-center">
+              {authState.error}
+            </div>
           )}
 
           {/* Crisis Support Notice */}

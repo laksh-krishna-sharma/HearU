@@ -104,13 +104,13 @@ const Login = () => {
             <div>
               <button
                 type="submit"
-                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-white bg-ocean-primary hover:bg-ocean-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ocean-primary transition-all duration-300 font-medium ${
+                className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-white font-medium ${
                   authState.loading 
                     ? 'bg-gray-400 cursor-not-allowed' 
                     : 'bg-ocean-primary hover:bg-ocean-primary-dark'
-                }"
+                }`}
                 disabled={authState.loading}
-              >
+                >
                 {authState.loading ? 'Signing in...' : 'Sign in'}
               </button>
             </div>

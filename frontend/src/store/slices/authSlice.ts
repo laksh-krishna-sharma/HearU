@@ -5,25 +5,26 @@ import toast from 'react-hot-toast'
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
 export interface User {
-  id: number
-  name: string
-  age: number
-  username: string
+  id: string
+  name: string | null
+  age: number | null
+  username: string | null
   email: string
-  gender: string
+  gender: string | null
+  is_admin: boolean
   created_at: string
 }
 
 interface AuthState {
   user: User | null
-  token: string | null
+  access_token: string | null
   loading: boolean
   error: string | null
 }
 
 const initialState: AuthState = {
   user: JSON.parse(localStorage.getItem('user') || 'null'),
-  token: localStorage.getItem('token'),
+  access_token: localStorage.getItem('token'),
   loading: false,
   error: null,
 }
@@ -31,26 +32,51 @@ const initialState: AuthState = {
 
 export const login = createAsyncThunk(
   'auth/login',
-  async ({ email, password }: { email: string; password: string }) => {
-    const response = await axios.post(`${API_URL}/api/login`, {
-      email,
-      password,
-    })
-    return response.data
+  async ({ email, password }: { email: string; password: string }, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(`${API_URL}/api/login`, {
+        email,
+        password,
+      })
+      return response.data
+    } catch (error: any) {
+      console.log('Login error:', error);
+      const message = error.response?.data?.detail || error.message || 'Login failed'
+      return rejectWithValue(message)
+    }
   }
 )
 
+// name: str
+//     email: EmailStr
+//     password: str = Field(..., min_length=6)
+//     username: Optional[str] = None
+//     age: Optional[int] = None
+//     gender: Optional[str] = None
 export const signup = createAsyncThunk(
   'auth/signup',
-  async ({ email, password, name, age, gender }: { email: string; password: string; name: string; age: number; gender: string }) => {
-    const response = await axios.post(`${API_URL}/api/register`, {
-      email,
-      password,
-      name,
-      age,
-      gender,
-    })
-    return response.data
+  async ({name, username, email, password, age, gender }: {name: string; email: string; password: string; username: string; age: number; gender: string }, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(`${API_URL}/api/register`, {
+        name,
+        email,
+        password,
+        username,
+        age,
+        gender,
+      })
+      // Backend returns { message, user } but we need { access_token, user } for auto-login
+      // So we'll need to login after successful registration
+      const loginResponse = await axios.post(`${API_URL}/api/login`, {
+        email,
+        password,
+      })
+      return loginResponse.data
+    } catch (error: any) {
+      console.log('Signup error:', error);
+      const message = error.response?.data?.detail || error.message || 'Signup failed'
+      return rejectWithValue(message)
+    }
   }
 )
 
@@ -60,7 +86,7 @@ export const authslice = createSlice({
     reducers: {
         logout: (state) => {
             state.user = null
-            state.token = null
+            state.access_token = null
             localStorage.removeItem('user')
             localStorage.removeItem('token')
             toast.success('Logged out successfully')
@@ -72,10 +98,12 @@ export const authslice = createSlice({
     extraReducers: (builder) => {
         builder
             .addCase(login.fulfilled, (state, action) => {
+                state.loading = false
                 state.user = action.payload.user
-                state.token = action.payload.token
+                state.access_token = action.payload.access_token
+                state.error = null
                 localStorage.setItem('user', JSON.stringify(action.payload.user))
-                localStorage.setItem('token', action.payload.token)
+                localStorage.setItem('token', action.payload.access_token)
                 toast.success('Logged in successfully')
             })
             .addCase(login.pending, (state) => {
@@ -84,15 +112,17 @@ export const authslice = createSlice({
             })
             .addCase(login.rejected, (state, action) => {
                 state.loading = false
-                state.error = action.error.message || 'Login failed'
-                toast.error(action.error.message || 'Login failed')
+                state.error = action.payload as string || 'Login failed'
+                toast.error(action.payload as string || 'Login failed')
             })
             .addCase(signup.fulfilled, (state, action) => {
+                state.loading = false
                 state.user = action.payload.user
-                state.token = action.payload.token
+                state.access_token = action.payload.access_token
+                state.error = null
                 localStorage.setItem('user', JSON.stringify(action.payload.user))
-                localStorage.setItem('token', action.payload.token)
-                toast.success('Signed up successfully')
+                localStorage.setItem('token', action.payload.access_token)
+                toast.success('Account created and logged in successfully')
             })
             .addCase(signup.pending, (state) => {
                 state.loading = true
@@ -100,8 +130,8 @@ export const authslice = createSlice({
             })
             .addCase(signup.rejected, (state, action) => {
                 state.loading = false
-                state.error = action.error.message || 'Signup failed'
-                toast.error(action.error.message || 'Signup failed')
+                state.error = action.payload as string || 'Signup failed'
+                toast.error(action.payload as string || 'Signup failed')
             })
     }
 })
