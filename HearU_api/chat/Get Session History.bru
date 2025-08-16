@@ -1,0 +1,36 @@
+meta {
+  name: Get Session History
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/chat/{{sessionId}}
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Chat history retrieved successfully", function() {
+    const history = res.getBody();
+    expect(history).to.have.property('session_id');
+    expect(history).to.have.property('messages');
+    expect(history.messages).to.be.an('array');
+    expect(history.session_id).to.eq(parseInt(bru.getVar("sessionId")));
+    
+    // Check message structure if messages exist
+    if (history.messages.length > 0) {
+      const message = history.messages[0];
+      expect(message).to.have.property('id');
+      expect(message).to.have.property('role');
+      expect(message).to.have.property('content');
+      expect(message).to.have.property('created_at');
+    }
+  });
+}

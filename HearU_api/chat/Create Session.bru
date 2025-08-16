@@ -1,0 +1,36 @@
+meta {
+  name: Create Session
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/chat/session
+  body: json
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+body:json {
+  {
+    "title": "My First Chat Session"
+  }
+}
+
+assert {
+  res.status: eq 201
+}
+
+tests {
+  test("Chat session created successfully", function() {
+    const session = res.getBody();
+    expect(session).to.have.property('session_id');
+    expect(session).to.have.property('user_id');
+    expect(session.title).to.eq('My First Chat Session');
+    
+    // Store session ID for future tests
+    bru.setVar("sessionId", session.session_id);
+  });
+}

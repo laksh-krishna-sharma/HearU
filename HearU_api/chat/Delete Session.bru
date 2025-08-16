@@ -1,0 +1,23 @@
+meta {
+  name: Delete Session
+  type: http
+  seq: 6
+}
+
+delete {
+  url: {{baseUrl}}/api/chat/{{sessionId}}
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+assert {
+  res.status: eq 204
+}
+
+tests {
+  test("Session deleted successfully", function() {
+    expect(res.getStatus()).to.eq(204);
+  });
+}

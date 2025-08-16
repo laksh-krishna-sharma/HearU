@@ -1,0 +1,37 @@
+meta {
+  name: Agent Chat
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/chat/agent
+  body: json
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+body:json {
+  {
+    "text": "What is artificial intelligence?",
+    "create_session_if_missing": true,
+    "title": "AI Discussion Session"
+  }
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Agent chat successful", function() {
+    const response = res.getBody();
+    expect(response).to.have.property('reply');
+    expect(response).to.have.property('session_id');
+    expect(response.reply).to.be.a('string');
+    expect(response.reply.length).to.be.greaterThan(0);
+    expect(response.session_id).to.be.a('number');
+  });
+}
