@@ -3,9 +3,9 @@ from datetime import datetime
 from typing import Optional, Dict, Any
 
 from sqlalchemy import Column, String, Integer, DateTime, Boolean, LargeBinary, func
+from sqlalchemy.orm import relationship
 from utilities.db import Base
 
-# password hashing
 from passlib.context import CryptContext
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -18,15 +18,13 @@ def gen_uuid() -> str:
 class User(Base):
     __tablename__ = "users"
 
-    # string primary key (UUID stored as string)
     id: str = Column(String(36), primary_key=True, default=gen_uuid)
 
-    # basic profile fields
     name: Optional[str] = Column(String(255), nullable=True)
     age: Optional[int] = Column(Integer, nullable=True)
     photo: Optional[bytes] = Column(
         LargeBinary, nullable=True
-    )  # or switch to photo_url:string if storing outside DB
+    )
     gender: Optional[str] = Column(String(32), nullable=True)
 
     username: Optional[str] = Column(
@@ -41,25 +39,25 @@ class User(Base):
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
 
-    # ---------- convenience methods ----------
+    chat_sessions = relationship(
+        "ChatSession",
+        back_populates="user",
+        cascade="all, delete-orphan"
+    )
+
+
     def set_password(self, raw_password: str) -> None:
-        """
-        Hash and store password.
-        """
+        """Hash and store password."""
         self.hashed_password = pwd_context.hash(raw_password)
 
     def verify_password(self, raw_password: str) -> bool:
-        """
-        Verify provided password against stored hash.
-        """
+        """Verify provided password against stored hash."""
         if not self.hashed_password:
             return False
         return pwd_context.verify(raw_password, self.hashed_password)
 
     def to_dict(self) -> Dict[str, Any]:
-        """
-        Minimal public representation (no hashed password).
-        """
+        """Minimal public representation (no hashed password)."""
         return {
             "id": self.id,
             "name": self.name,

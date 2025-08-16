@@ -25,31 +25,42 @@ class ChatSession(Base):
     __tablename__ = "chat_sessions"
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(String(36), nullable=True, index=True)
+
+    user_id = Column(
+        String(36),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+
     title = Column(String(255), nullable=True)
     created_at = Column(
-        DateTime(timezone=True), nullable=False, default=datetime.utcnow
+        DateTime(timezone=True), nullable=False, default=datetime.now
     )
 
     messages = relationship(
         "Message", back_populates="session", cascade="all, delete-orphan"
     )
 
+    user = relationship("User", back_populates="chat_sessions")
+
 
 class Message(Base):
     __tablename__ = "messages"
 
     id = Column(Integer, primary_key=True, index=True)
+
     session_id = Column(
         Integer,
         ForeignKey("chat_sessions.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
+
     role = Column(SAEnum(Role), nullable=False)
     content = Column(Text, nullable=False)
     created_at = Column(
-        DateTime(timezone=True), nullable=False, default=datetime.utcnow
+        DateTime(timezone=True), nullable=False, default=datetime.now
     )
 
     session = relationship("ChatSession", back_populates="messages")
