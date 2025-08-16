@@ -14,6 +14,23 @@ const Navbar = () => {
           </div>
         </Link>
 
+        <div className="hidden md:flex space-x-6">
+          <ul className="flex space-x-6">
+            <Link to="/about">
+              <li>About Us</li>
+            </Link>
+            <Link to="/services">
+              <li>Our Services</li>
+            </Link>
+            <Link to="/contact">
+              <li>Contact Us</li>
+            </Link>
+            <Link to="/chat">
+              <li>Chat</li>
+            </Link>
+          </ul>
+        </div>
+
         {/* Navigation Buttons */}
         <div className="flex items-center space-x-3">
           <Link 
