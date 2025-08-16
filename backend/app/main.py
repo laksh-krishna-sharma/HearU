@@ -12,6 +12,7 @@ from routes.auth.auth import router as auth_router
 from routes.chat.chat import router as chat_router
 from utilities.db import init_models, async_session
 from services.auth.auth import create_default_admin_if_missing
+import models
 
 description = """
 HearU API's

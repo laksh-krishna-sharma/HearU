@@ -1,12 +1,13 @@
 import uuid
 from datetime import datetime
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, TYPE_CHECKING
 
-from sqlalchemy import Column, String, Integer, DateTime, Boolean, LargeBinary, func
-from sqlalchemy.orm import relationship
-from utilities.db import Base
-
+from sqlmodel import SQLModel, Field, Relationship
+from sqlalchemy import Column, LargeBinary, DateTime, func
 from passlib.context import CryptContext
+
+if TYPE_CHECKING:
+    from models.chat import ChatSession
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -15,34 +16,36 @@ def gen_uuid() -> str:
     return str(uuid.uuid4())
 
 
-class User(Base):
+class User(SQLModel, table=True):
     __tablename__ = "users"
 
-    id: str = Column(String(36), primary_key=True, default=gen_uuid)
+    id: str = Field(default_factory=gen_uuid, primary_key=True, max_length=36)
 
-    name: Optional[str] = Column(String(255), nullable=True)
-    age: Optional[int] = Column(Integer, nullable=True)
-    photo: Optional[bytes] = Column(
-        LargeBinary, nullable=True
+    name: Optional[str] = Field(default=None, max_length=255)
+    age: Optional[int] = Field(default=None)
+    photo: Optional[bytes] = Field(default=None, sa_column=Column(LargeBinary))
+    gender: Optional[str] = Field(default=None, max_length=32)
+
+    username: Optional[str] = Field(
+        default=None, max_length=128, unique=True, index=True
     )
-    gender: Optional[str] = Column(String(32), nullable=True)
+    email: str = Field(max_length=255, unique=True, index=True)
 
-    username: Optional[str] = Column(
-        String(128), nullable=True, unique=True, index=True
+    hashed_password: str = Field(max_length=255)
+
+    is_admin: bool = Field(default=False)
+    created_at: datetime = Field(
+        sa_column=Column(
+            "created_at", 
+            DateTime(timezone=True), 
+            server_default=func.now(), 
+            nullable=False
+        )
     )
-    email: str = Column(String(255), nullable=False, unique=True, index=True)
 
-    hashed_password: str = Column(String(255), nullable=False)
-
-    is_admin: bool = Column(Boolean, default=False, nullable=False)
-    created_at: datetime = Column(
-        DateTime(timezone=True), server_default=func.now(), nullable=False
-    )
-
-    chat_sessions = relationship(
-        "ChatSession",
+    chat_sessions: list["ChatSession"] = Relationship(
         back_populates="user",
-        cascade="all, delete-orphan"
+        cascade_delete=True
     )
 
 

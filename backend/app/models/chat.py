@@ -1,18 +1,12 @@
 from datetime import datetime
 from enum import Enum
+from typing import Optional, TYPE_CHECKING
 
-from sqlalchemy import (
-    Column,
-    DateTime,
-    Enum as SAEnum,
-    ForeignKey,
-    Integer,
-    String,
-    Text,
-)
-from sqlalchemy.orm import relationship
+from sqlmodel import SQLModel, Field, Relationship
+from sqlalchemy import Column, DateTime, func, Text
 
-from utilities.db import Base
+if TYPE_CHECKING:
+    from models.user import User
 
 
 class Role(str, Enum):
@@ -21,46 +15,55 @@ class Role(str, Enum):
     system = "system"
 
 
-class ChatSession(Base):
+class ChatSession(SQLModel, table=True):
     __tablename__ = "chat_sessions"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id: Optional[int] = Field(default=None, primary_key=True, index=True)
 
-    user_id = Column(
-        String(36),
-        ForeignKey("users.id", ondelete="CASCADE"),
-        nullable=False,
-        index=True,
+    user_id: str = Field(
+        foreign_key="users.id",
+        max_length=36,
+        index=True
     )
 
-    title = Column(String(255), nullable=True)
-    created_at = Column(
-        DateTime(timezone=True), nullable=False, default=datetime.now
+    title: Optional[str] = Field(default=None, max_length=255)
+    created_at: datetime = Field(
+        default_factory=datetime.now,
+        sa_column=Column(
+            "created_at",
+            DateTime(timezone=True),
+            nullable=False,
+            default=datetime.now
+        )
     )
 
-    messages = relationship(
-        "Message", back_populates="session", cascade="all, delete-orphan"
+    messages: list["Message"] = Relationship(
+        back_populates="session", cascade_delete=True
     )
 
-    user = relationship("User", back_populates="chat_sessions")
+    user: "User" = Relationship(back_populates="chat_sessions")
 
 
-class Message(Base):
+class Message(SQLModel, table=True):
     __tablename__ = "messages"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id: Optional[int] = Field(default=None, primary_key=True, index=True)
 
-    session_id = Column(
-        Integer,
-        ForeignKey("chat_sessions.id", ondelete="CASCADE"),
-        nullable=False,
-        index=True,
+    session_id: int = Field(
+        foreign_key="chat_sessions.id",
+        index=True
     )
 
-    role = Column(SAEnum(Role), nullable=False)
-    content = Column(Text, nullable=False)
-    created_at = Column(
-        DateTime(timezone=True), nullable=False, default=datetime.now
+    role: Role = Field()
+    content: str = Field(sa_column=Column(Text))
+    created_at: datetime = Field(
+        default_factory=datetime.now,
+        sa_column=Column(
+            "created_at",
+            DateTime(timezone=True),
+            nullable=False,
+            default=datetime.now
+        )
     )
 
-    session = relationship("ChatSession", back_populates="messages")
+    session: ChatSession = Relationship(back_populates="messages")
