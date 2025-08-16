@@ -1,4 +1,5 @@
-# HearU
+# <img src="https://github.com/user-attachments/assets/d3a33f86-4576-40de-ae71-36db44e2d6e9" alt="HearU Logo" width="60" height="60" />
+
 
 ## Overview
 MindSpace is an AI-powered, confidential, and empathetic mental wellness companion designed for Indian youth. It provides a safe platform where young individuals can openly share their thoughts, seek guidance, and access resources without fear of stigma or judgment. Leveraging Google Cloud's Generative AI, MindSpace offers intelligent support, mental wellness insights, and a community-driven space to promote emotional well-being.
