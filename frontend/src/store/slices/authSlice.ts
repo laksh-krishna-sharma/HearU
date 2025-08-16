@@ -39,10 +39,14 @@ export const login = createAsyncThunk(
         password,
       })
       return response.data
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.log('Login error:', error);
-      const message = error.response?.data?.detail || error.message || 'Login failed'
-      return rejectWithValue(message)
+      if(axios.isAxiosError(error)) {
+        const message = error.response?.data?.detail || error.message || 'Login failed'
+        return rejectWithValue(message)
+      }
+
+      return rejectWithValue('Login failed')
     }
   }
 )
@@ -65,20 +69,18 @@ export const signup = createAsyncThunk(
         age,
         gender,
       })
-      // Backend returns { message, user } but we need { access_token, user } for auto-login
-      // So we'll need to login after successful registration
-      const loginResponse = await axios.post(`${API_URL}/api/login`, {
-        email,
-        password,
-      })
-      return loginResponse.data
-    } catch (error: any) {
+
+      return response.data
+    } catch (error: unknown) {
       console.log('Signup error:', error);
-      const message = error.response?.data?.detail || error.message || 'Signup failed'
-      return rejectWithValue(message)
-    }
+      if(axios.isAxiosError(error)) {
+        const message = error.response?.data?.detail || error.message || 'Signup failed'
+        return rejectWithValue(message)
+      }
+
+      return rejectWithValue('Signup failed')
   }
-)
+})
 
 export const authslice = createSlice({
     name: 'auth',

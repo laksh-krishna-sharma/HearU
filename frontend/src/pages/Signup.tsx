@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { logout, clearError, login, signup } from '../store/slices/authSlice';
+import { signup } from '../store/slices/authSlice';
 import { useAppDispatch } from '@/hooks/hooks';
+import type { RootState } from '@/store/store';
 
 
 interface FormData {
@@ -22,7 +23,7 @@ interface FormData {
 
 const Signup = () => {
   const dispatch = useAppDispatch();
-  const authState = useSelector((state: any) => state.auth);
+  const authState = useSelector((state: RootState) => state.auth);
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<FormData>({
     firstName: '',
