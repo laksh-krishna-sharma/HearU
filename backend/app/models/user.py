@@ -36,18 +36,16 @@ class User(SQLModel, table=True):
     is_admin: bool = Field(default=False)
     created_at: datetime = Field(
         sa_column=Column(
-            "created_at", 
-            DateTime(timezone=True), 
-            server_default=func.now(), 
-            nullable=False
+            "created_at",
+            DateTime(timezone=True),
+            server_default=func.now(),
+            nullable=False,
         )
     )
 
     chat_sessions: list["ChatSession"] = Relationship(
-        back_populates="user",
-        cascade_delete=True
+        back_populates="user", cascade_delete=True
     )
-
 
     def set_password(self, raw_password: str) -> None:
         """Hash and store password."""
