@@ -1,10 +1,13 @@
 fastapi
 'uvicorn[standard]'
 passlib
-sqlalchemy
+sqlmodel
 pydantic_settings
 pydantic
 jwt
 asyncpg
 'pydantic[email]'
 PyJWT
+google-genai
+httpx
+google-generativeai

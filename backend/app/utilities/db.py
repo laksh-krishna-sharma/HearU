@@ -7,16 +7,14 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
     create_async_engine,
 )
-from sqlalchemy import create_engine
-from sqlalchemy.orm import declarative_base
+from sqlalchemy import create_engine, Engine
 from sqlalchemy.pool import NullPool
+from sqlmodel import SQLModel
 
 from config import settings
 from utilities.logger import logger
 
 log = logger(__name__)
-
-Base = declarative_base()
 
 
 def _make_async_uri(db_uri: str) -> str:
@@ -70,16 +68,16 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
 
 async def init_models(engine: Optional[AsyncEngine] = None) -> None:
     """
-    Create tables for all models that inherit from `Base`.
+    Create tables for all SQLModel models.
     Call at app startup if you want SQLAlchemy to create tables automatically.
     """
     eng = engine or async_engine
     async with eng.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+        await conn.run_sync(SQLModel.metadata.create_all)
     log.info("Database tables created (if they did not exist).")
 
 
-def get_sync_engine(db_uri: Optional[str] = None):
+def get_sync_engine(db_uri: Optional[str] = None) -> Engine:
     """
     Return a synchronous SQLAlchemy Engine. Useful for Alembic or scripts that are sync-only.
     Converts a +asyncpg URI back to a sync form if necessary.

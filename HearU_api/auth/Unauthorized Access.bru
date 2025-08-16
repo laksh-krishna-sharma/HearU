@@ -1,0 +1,23 @@
+meta {
+  name: Unauthorized Access
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{baseUrl}}/api/me
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 401
+  res.body.detail: eq Missing Authorization header
+}
+
+tests {
+  test("Unauthorized access without token", function() {
+    expect(res.getStatus()).to.eq(401);
+    expect(res.getBody().detail).to.eq('Missing Authorization header');
+  });
+}

@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     )
 
     db_uri: str = Field(..., env="DB_URI")
+    gemini_api_key: str = Field(..., env="GEMINI_API_KEY")
     root_path: str = Field("", env="ROOT_PATH")
     logging_level: str = Field("INFO", env="LOGGING_LEVEL")
 

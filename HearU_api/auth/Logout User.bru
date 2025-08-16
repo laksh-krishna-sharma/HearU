@@ -1,0 +1,25 @@
+meta {
+  name: Logout User
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/api/logout
+  body: none
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+assert {
+  res.status: eq 200
+  res.body.message: eq Successfully logged out
+}
+
+tests {
+  test("Logout successful", function() {
+    expect(res.getBody().message).to.eq('Successfully logged out');
+  });
+}

@@ -1,0 +1,33 @@
+meta {
+  name: Send Message
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/chat/{{sessionId}}/message
+  body: json
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+body:json {
+  {
+    "text": "Hello! Can you help me with something?"
+  }
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Message sent and reply received", function() {
+    const response = res.getBody();
+    expect(response).to.have.property('reply');
+    expect(response.reply).to.be.a('string');
+    expect(response.reply.length).to.be.greaterThan(0);
+  });
+}

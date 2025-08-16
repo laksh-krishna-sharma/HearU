@@ -1,0 +1,27 @@
+meta {
+  name: Get Me
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/api/me
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Get current user profile", function() {
+    const user = res.getBody();
+    expect(user).to.have.property('id');
+    expect(user).to.have.property('email');
+    expect(user).to.have.property('name');
+    expect(user).to.have.property('is_admin');
+  });
+}
