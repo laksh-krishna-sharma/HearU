@@ -36,7 +36,9 @@ async def list_blogs(
     limit: int = 10,
     q: Optional[str] = None,
 ) -> Tuple[List[Blog], int]:
-    stmt = select(Blog).options(selectinload(Blog.user)).order_by(Blog.created_at.desc())
+    stmt = (
+        select(Blog).options(selectinload(Blog.user)).order_by(Blog.created_at.desc())
+    )
     if q:
         pattern = f"%{q}%"
         stmt = stmt.where((Blog.title.ilike(pattern)) | (Blog.content.ilike(pattern)))
