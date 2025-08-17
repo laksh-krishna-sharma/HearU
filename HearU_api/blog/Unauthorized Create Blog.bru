@@ -1,0 +1,35 @@
+meta {
+  name: Unauthorized Create Blog
+  type: http
+  seq: 60
+}
+
+post {
+  url: {{baseUrl}}/api/blogs
+  body: json
+}
+
+body:json {
+  {
+    "title": "This should fail",
+    "content": "Trying to create blog without auth",
+    "tags": ["test"]
+  }
+}
+
+# No Authorization header on purpose
+headers {
+  Content-Type: application/json
+}
+
+assert {
+  res.status: eq 401
+}
+
+tests {
+  test("Unauthorized create blocked", function() {
+    const body = res.getBody();
+    // ensure error shape contains message or detail
+    expect(body).to.have.property('detail');
+  });
+}

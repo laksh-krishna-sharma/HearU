@@ -1,0 +1,32 @@
+meta {
+  name: Get Blog
+  type: http
+  seq: 30
+}
+
+get {
+  url: {{baseUrl}}/api/blogs/{{blogId}}
+}
+
+headers {
+  Content-Type: application/json
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Get single blog returns expected BlogOut shape", function() {
+    const body = res.getBody();
+    expect(body).to.have.property('id');
+    expect(body).to.have.property('user_id');
+    expect(body).to.have.property('title');
+    expect(body).to.have.property('content');
+    expect(body).to.have.property('tags');
+    expect(Array.isArray(body.tags)).to.be.true;
+    expect(body).to.have.property('created_at');
+    expect(body).to.have.property('updated_at');
+    expect(body).to.have.property('author_name');
+  });
+}

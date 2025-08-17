@@ -1,0 +1,45 @@
+meta {
+  name: Update Blog
+  type: http
+  seq: 40
+}
+
+put {
+  url: {{baseUrl}}/api/blogs/{{blogId}}
+  body: json
+}
+
+body:json {
+  {
+    "title": "Coping with exam stress (updated)",
+    "content": "Updated content: added 3 practical breathing exercises.",
+    "tags": ["exam", "stress", "breathing"]
+  }
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+  Content-Type: application/json
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Update blog response has complete BlogOut shape", function() {
+    const body = res.getBody();
+    expect(body).to.have.property('id');
+    expect(body).to.have.property('user_id');
+    expect(body).to.have.property('title', "Coping with exam stress (updated)");
+    expect(body).to.have.property('content');
+    expect(body).to.have.property('tags');
+    expect(Array.isArray(body.tags)).to.be.true;
+    expect(body.tags).to.include("breathing");
+    expect(body.tags).to.include("exam");
+    expect(body.tags).to.include("stress");
+    expect(body).to.have.property('created_at');
+    expect(body).to.have.property('updated_at');
+    expect(body).to.have.property('author_name');
+  });
+}
