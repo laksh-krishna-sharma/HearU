@@ -1,0 +1,49 @@
+meta {
+  name: Create Blog
+  type: http
+  seq: 10
+}
+
+post {
+  url: {{baseUrl}}/api/blogs
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "title": "testing",
+    "content": "A short personal piece about dealing with exam anxiety and practical steps.",
+    "tags": ["exam", "stress", "coping"]
+  }
+}
+
+assert {
+  res.status: eq 201
+}
+
+tests {
+  test("Create blog response has BlogOut shape", function() {
+    const body = res.getBody();
+    expect(body).to.have.property('id');
+    expect(body).to.have.property('user_id');
+    expect(body).to.have.property('title', "Coping with exam stress");
+    expect(body).to.have.property('content');
+    expect(body).to.have.property('tags');
+    expect(Array.isArray(body.tags)).to.be.true;
+    expect(body.tags).to.include('exam');
+    expect(body.tags).to.include('stress');
+    expect(body.tags).to.include('coping');
+    expect(body).to.have.property('created_at');
+    expect(body).to.have.property('updated_at');
+    expect(body).to.have.property('author_name');
+  });
+  
+  // Optional: persist blog id for subsequent tests (runner-specific)
+  // e.g. setEnv("blogId", res.getBody().id);
+}

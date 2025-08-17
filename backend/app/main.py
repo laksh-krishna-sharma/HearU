@@ -8,8 +8,11 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from config import settings
 from utilities.logger import logger
+
 from routes.auth.auth import router as auth_router
 from routes.chat.chat import router as chat_router
+from routes.blog.blog import router as blog_router
+
 from utilities.db import init_models, async_session
 from services.auth.auth import create_default_admin_if_missing
 
@@ -51,12 +54,12 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-    allow_origins=["http://localhost:5173", 
-    "http://127.0.0.1:5173"],
+    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
 )
 
 app.include_router(auth_router)
 app.include_router(chat_router)
+app.include_router(blog_router)
 
 
 @app.get("/", tags=["Health"])

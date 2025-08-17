@@ -1,0 +1,40 @@
+meta {
+  name: Get User Blogs
+  type: http
+  seq: 25
+}
+
+get {
+  url: {{baseUrl}}/api/blogs?skip=0&limit=50&q=
+}
+
+headers {
+  Content-Type: application/json
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Returned blogs include at least owner's posts if any", function() {
+    const arr = res.getBody();
+    expect(Array.isArray(arr)).to.be.true;
+  });
+
+  test("Blog items have complete BlogOut schema when present", function() {
+    const arr = res.getBody();
+    if (arr.length > 0) {
+      const first = arr[0];
+      expect(first).to.have.property('id');
+      expect(first).to.have.property('user_id');
+      expect(first).to.have.property('title');
+      expect(first).to.have.property('content');
+      expect(first).to.have.property('tags');
+      expect(Array.isArray(first.tags)).to.be.true;
+      expect(first).to.have.property('created_at');
+      expect(first).to.have.property('updated_at');
+      expect(first).to.have.property('author_name');
+    }
+  });
+}
