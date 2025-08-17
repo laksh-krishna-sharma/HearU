@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from typing import Optional, Dict, Any, TYPE_CHECKING
+from typing import Optional, Dict, Any, TYPE_CHECKING, List
 
 from sqlmodel import SQLModel, Field, Relationship
 from sqlalchemy import Column, LargeBinary, DateTime, func
@@ -8,6 +8,7 @@ from passlib.context import CryptContext
 
 if TYPE_CHECKING:
     from models.chat import ChatSession
+    from models.blog import Blog
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -43,8 +44,12 @@ class User(SQLModel, table=True):
         )
     )
 
-    chat_sessions: list["ChatSession"] = Relationship(
-        back_populates="user", cascade_delete=True
+    chat_sessions: List["ChatSession"] = Relationship(
+        back_populates="user", sa_relationship_kwargs={"cascade": "all, delete-orphan"}
+    )
+
+    blogs: List["Blog"] = Relationship(
+        back_populates="user", sa_relationship_kwargs={"cascade": "all, delete-orphan"}
     )
 
     def set_password(self, raw_password: str) -> None:

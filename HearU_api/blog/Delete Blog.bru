@@ -1,0 +1,25 @@
+meta {
+  name: Delete Blog
+  type: http
+  seq: 50
+}
+
+delete {
+  url: {{baseUrl}}/api/blogs/{{blogId}}
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Delete blog returns success message", function() {
+    const body = res.getBody();
+    expect(body).to.have.property('message');
+    expect(body.message.toLowerCase()).to.include('deleted');
+  });
+}
