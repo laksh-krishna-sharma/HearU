@@ -5,10 +5,10 @@ This Bruno collection contains comprehensive tests for the HearU API endpoints.
 ## Setup
 
 1. **Start the HearU Backend Server**
-   ```bash
-   cd backend
-   uvicorn app.main:app --reload --port 8000
-   ```
+```zsh
+   cd backend/app
+   uv run main.py
+```
 
 2. **Open Bruno**
    - Open Bruno application
@@ -40,10 +40,19 @@ This Bruno collection contains comprehensive tests for the HearU API endpoints.
 5. **Agent Chat Existing Session** - Uses agent endpoint with existing session
 6. **Delete Session** - Deletes the chat session
 
+### Blog Flow
+1. **Create Post** - Creates a new blog post with title and content
+2. **List Posts** - Gets all published blog posts with pagination
+3. **View Post** - Retrieves a specific post by ID
+4. **Edit Post** - Updates an existing post (author/admin only)
+5. **My Posts** - Lists all posts by the authenticated user
+6. **Delete Post** - Removes a blog post (author/admin only)
+
 ### Error Cases
 - **Auth Error Cases** - Tests invalid login credentials
 - **Unauthorized Access** - Tests access without authentication
 - **Chat Error Cases** - Tests non-existent session access
+- **Blog Error Cases** - Tests unauthorized blog creation, invalid post updates, and non-existent post access
 
 ## API Endpoints Covered
 
@@ -64,6 +73,13 @@ This Bruno collection contains comprehensive tests for the HearU API endpoints.
 - `POST /{session_id}/message` - Send message
 - `DELETE /{session_id}` - Delete session
 - `POST /agent` - Agent chat endpoint
+
+### Blog (`/api/blogs`)
+- `POST /` - Create new blog post
+- `GET /` - List all blog posts
+- `GET /{blog_id}` - Get single blog post
+- `PUT /{blog_id}` - Update blog post
+- `DELETE /{blog_id}` - Delete blog post
 
 ## Running Tests
 
