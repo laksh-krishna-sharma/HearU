@@ -55,7 +55,9 @@ async def list_journals(
     )
     if q:
         pattern = f"%{q}%"
-        stmt = stmt.where((Journal.title.ilike(pattern)) | (Journal.content.ilike(pattern)))
+        stmt = stmt.where(
+            (Journal.title.ilike(pattern)) | (Journal.content.ilike(pattern))
+        )
 
     total_stmt = select(func.count()).select_from(stmt.subquery())
     res = await db.execute(stmt.offset(skip).limit(limit))
