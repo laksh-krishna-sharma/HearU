@@ -1,0 +1,24 @@
+meta {
+  name: Get User Journals
+  type: http
+  seq: 25
+}
+
+get {
+  url: {{baseUrl}}/api/journals?skip=0&limit=50&q=
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Returned journals include user's posts if any", function() {
+    const arr = res.getBody();
+    expect(Array.isArray(arr)).to.be.true;
+  });
+}
