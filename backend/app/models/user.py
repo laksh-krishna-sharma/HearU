@@ -9,6 +9,7 @@ from passlib.context import CryptContext
 if TYPE_CHECKING:
     from models.chat import ChatSession
     from models.blog import Blog
+    from models.journal import Journal
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -49,6 +50,10 @@ class User(SQLModel, table=True):
     )
 
     blogs: List["Blog"] = Relationship(
+        back_populates="user", sa_relationship_kwargs={"cascade": "all, delete-orphan"}
+    )
+
+    journals: List["Journal"] = Relationship(
         back_populates="user", sa_relationship_kwargs={"cascade": "all, delete-orphan"}
     )
 
