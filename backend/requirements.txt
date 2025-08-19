@@ -1,6 +1,6 @@
 fastapi
 uvicorn[standard]
-passlib
+passlib[bcrypt]
 sqlalchemy
 pydantic_settings
 pydantic
@@ -11,4 +11,3 @@ google-genai
 httpx
 google-generativeai
 sqlmodel
-bcrypt

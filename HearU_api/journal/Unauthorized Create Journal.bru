@@ -1,0 +1,34 @@
+meta {
+  name: Unauthorized Create Journal
+  type: http
+  seq: 60
+}
+
+post {
+  url: {{baseUrl}}/api/journals
+  body: json
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "title": "Should fail",
+    "content": "Trying to create journal without auth",
+    "tags": ["test"],
+    "entry_date": "2025-02-04T19:30:00Z"
+  }
+}
+
+assert {
+  res.status: eq 401
+}
+
+tests {
+  test("Unauthorized create blocked", function() {
+    const body = res.getBody();
+    expect(body).to.have.property('detail');
+  });
+}
