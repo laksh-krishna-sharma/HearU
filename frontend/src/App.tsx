@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useAppSelector } from './hooks/hooks';
 import Navbar from './components/Navbar';
+import PageTransition from './components/PageTransition';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Signup from './pages/Signup';  
@@ -30,7 +31,8 @@ function App() {
     <Router>
       <div className="min-h-screen bg-ocean-background">
         <Navbar />
-        <Routes>
+        <PageTransition>
+          <Routes>
           {/* Public Routes */}
           <Route path="/" element={
             <PublicRoute>
@@ -70,9 +72,10 @@ function App() {
             </ProtectedRoute>
           } />
           
-          {/* Catch all route */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+            {/* Catch all route */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </PageTransition>
       </div>
     </Router>
   );
