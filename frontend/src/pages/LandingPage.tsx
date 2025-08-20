@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppSelector } from '@/hooks/hooks';
 import { pageTransitions, scrollAnimations, counterAnimation, hoverAnimations, createTimeline } from '../utils/animations';
@@ -25,7 +25,7 @@ const LandingPage = () => {
     // Animate cards with stagger
     const cards = cardsRef.current?.children;
     if (cards) {
-      pageTransitions.staggerIn(cards, 0.5);
+      pageTransitions.staggerIn(Array.from(cards), 0.5);
       
       // Add hover effects to cards
       Array.from(cards).forEach(card => {

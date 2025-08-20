@@ -59,7 +59,7 @@ export const pageTransitions = {
   },
 
   // Stagger animation for multiple elements
-  staggerIn: (elements: string | NodeListOf<Element>, delay = 0) => {
+  staggerIn: (elements: string | NodeListOf<Element> | Element[], delay = 0) => {
     return gsap.fromTo(elements,
       {
         opacity: 0,
@@ -297,7 +297,7 @@ export const scrollAnimations = {
   },
 
   // Stagger reveal on scroll
-  staggerOnScroll: (elements: string | NodeListOf<Element>, options = {}) => {
+  staggerOnScroll: (elements: string | NodeListOf<Element> | Element[], options = {}) => {
     return gsap.fromTo(elements,
       {
         opacity: 0,

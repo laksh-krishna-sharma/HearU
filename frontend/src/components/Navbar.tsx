@@ -2,7 +2,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '@/hooks/hooks';
 import { logout } from '@/store/slices/authSlice';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { pageTransitions, hoverAnimations } from '../utils/animations';
 
 const Navbar = () => {
@@ -10,18 +10,12 @@ const Navbar = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const isAuthenticated = !!access_token && !!user;
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navRef = useRef<HTMLElement>(null);
   const logoRef = useRef<HTMLDivElement>(null);
-  const mobileMenuRef = useRef<HTMLDivElement>(null);
 
   const handleLogout = () => {
     dispatch(logout());
     navigate('/login');
-  };
-
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
   useEffect(() => {

@@ -6,6 +6,7 @@ import type { RootState } from "../store";
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 export interface BlogPost {
+  id?: string;
   title: string;
   content: string;
   tags: string[];

@@ -1,7 +1,7 @@
 
 import { Link } from 'react-router-dom';
 import { useEffect, useRef } from 'react';
-import { pageTransitions, floatingAnimation, createTimeline, scrollAnimations } from '../utils/animations';
+import { pageTransitions, floatingAnimation, createTimeline } from '../utils/animations';
 
 const Hero = () => {
   const heroRef = useRef<HTMLElement>(null);

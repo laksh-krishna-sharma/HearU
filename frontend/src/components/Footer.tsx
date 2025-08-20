@@ -1,10 +1,9 @@
 
 import { useEffect, useRef } from 'react';
-import { scrollAnimations, pageTransitions } from '../utils/animations';
+import { scrollAnimations } from '../utils/animations';
 
 const Footer = () => {
   const footerRef = useRef<HTMLElement>(null);
-  const logoRef = useRef<HTMLDivElement>(null);
   const linksRef = useRef<HTMLDivElement>(null);
   const emergencyRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -16,7 +15,7 @@ const Footer = () => {
     }
 
     if (linksRef.current) {
-      const columns = linksRef.current.children;
+      const columns = Array.from(linksRef.current.children);
       scrollAnimations.staggerOnScroll(columns, {
         start: "top 90%"
       });

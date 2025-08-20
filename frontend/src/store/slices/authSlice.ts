@@ -101,8 +101,11 @@ export const fetchUser = createAsyncThunk(
       console.log('Fetched user:', response.data);
       return response.data;
 
-    } catch (error: any) {
-      return thunkAPI.rejectWithValue(error.response?.data || "Failed to fetch user");
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        return thunkAPI.rejectWithValue(error.response?.data || "Failed to fetch user");
+      }
+      return thunkAPI.rejectWithValue("Failed to fetch user");
     }
   }
 );
