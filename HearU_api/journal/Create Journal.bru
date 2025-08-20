@@ -1,0 +1,50 @@
+meta {
+  name: Create Journal
+  type: http
+  seq: 10
+}
+
+post {
+  url: {{baseUrl}}/api/journals
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "title": "Evening reflections",
+    "content": "Today I felt anxious about exams but tried 4-7-8 breathing. It helped a bit.",
+    "tags": ["exam", "reflection"],
+    "entry_date": "2025-02-04T19:30:00Z"
+  }
+}
+
+assert {
+  res.status: eq 201
+}
+
+tests {
+  test("Create journal response has JournalOut shape", function() {
+    const body = res.getBody();
+    expect(body).to.have.property('id');
+    expect(body).to.have.property('user_id');
+    expect(body).to.have.property('title', "Evening reflections");
+    expect(body).to.have.property('content');
+    expect(body).to.have.property('tags');
+    expect(Array.isArray(body.tags)).to.be.true;
+    expect(body.tags).to.include('exam');
+    expect(body.tags).to.include('reflection');
+    expect(body).to.have.property('entry_date');
+    expect(body).to.have.property('created_at');
+    expect(body).to.have.property('updated_at');
+    expect(body).to.have.property('author_name');
+  });
+
+  // Optional: persist journal id for subsequent tests (runner-specific)
+  // e.g. setEnv("journalId", res.getBody().id);
+}

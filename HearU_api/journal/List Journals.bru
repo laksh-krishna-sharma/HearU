@@ -1,0 +1,36 @@
+meta {
+  name: List Journals
+  type: http
+  seq: 20
+}
+
+get {
+  url: {{baseUrl}}/api/journals?skip=0&limit=10
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("List journals returns array", function() {
+    const body = res.getBody();
+    expect(Array.isArray(body)).to.be.true;
+  });
+
+  test("First journal item has required fields when present", function() {
+    const arr = res.getBody();
+    if (arr.length > 0) {
+      const first = arr[0];
+      expect(first).to.have.property('id');
+      expect(first).to.have.property('title');
+      expect(first).to.have.property('content');
+      expect(first).to.have.property('entry_date');
+      expect(first).to.have.property('created_at');
+    }
+  });
+}
