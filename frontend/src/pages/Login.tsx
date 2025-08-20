@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import {useSelector } from 'react-redux';
 import { login } from '../store/slices/authSlice';
 import type { RootState } from '../store/store'; 
@@ -7,11 +7,19 @@ import { useAppDispatch } from '@/hooks/hooks';
 
 const Login = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const authState = useSelector((state: RootState) => state.auth);
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
+
+  // Redirect to landing page after successful login
+  useEffect(() => {
+    if (authState.user && authState.access_token) {
+      navigate('/landing');
+    }
+  }, [authState.user, authState.access_token, navigate]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
