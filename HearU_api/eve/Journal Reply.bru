@@ -1,0 +1,81 @@
+meta {
+  name: Journal Reply
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/eve/journal-reply
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "journal_id": "{{journalId}}"
+  }
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Eve journal reply successful", function() {
+    const body = res.getBody();
+    
+    // Check response structure
+    expect(body).to.have.property('message_id');
+    expect(body).to.have.property('text');
+    expect(body).to.have.property('audio_path');
+    expect(body).to.have.property('created_at');
+    
+    // Validate data types
+    expect(body.message_id).to.be.a('string');
+    expect(body.text).to.be.a('string');
+    expect(body.created_at).to.be.a('string');
+    
+    // Check that Eve provided a meaningful response
+    expect(body.text.length).to.be.greaterThan(10);
+    
+    // Audio path should be provided (can be null if TTS failed)
+    if (body.audio_path) {
+      expect(body.audio_path).to.be.a('string');
+    }
+    
+    // Store message ID for potential follow-up tests
+    bru.setVar("eveMessageId", body.message_id);
+    
+    console.log("Eve's reply:", body.text);
+    console.log("Audio path:", body.audio_path);
+  });
+}
+
+docs {
+  # Journal Reply (Feature A)
+  
+  This endpoint generates Eve's supportive voice reply to a journal entry.
+  
+  ## Prerequisites
+  - User must be authenticated (authToken required)
+  - A journal entry must exist (journalId required)
+  
+  ## Flow
+  1. Backend retrieves journal entry and any previous Eve messages
+  2. Context is built from journal content + previous conversation
+  3. Gemini generates a supportive reply
+  4. Reply is converted to speech using TTS
+  5. Both text and audio are stored as EveMessage
+  6. Response includes text, audio path, and metadata
+  
+  ## Expected Response
+  - message_id: UUID of the created EveMessage
+  - text: Eve's supportive response text
+  - audio_path: Path to the generated audio file
+  - created_at: Timestamp of when the reply was created
+}

@@ -104,15 +104,15 @@ class MockTTSAdapter(ITTSAdapter):
 class GeminiTTSAdapter(ITTSAdapter):
     """
     Adapter for Gemini TTS using google.genai (Gemini TTS preview).
-    Requires `google-genai` installed and settings.GEMINI_API_KEY to be set.
+    Requires `google-genai` installed and settings.gemini_api_key to be set.
     The adapter runs blocking genai calls inside asyncio.to_thread to keep async compat.
     """
 
     def __init__(self, *, model: str = "gemini-2.5-flash-preview-tts", sample_rate: int = 24000, sample_width: int = 2):
         if not _HAS_GENAI:
             raise RuntimeError("google-genai is required for GeminiTTSAdapter (install google-genai).")
-        if not getattr(settings, "GEMINI_API_KEY", None):
-            raise RuntimeError("settings.GEMINI_API_KEY must be set to use GeminiTTSAdapter.")
+        if not getattr(settings, "gemini_api_key", None):
+            raise RuntimeError("settings.gemini_api_key must be set to use GeminiTTSAdapter.")
         self._model = model
         self._sample_rate = sample_rate
         self._sample_width = sample_width
@@ -121,7 +121,7 @@ class GeminiTTSAdapter(ITTSAdapter):
 
     def _init_client_sync(self):
         # create client using the key from settings
-        client = genai.Client(api_key=getattr(settings, "GEMINI_API_KEY"))
+        client = genai.Client(api_key=getattr(settings, "gemini_api_key"))
         return client
 
     async def synthesize_to_gcs(

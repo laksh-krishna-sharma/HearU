@@ -1,0 +1,101 @@
+meta {
+  name: Voice Session End with Summary
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/api/eve/voice/end
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "session_id": "{{voiceSessionId}}",
+    "save_summary": true
+  }
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Voice session ended with summary", function() {
+    const body = res.getBody();
+    
+    // Check response structure
+    expect(body).to.have.property('session_id');
+    expect(body).to.have.property('status');
+    expect(body).to.have.property('summary');
+    
+    // Validate data types
+    expect(body.session_id).to.be.a('string');
+    expect(body.status).to.be.a('string');
+    
+    // Validate values
+    expect(body.session_id).to.equal(bru.getVar("voiceSessionId"));
+    expect(body.status).to.equal('ended');
+    
+    // Summary should be provided when save_summary is true
+    // Note: If the session had no messages, summary might be null or empty
+    if (body.summary) {
+      expect(body.summary).to.be.a('string');
+      console.log("Generated summary:", body.summary);
+    } else {
+      console.log("No summary generated (session may have had no conversation)");
+    }
+    
+    console.log("Session ended with summary:", body.session_id);
+    console.log("Status:", body.status);
+  });
+  
+  test("Session ID is valid UUID format", function() {
+    const body = res.getBody();
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    expect(body.session_id).to.match(uuidRegex);
+  });
+}
+
+docs {
+  # Voice Session End with Summary (Feature B)
+  
+  This endpoint ends a voice session and generates a summary before deletion.
+  
+  ## Prerequisites
+  - User must be authenticated (authToken required)
+  - A voice session must exist (voiceSessionId required)
+  
+  ## Flow
+  1. Backend retrieves all session messages
+  2. If messages exist, generates a summary using Gemini
+  3. Session is marked as inactive with end timestamp
+  4. All session messages are deleted (privacy requirement)
+  5. Response includes session details and the generated summary
+  
+  ## Expected Response
+  - session_id: UUID of the ended session
+  - status: "ended" to confirm the operation
+  - summary: Generated summary of the conversation (or null if no messages)
+  
+  ## Summarization
+  The summary includes:
+  - Key topics discussed
+  - User's main concerns or issues
+  - Guidance or suggestions provided by Eve
+  - Overall conversation context
+  
+  ## Data Privacy
+  Even with summarization, all original messages are deleted after
+  the summary is generated. Only the summary text is preserved.
+  
+  ## Note
+  This test uses the same session from previous tests. For meaningful
+  summary generation, ensure some voice turns have been processed first.
+}

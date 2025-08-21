@@ -1,9 +1,11 @@
-from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
+from fastapi import APIRouter, Depends, UploadFile, File, HTTPException, Form
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List
 
 from services.eve.eve import EveService
 from utilities.db import get_db
+from routes.auth.auth import get_current_user
+from models.user import User
 from routes.eve.schema.eve import (
     JournalEveRequest,
     JournalEveResponse,
@@ -21,89 +23,180 @@ from routes.eve.schema.eve import (
     EveMessageResponse,
 )
 
-router = APIRouter(prefix="/eve", tags=["Eve"])
+router = APIRouter(prefix="/api/eve", tags=["Eve"])
 
-# --- Journal Reply ---
+# --- Journal Reply (Feature A) ---
 @router.post("/journal-reply", response_model=JournalEveResponse)
-async def journal_reply(payload: JournalEveRequest, db: AsyncSession = Depends(get_db)):
+async def journal_reply(
+    payload: JournalEveRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Generate Eve's supportive voice reply to a journal entry."""
     service = EveService(db)
-    reply = await service.journal_reply(payload.journal_id)
+    reply = await service.journal_reply(payload.journal_id, current_user)
     if not reply:
         raise HTTPException(status_code=404, detail="Journal not found")
     return reply
 
 
-# --- Voice Session ---
+# --- Voice Session (Feature B) ---
 @router.post("/voice/start", response_model=VoiceSessionStartResponse)
-async def start_voice_session(payload: VoiceSessionStartRequest, db: AsyncSession = Depends(get_db)):
+async def start_voice_session(
+    payload: VoiceSessionStartRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Start a new interactive voice session with Eve."""
     service = EveService(db)
-    return await service.start_voice_session(payload.system_prompt)
+    return await service.start_voice_session(payload.system_prompt, current_user)
 
 
-@router.post("/voice/turn", response_model=VoiceSessionTurnResponse)
+@router.post("/voice/turn/{session_id}", response_model=VoiceSessionTurnResponse)
 async def voice_turn(
-    session_id: int,
+    session_id: str,
     audio: UploadFile = File(...),
     db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
+    """Process a voice turn in an active session."""
     service = EveService(db)
     audio_bytes = await audio.read()
-    return await service.voice_turn(session_id, audio_bytes)
+    result = await service.voice_turn(session_id, audio_bytes, current_user)
+    if not result:
+        raise HTTPException(status_code=404, detail="Session not found or inactive")
+    return result
 
 
 @router.post("/voice/end", response_model=VoiceSessionEndResponse)
-async def end_voice_session(payload: VoiceSessionEndRequest, db: AsyncSession = Depends(get_db)):
+async def end_voice_session(
+    payload: VoiceSessionEndRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """End a voice session with optional summarization."""
     service = EveService(db)
-    return await service.end_voice_session(payload.session_id)
+    result = await service.end_voice_session(
+        payload.session_id, current_user, payload.save_summary
+    )
+    if not result:
+        raise HTTPException(status_code=404, detail="Session not found")
+    return result
 
 
 # --- Journal CRUD ---
 @router.get("/journals", response_model=List[JournalResponse])
-async def list_journals(db: AsyncSession = Depends(get_db)):
-    return await EveService(db).list_journals()
+async def list_journals(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """List user's journals."""
+    service = EveService(db)
+    return await service.list_journals(current_user)
 
 
 @router.get("/journals/{journal_id}", response_model=JournalResponse)
-async def get_journal(journal_id: int, db: AsyncSession = Depends(get_db)):
-    journal = await EveService(db).get_journal(journal_id)
+async def get_journal(
+    journal_id: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Get a specific journal."""
+    service = EveService(db)
+    journal = await service.get_journal(journal_id, current_user)
     if not journal:
         raise HTTPException(status_code=404, detail="Journal not found")
     return journal
 
 
 @router.post("/journals", response_model=JournalResponse)
-async def create_journal(payload: JournalCreateRequest, db: AsyncSession = Depends(get_db)):
-    return await EveService(db).create_journal(payload)
+async def create_journal(
+    payload: JournalCreateRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Create a new journal."""
+    service = EveService(db)
+    return await service.create_journal(payload, current_user)
 
 
 @router.put("/journals/{journal_id}", response_model=JournalResponse)
-async def update_journal(journal_id: int, payload: JournalUpdateRequest, db: AsyncSession = Depends(get_db)):
-    return await EveService(db).update_journal(journal_id, payload)
+async def update_journal(
+    journal_id: str,
+    payload: JournalUpdateRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Update a journal."""
+    service = EveService(db)
+    journal = await service.update_journal(journal_id, payload, current_user)
+    if not journal:
+        raise HTTPException(status_code=404, detail="Journal not found")
+    return journal
 
 
 @router.delete("/journals/{journal_id}")
-async def delete_journal(journal_id: int, db: AsyncSession = Depends(get_db)):
-    await EveService(db).delete_journal(journal_id)
+async def delete_journal(
+    journal_id: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Delete a journal."""
+    service = EveService(db)
+    success = await service.delete_journal(journal_id, current_user)
+    if not success:
+        raise HTTPException(status_code=404, detail="Journal not found")
     return {"status": "deleted"}
 
 
 # --- EveMessage CRUD ---
 @router.get("/journals/{journal_id}/messages", response_model=List[EveMessageResponse])
-async def list_messages(journal_id: int, db: AsyncSession = Depends(get_db)):
-    return await EveService(db).list_messages(journal_id)
+async def list_messages(
+    journal_id: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """List messages for a journal."""
+    service = EveService(db)
+    return await service.list_messages(journal_id, current_user)
 
 
 @router.post("/journals/{journal_id}/messages", response_model=EveMessageResponse)
-async def create_message(journal_id: int, payload: EveMessageCreateRequest, db: AsyncSession = Depends(get_db)):
-    return await EveService(db).create_message(journal_id, payload)
+async def create_message(
+    journal_id: str,
+    payload: EveMessageCreateRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Create a new message."""
+    service = EveService(db)
+    return await service.create_message(journal_id, payload, current_user)
 
 
 @router.put("/messages/{message_id}", response_model=EveMessageResponse)
-async def update_message(message_id: int, payload: EveMessageUpdateRequest, db: AsyncSession = Depends(get_db)):
-    return await EveService(db).update_message(message_id, payload)
+async def update_message(
+    message_id: str,
+    payload: EveMessageUpdateRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Update a message."""
+    service = EveService(db)
+    message = await service.update_message(message_id, payload, current_user)
+    if not message:
+        raise HTTPException(status_code=404, detail="Message not found")
+    return message
 
 
 @router.delete("/messages/{message_id}")
-async def delete_message(message_id: int, db: AsyncSession = Depends(get_db)):
-    await EveService(db).delete_message(message_id)
+async def delete_message(
+    message_id: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Delete a message."""
+    service = EveService(db)
+    success = await service.delete_message(message_id, current_user)
+    if not success:
+        raise HTTPException(status_code=404, detail="Message not found")
     return {"status": "deleted"}

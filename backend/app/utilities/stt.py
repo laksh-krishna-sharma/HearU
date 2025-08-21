@@ -7,7 +7,7 @@ from config import settings
 
 class SpeechToText:
     def __init__(self):
-        self.client = genai.Client(api_key=settings.GEMINI_API_KEY)
+        self.client = genai.Client(api_key=settings.gemini_api_key)
 
     def transcribe_from_bytes(
         self, audio_bytes: bytes, mime_type: str = "audio/mp3", prompt: Optional[str] = None
@@ -25,7 +25,7 @@ class SpeechToText:
         )
 
         response = self.client.models.generate_content(
-            model="gemini-2.5-flash",
+            model=settings.stt_model,
             contents=contents,
         )
 
@@ -36,7 +36,7 @@ class SpeechToText:
         myfile = self.client.files.upload(file=file_path)
 
         response = self.client.models.generate_content(
-            model="gemini-2.5-flash",
+            model=settings.stt_model,
             contents=[prompt, myfile],
         )
         return response.text
