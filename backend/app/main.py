@@ -13,6 +13,7 @@ from routes.auth.auth import router as auth_router
 from routes.chat.chat import router as chat_router
 from routes.blog.blog import router as blog_router
 from routes.journal.journal import router as journal_router
+from routes.eve.eve import router as eve_router
 
 from utilities.db import init_models, async_session
 from services.auth.auth import create_default_admin_if_missing
@@ -62,6 +63,7 @@ app.include_router(auth_router)
 app.include_router(chat_router)
 app.include_router(blog_router)
 app.include_router(journal_router)
+app.include_router(eve_router)
 
 
 @app.get("/", tags=["Health"])

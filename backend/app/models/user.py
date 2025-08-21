@@ -10,6 +10,7 @@ if TYPE_CHECKING:
     from models.chat import ChatSession
     from models.blog import Blog
     from models.journal import Journal
+    from models.eve import EveSession, EveMessage
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -54,6 +55,12 @@ class User(SQLModel, table=True):
     )
 
     journals: List["Journal"] = Relationship(
+        back_populates="user", sa_relationship_kwargs={"cascade": "all, delete-orphan"}
+    )
+    eve_sessions: List["EveSession"] = Relationship(
+        back_populates="user", sa_relationship_kwargs={"cascade": "all, delete-orphan"}
+    )
+    eve_messages: List["EveMessage"] = Relationship(
         back_populates="user", sa_relationship_kwargs={"cascade": "all, delete-orphan"}
     )
 
