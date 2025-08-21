@@ -1,0 +1,88 @@
+meta {
+  name: Voice Session End
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/eve/voice/end
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "session_id": "{{voiceSessionId}}",
+    "save_summary": false
+  }
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Voice session ended successfully", function() {
+    const body = res.getBody();
+    
+    // Check response structure
+    expect(body).to.have.property('session_id');
+    expect(body).to.have.property('status');
+    
+    // Validate data types
+    expect(body.session_id).to.be.a('string');
+    expect(body.status).to.be.a('string');
+    
+    // Validate values
+    expect(body.session_id).to.equal(bru.getVar("voiceSessionId"));
+    expect(body.status).to.equal('ended');
+    
+    // Summary should be null when save_summary is false
+    if (body.hasOwnProperty('summary')) {
+      expect(body.summary).to.be.null;
+    }
+    
+    console.log("Session ended:", body.session_id);
+    console.log("Status:", body.status);
+  });
+  
+  test("Session ID matches the one being ended", function() {
+    const body = res.getBody();
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    expect(body.session_id).to.match(uuidRegex);
+  });
+}
+
+docs {
+  # Voice Session End (Feature B)
+  
+  This endpoint ends an active voice session without saving a summary.
+  
+  ## Prerequisites
+  - User must be authenticated (authToken required)
+  - An active voice session must exist (voiceSessionId required)
+  
+  ## Flow
+  1. Backend marks the session as inactive
+  2. Session end timestamp is recorded
+  3. All session messages are deleted (privacy requirement)
+  4. Response confirms the session has been ended
+  
+  ## Expected Response
+  - session_id: UUID of the ended session
+  - status: "ended" to confirm the operation
+  - summary: null (since save_summary is false)
+  
+  ## Data Privacy
+  When a session ends, all associated messages are permanently deleted
+  from the database to ensure user privacy. This cannot be undone.
+  
+  ## Note
+  This test uses save_summary: false. For testing with summarization,
+  see the "Voice Session End with Summary" test.
+}

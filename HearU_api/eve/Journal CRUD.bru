@@ -1,0 +1,64 @@
+meta {
+  name: Journal CRUD
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/api/eve/journals
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("List journals successful", function() {
+    const body = res.getBody();
+    
+    // Response should be an array
+    expect(Array.isArray(body)).to.be.true;
+    
+    console.log("Found", body.length, "journals");
+    
+    // If journals exist, validate structure
+    if (body.length > 0) {
+      const journal = body[0];
+      expect(journal).to.have.property('id');
+      expect(journal).to.have.property('user_id');
+      expect(journal).to.have.property('title');
+      expect(journal).to.have.property('content');
+      expect(journal).to.have.property('created_at');
+      
+      // Store first journal ID for other tests
+      bru.setVar("eveJournalId", journal.id);
+    }
+  });
+}
+
+docs {
+  # Journal CRUD via Eve API
+  
+  This endpoint lists all journals for the authenticated user through the Eve API.
+  
+  ## Prerequisites
+  - User must be authenticated (authToken required)
+  
+  ## Expected Response
+  Array of journal objects, each containing:
+  - id: UUID of the journal
+  - user_id: UUID of the journal owner
+  - title: Journal title
+  - content: Journal content
+  - created_at: Creation timestamp
+  - updated_at: Last update timestamp (optional)
+  
+  ## Note
+  This is part of the Eve API's journal management capabilities,
+  separate from the main journal endpoints but with the same data.
+}

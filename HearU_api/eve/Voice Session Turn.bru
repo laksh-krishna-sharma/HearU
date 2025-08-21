@@ -1,0 +1,110 @@
+meta {
+  name: Voice Session Turn
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/eve/voice/turn/{{voiceSessionId}}
+  body: multipartForm
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+body:multipart-form {
+  audio: @file(./sample-audio.wav)
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Voice turn processed successfully", function() {
+    const body = res.getBody();
+    
+    // Check response structure
+    expect(body).to.have.property('user_message_id');
+    expect(body).to.have.property('eve_message_id');
+    expect(body).to.have.property('user_text');
+    expect(body).to.have.property('eve_text');
+    expect(body).to.have.property('audio_path');
+    expect(body).to.have.property('created_at');
+    
+    // Validate data types
+    expect(body.user_message_id).to.be.a('string');
+    expect(body.eve_message_id).to.be.a('string');
+    expect(body.user_text).to.be.a('string');
+    expect(body.eve_text).to.be.a('string');
+    expect(body.created_at).to.be.a('string');
+    
+    // Validate message IDs are different
+    expect(body.user_message_id).to.not.equal(body.eve_message_id);
+    
+    // Check that both messages have meaningful content
+    expect(body.user_text.length).to.be.greaterThan(0);
+    expect(body.eve_text.length).to.be.greaterThan(10);
+    
+    // Audio path should be provided for Eve's response
+    if (body.audio_path) {
+      expect(body.audio_path).to.be.a('string');
+    }
+    
+    // Store message IDs for potential follow-up tests
+    bru.setVar("lastUserMessageId", body.user_message_id);
+    bru.setVar("lastEveMessageId", body.eve_message_id);
+    
+    console.log("User said:", body.user_text);
+    console.log("Eve replied:", body.eve_text);
+    console.log("Audio path:", body.audio_path);
+  });
+  
+  test("Message IDs are valid UUID format", function() {
+    const body = res.getBody();
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    expect(body.user_message_id).to.match(uuidRegex);
+    expect(body.eve_message_id).to.match(uuidRegex);
+  });
+}
+
+docs {
+  # Voice Session Turn (Feature B)
+  
+  This endpoint processes a voice turn in an active session.
+  
+  ## Prerequisites
+  - User must be authenticated (authToken required)
+  - An active voice session must exist (voiceSessionId required)
+  - Audio file must be provided in the request
+  
+  ## Flow
+  1. Client uploads user's voice recording as multipart form data
+  2. Backend converts speech to text using STT (Gemini)
+  3. User text is added to session context with conversation history
+  4. Gemini generates contextual reply based on system prompt + history
+  5. Eve's reply is converted to speech using TTS
+  6. Both user and Eve messages are stored in the session
+  7. Response includes transcribed text, Eve's reply, and audio path
+  
+  ## Expected Response
+  - user_message_id: UUID of the user's message
+  - eve_message_id: UUID of Eve's response message
+  - user_text: Transcribed text from the user's audio
+  - eve_text: Eve's contextual response
+  - audio_path: Path to Eve's response audio file
+  - created_at: Timestamp of when the turn was processed
+  
+  ## Audio File Requirements
+  - Supported formats: WAV, MP3, M4A, etc.
+  - Reasonable file size (typically under 10MB)
+  - Clear audio quality for better STT results
+  
+  ## Note on Testing
+  Since this requires audio upload, you'll need to:
+  1. Place a sample audio file (sample-audio.wav) in the same directory
+  2. Or modify the @file() path to point to an existing audio file
+  3. The audio should contain clear speech for testing STT functionality
+}
