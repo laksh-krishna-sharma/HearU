@@ -2,17 +2,17 @@ from typing import Dict, List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from utilities.db import get_db
-from routes.auth.auth import get_current_user
-from models.user import User
-from services.journal.journal import (
+from app.utilities.db import get_db
+from app.routes.auth.auth import get_current_user
+from app.models.user import User
+from app.services.journal.journal import (
     create_journal,
     get_journal,
     list_journals,
     update_journal,
     delete_journal,
 )
-from routes.journal.schema.journal import JournalCreate, JournalUpdate, JournalOut
+from app.routes.journal.schema.journal import JournalCreate, JournalUpdate, JournalOut
 
 router = APIRouter(prefix="/api/journals", tags=["journals"])
 

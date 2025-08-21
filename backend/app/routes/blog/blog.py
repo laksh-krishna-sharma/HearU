@@ -3,19 +3,19 @@ from fastapi import APIRouter, Depends, HTTPException, status, Query
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from utilities.db import get_db
+from app.utilities.db import get_db
 
 # reuse auth dependency from your existing auth router
-from routes.auth.auth import get_current_user
-from models.user import User
-from services.blog.blog import (
+from app.routes.auth.auth import get_current_user
+from app.models.user import User
+from app.services.blog.blog import (
     create_blog,
     get_blog,
     list_blogs,
     update_blog,
     delete_blog,
 )
-from routes.blog.schema.blog import BlogCreate, BlogUpdate, BlogOut
+from app.routes.blog.schema.blog import BlogCreate, BlogUpdate, BlogOut
 
 router = APIRouter(prefix="/api/blogs", tags=["blogs"])
 

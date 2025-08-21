@@ -2,7 +2,7 @@ from typing import List
 from google import genai
 import os
 
-from models.eve import EveSession
+from app.models.eve import EveSession
 
 
 class GeminiService:

@@ -2,11 +2,11 @@ from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List, Dict
 
-from services.eve.eve import EveService
-from utilities.db import get_db
-from routes.auth.auth import get_current_user
-from models.user import User
-from routes.eve.schema.eve import (
+from app.services.eve.eve import EveService
+from app.utilities.db import get_db
+from app.routes.auth.auth import get_current_user
+from app.models.user import User
+from app.routes.eve.schema.eve import (
     JournalEveRequest,
     JournalEveResponse,
     VoiceSessionStartRequest,
@@ -77,7 +77,9 @@ async def end_voice_session(
     """End a voice session with optional summarization."""
     service = EveService(db)
     result = await service.end_voice_session(
-        payload.session_id, current_user, payload.save_summary
+        payload.session_id,
+        current_user,
+        payload.save_summary or False,  # ensure strict bool
     )
     if not result:
         raise HTTPException(status_code=404, detail="Session not found")

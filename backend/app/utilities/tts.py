@@ -9,7 +9,7 @@ import base64
 from typing import Optional, Dict, Any, Callable
 
 # Import config settings (assumes you have app/config.py exposing `settings`)
-from config import settings
+from app.config import settings
 
 # genai client for Gemini TTS
 try:

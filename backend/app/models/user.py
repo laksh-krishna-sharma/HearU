@@ -7,10 +7,10 @@ from sqlalchemy import Column, LargeBinary, DateTime, func
 from passlib.context import CryptContext
 
 if TYPE_CHECKING:
-    from models.chat import ChatSession
-    from models.blog import Blog
-    from models.journal import Journal
-    from models.eve import EveSession, EveMessage
+    from app.models.chat import ChatSession
+    from app.models.blog import Blog
+    from app.models.journal import Journal
+    from app.models.eve import EveSession, EveMessage
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

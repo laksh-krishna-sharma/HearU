@@ -1,19 +1,19 @@
 from typing import Optional, List
-from sqlalchemy import select, delete
+from sqlalchemy import select, delete, desc, asc
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from datetime import datetime
 import asyncio
 import os
 
-from models.eve import EveMessage, EveSession, EveRole
-from models.journal import Journal
-from models.user import User
-from utilities.tts import TTSResult, GeminiTTSAdapter
-from utilities.stt import SpeechToText
-from services.llm.gemini import GeminiService
-from config import settings
-from routes.eve.schema.eve import (
+from app.models.eve import EveMessage, EveSession, EveRole
+from app.models.journal import Journal
+from app.models.user import User
+from app.utilities.tts import TTSResult, GeminiTTSAdapter
+from app.utilities.stt import SpeechToText
+from app.services.llm.gemini import GeminiService
+from app.config import settings
+from app.routes.eve.schema.eve import (
     JournalEveResponse,
     VoiceSessionStartResponse,
     VoiceSessionTurnResponse,
@@ -236,7 +236,7 @@ class EveService:
         stmt = (
             select(Journal)
             .where(Journal.user_id == user.id)
-            .order_by(Journal.created_at.desc())
+            .order_by(desc(Journal.created_at))
         )
         result = await self.db.execute(stmt)
         journals = result.scalars().all()
@@ -350,7 +350,7 @@ class EveService:
         stmt = (
             select(EveMessage)
             .where(EveMessage.journal_id == journal_id, EveMessage.user_id == user.id)
-            .order_by(EveMessage.created_at.asc())
+            .order_by(asc(EveMessage.created_at))
         )
         result = await self.db.execute(stmt)
         messages = result.scalars().all()

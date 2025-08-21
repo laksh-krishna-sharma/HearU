@@ -6,8 +6,8 @@ from sqlmodel import SQLModel, Field, Relationship
 from sqlalchemy import Column, DateTime, func, Text
 
 if TYPE_CHECKING:
-    from models.user import User
-    from models.eve import EveMessage
+    from app.models.user import User
+    from app.models.eve import EveMessage
 
 
 def gen_uuid() -> str:

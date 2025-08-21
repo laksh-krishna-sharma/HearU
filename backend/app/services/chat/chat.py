@@ -9,12 +9,12 @@ from sqlalchemy import select
 from dotenv import load_dotenv
 import os
 import sys
-from utilities.logger import logger
-from utilities.db import async_session
-from models.chat import ChatSession, Message, Role
-from static_values import SYSTEM_PROMPT
+from app.utilities.logger import logger
+from app.utilities.db import async_session
+from app.models.chat import ChatSession, Message, Role
+from app.static_values import SYSTEM_PROMPT
 
-from config import settings
+from app.config import settings
 
 load_dotenv()
 

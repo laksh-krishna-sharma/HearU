@@ -15,8 +15,8 @@ from sqlalchemy import (
 )
 
 if TYPE_CHECKING:
-    from models.user import User
-    from models.journal import Journal
+    from app.models.user import User
+    from app.models.journal import Journal
 
 
 def gen_uuid() -> str:
