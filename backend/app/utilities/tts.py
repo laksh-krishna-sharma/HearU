@@ -18,8 +18,8 @@ try:
 
     _HAS_GENAI = True
 except Exception:
-    genai = None  # type: ignore
-    genai_types = None  # type: ignore
+    genai = None
+    genai_types = None
     _HAS_GENAI = False
 
 import wave
@@ -86,8 +86,8 @@ class MockTTSAdapter(ITTSAdapter):
             f.write(b"MOCK_TTS\n")
             f.write(text.encode("utf-8")[:16000])
 
-        gcs_path = local_path
-        signed_url = f"file://{local_path}"
+        gcs_path: str = local_path
+        signed_url: Optional[str] = f"file://{local_path}"
         if gcs_uploader:
             try:
                 # run uploader in threadpool if sync
@@ -135,9 +135,9 @@ class GeminiTTSAdapter(ITTSAdapter):
         self._sample_rate = sample_rate
         self._sample_width = sample_width
         # instantiate client lazily (in thread) to avoid import-time side-effects
-        self._client = None
+        self._client: Optional[Any] = None
 
-    def _init_client_sync(self):
+    def _init_client_sync(self) -> Any:
         # create client using the key from settings
         client = genai.Client(api_key=getattr(settings, "gemini_api_key"))
         return client
@@ -164,6 +164,8 @@ class GeminiTTSAdapter(ITTSAdapter):
         # run genai.generate_content in thread to avoid blocking event loop
         def _call_genai() -> Dict[str, Any]:
             # Build the request config similar to your sample
+            if self._client is None:
+                raise RuntimeError("TTS client not initialized")
             response = self._client.models.generate_content(
                 model=self._model,
                 contents=f"Say: {text}",
@@ -236,7 +238,7 @@ class GeminiTTSAdapter(ITTSAdapter):
 
         if gcs_uploader:
             # call uploader in threadpool (uploader is likely sync)
-            def _upload():
+            def _upload() -> str:
                 return gcs_uploader(local_path, object_name)
 
             try:

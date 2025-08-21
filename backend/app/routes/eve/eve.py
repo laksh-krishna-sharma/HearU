@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import List
+from typing import List, Dict
 
 from services.eve.eve import EveService
 from utilities.db import get_db
@@ -31,7 +31,7 @@ async def journal_reply(
     payload: JournalEveRequest,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
-):
+) -> JournalEveResponse:
     """Generate Eve's supportive voice reply to a journal entry."""
     service = EveService(db)
     reply = await service.journal_reply(payload.journal_id, current_user)
@@ -46,7 +46,7 @@ async def start_voice_session(
     payload: VoiceSessionStartRequest,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
-):
+) -> VoiceSessionStartResponse:
     """Start a new interactive voice session with Eve."""
     service = EveService(db)
     return await service.start_voice_session(payload.system_prompt, current_user)
@@ -58,7 +58,7 @@ async def voice_turn(
     audio: UploadFile = File(...),
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
-):
+) -> VoiceSessionTurnResponse:
     """Process a voice turn in an active session."""
     service = EveService(db)
     audio_bytes = await audio.read()
@@ -73,7 +73,7 @@ async def end_voice_session(
     payload: VoiceSessionEndRequest,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
-):
+) -> VoiceSessionEndResponse:
     """End a voice session with optional summarization."""
     service = EveService(db)
     result = await service.end_voice_session(
@@ -89,7 +89,7 @@ async def end_voice_session(
 async def list_journals(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
-):
+) -> List[JournalResponse]:
     """List user's journals."""
     service = EveService(db)
     return await service.list_journals(current_user)
@@ -100,7 +100,7 @@ async def get_journal(
     journal_id: str,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
-):
+) -> JournalResponse:
     """Get a specific journal."""
     service = EveService(db)
     journal = await service.get_journal(journal_id, current_user)
@@ -114,7 +114,7 @@ async def create_journal(
     payload: JournalCreateRequest,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
-):
+) -> JournalResponse:
     """Create a new journal."""
     service = EveService(db)
     return await service.create_journal(payload, current_user)
@@ -126,7 +126,7 @@ async def update_journal(
     payload: JournalUpdateRequest,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
-):
+) -> JournalResponse:
     """Update a journal."""
     service = EveService(db)
     journal = await service.update_journal(journal_id, payload, current_user)
@@ -140,7 +140,7 @@ async def delete_journal(
     journal_id: str,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
-):
+) -> Dict[str, str]:
     """Delete a journal."""
     service = EveService(db)
     success = await service.delete_journal(journal_id, current_user)
@@ -155,7 +155,7 @@ async def list_messages(
     journal_id: str,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
-):
+) -> List[EveMessageResponse]:
     """List messages for a journal."""
     service = EveService(db)
     return await service.list_messages(journal_id, current_user)
@@ -167,7 +167,7 @@ async def create_message(
     payload: EveMessageCreateRequest,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
-):
+) -> EveMessageResponse:
     """Create a new message."""
     service = EveService(db)
     return await service.create_message(journal_id, payload, current_user)
@@ -179,7 +179,7 @@ async def update_message(
     payload: EveMessageUpdateRequest,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
-):
+) -> EveMessageResponse:
     """Update a message."""
     service = EveService(db)
     message = await service.update_message(message_id, payload, current_user)
@@ -193,7 +193,7 @@ async def delete_message(
     message_id: str,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
-):
+) -> Dict[str, str]:
     """Delete a message."""
     service = EveService(db)
     success = await service.delete_message(message_id, current_user)

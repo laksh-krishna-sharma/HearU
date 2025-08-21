@@ -5,7 +5,7 @@ from config import settings
 
 
 class SpeechToText:
-    def __init__(self):
+    def __init__(self) -> None:
         self.client = genai.Client(api_key=settings.gemini_api_key)
 
     def transcribe_from_bytes(
