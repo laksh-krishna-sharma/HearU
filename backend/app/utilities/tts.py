@@ -274,3 +274,90 @@ class GeminiTTSAdapter(ITTSAdapter):
             voice=voice,
             tts_meta=tts_meta,
         )
+
+    async def synthesize_to_local(
+        self,
+        text: str,
+        output_dir: str,
+        *,
+        voice: str = "Kore",
+        language: str = "en-IN",
+        filename_prefix: str = "eve",
+    ) -> TTSResult:
+        """
+        Synthesize speech and save the audio file to a local directory.
+        """
+        # Use the same logic as synthesize_to_gcs to get audio bytes
+        if self._client is None:
+            self._client = await asyncio.to_thread(self._init_client_sync)
+
+        def _call_genai() -> Dict[str, Any]:
+            if self._client is None:
+                raise RuntimeError("TTS client not initialized")
+            response = self._client.models.generate_content(
+                model=self._model,
+                contents=f"Say: {text}",
+                config=genai_types.GenerateContentConfig(
+                    response_modalities=["AUDIO"],
+                    speech_config=genai_types.SpeechConfig(
+                        voice_config=genai_types.VoiceConfig(
+                            prebuilt_voice_config=genai_types.PrebuiltVoiceConfig(
+                                voice_name=voice,
+                            )
+                        ),
+                    ),
+                ),
+            )
+            return {"response": response}
+
+        genai_result = await asyncio.to_thread(_call_genai)
+        response = genai_result["response"]
+        try:
+            candidate = response.candidates[0]
+            parts = candidate.content.parts
+            inline_bytes = None
+            for p in parts:
+                if hasattr(p, "inline_data") and getattr(p.inline_data, "data", None):
+                    inline_bytes = p.inline_data.data
+                    break
+            if inline_bytes is None:
+                raise ValueError("No inline audio data in Gemini response")
+        except Exception as exc:
+            raise RuntimeError(f"Failed to parse Gemini response: {exc}")
+
+        if isinstance(inline_bytes, (bytes, bytearray)):
+            pcm_bytes = bytes(inline_bytes)
+        elif isinstance(inline_bytes, str):
+            try:
+                pcm_bytes = base64.b64decode(inline_bytes)
+            except Exception:
+                pcm_bytes = inline_bytes.encode("utf-8")
+        else:
+            pcm_bytes = bytes(inline_bytes)
+
+        # Ensure output directory exists
+        os.makedirs(output_dir, exist_ok=True)
+        suffix = ".wav"
+        fname = f"{filename_prefix}-{uuid.uuid4().hex[:8]}{suffix}"
+        local_path = os.path.join(output_dir, fname)
+
+        try:
+            wave_file(
+                local_path,
+                pcm_bytes,
+                channels=1,
+                rate=self._sample_rate,
+                sample_width=self._sample_width,
+            )
+        except Exception:
+            with open(local_path, "wb") as wf:
+                wf.write(pcm_bytes)
+
+        return TTSResult(
+            gcs_path=None,
+            signed_url=None,
+            duration_seconds=None,
+            audio_format="wav",
+            voice=voice,
+            tts_meta={"model": self._model, "voice": voice, "local_path": local_path},
+        )

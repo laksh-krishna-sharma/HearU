@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from datetime import datetime
 import asyncio
+import os
 
 from models.eve import EveMessage, EveSession, EveRole
 from models.journal import Journal
@@ -23,6 +24,10 @@ from routes.eve.schema.eve import (
     EveMessageCreateRequest,
     EveMessageUpdateRequest,
     EveMessageResponse,
+)
+
+AUDIO_DIR = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "../../../../audio")
 )
 
 
@@ -59,7 +64,9 @@ class EveService:
         reply_text = await asyncio.to_thread(self.llm.generate_reply, context)
 
         # Convert reply to speech
-        tts_result: TTSResult = await self.tts.synthesize_to_gcs(reply_text)
+        tts_result: TTSResult = await self.tts.synthesize_to_local(
+            reply_text, AUDIO_DIR
+        )
 
         # Store Eve message
         eve_msg = EveMessage(
@@ -67,7 +74,7 @@ class EveService:
             journal_id=journal.id,
             role=EveRole.EVE,
             text=reply_text,
-            audio_path=tts_result.signed_url or tts_result.gcs_path,
+            audio_path=tts_result.tts_meta.get("local_path"),
         )
         self.db.add(eve_msg)
         await self.db.commit()
@@ -164,7 +171,7 @@ class EveService:
             session_id=session.id,
             role=EveRole.EVE,
             text=eve_reply,
-            audio_path=tts_result.signed_url or tts_result.gcs_path,
+            audio_path=tts_result.tts_meta.get("local_path"),
         )
 
         self.db.add_all([user_msg, eve_msg])
