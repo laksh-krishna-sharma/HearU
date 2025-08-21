@@ -4,7 +4,6 @@ import os
 import uuid
 import tempfile
 import dataclasses
-import typing
 import asyncio
 import base64
 from typing import Optional, Dict, Any, Callable
@@ -16,6 +15,7 @@ from config import settings
 try:
     from google import genai
     from google.genai import types as genai_types
+
     _HAS_GENAI = True
 except Exception:
     genai = None  # type: ignore
@@ -51,7 +51,13 @@ class ITTSAdapter(abc.ABC):
 
 
 # helper to write PCM bytes into a WAV file using wave module
-def wave_file(filename: str, pcm_bytes: bytes, channels: int = 1, rate: int = 24000, sample_width: int = 2) -> None:
+def wave_file(
+    filename: str,
+    pcm_bytes: bytes,
+    channels: int = 1,
+    rate: int = 24000,
+    sample_width: int = 2,
+) -> None:
     """
     Write raw PCM bytes to a WAV container.
     Note: the 'pcm_bytes' should be raw PCM (little-endian) matching sample_width and rate.
@@ -85,7 +91,9 @@ class MockTTSAdapter(ITTSAdapter):
         if gcs_uploader:
             try:
                 # run uploader in threadpool if sync
-                gcs_path = await asyncio.get_event_loop().run_in_executor(None, lambda: gcs_uploader(local_path, fname))
+                gcs_path = await asyncio.get_event_loop().run_in_executor(
+                    None, lambda: gcs_uploader(local_path, fname)
+                )
                 # uploader may also generate signed url; we leave signed_url None unless uploader returns something recognizable
                 signed_url = None
             except Exception:
@@ -108,11 +116,21 @@ class GeminiTTSAdapter(ITTSAdapter):
     The adapter runs blocking genai calls inside asyncio.to_thread to keep async compat.
     """
 
-    def __init__(self, *, model: str = "gemini-2.5-flash-preview-tts", sample_rate: int = 24000, sample_width: int = 2):
+    def __init__(
+        self,
+        *,
+        model: str = "gemini-2.5-flash-preview-tts",
+        sample_rate: int = 24000,
+        sample_width: int = 2,
+    ):
         if not _HAS_GENAI:
-            raise RuntimeError("google-genai is required for GeminiTTSAdapter (install google-genai).")
+            raise RuntimeError(
+                "google-genai is required for GeminiTTSAdapter (install google-genai)."
+            )
         if not getattr(settings, "gemini_api_key", None):
-            raise RuntimeError("settings.gemini_api_key must be set to use GeminiTTSAdapter.")
+            raise RuntimeError(
+                "settings.gemini_api_key must be set to use GeminiTTSAdapter."
+            )
         self._model = model
         self._sample_rate = sample_rate
         self._sample_width = sample_width
@@ -200,8 +218,14 @@ class GeminiTTSAdapter(ITTSAdapter):
         local_path = os.path.join(tempfile.gettempdir(), fname)
 
         try:
-            wave_file(local_path, pcm_bytes, channels=1, rate=self._sample_rate, sample_width=self._sample_width)
-        except Exception as exc:
+            wave_file(
+                local_path,
+                pcm_bytes,
+                channels=1,
+                rate=self._sample_rate,
+                sample_width=self._sample_width,
+            )
+        except Exception:
             # As a fallback, just write raw bytes to file
             with open(local_path, "wb") as wf:
                 wf.write(pcm_bytes)
@@ -219,7 +243,9 @@ class GeminiTTSAdapter(ITTSAdapter):
                 gcs_path_or_url = await asyncio.to_thread(_upload)
                 # Accept either a gs:// path or a signed URL or object name
                 # If uploader returns signed URL string, set signed_url; else set gcs_path
-                if isinstance(gcs_path_or_url, str) and gcs_path_or_url.startswith("http"):
+                if isinstance(gcs_path_or_url, str) and gcs_path_or_url.startswith(
+                    "http"
+                ):
                     signed_url = gcs_path_or_url
                     gcs_path = None
                 else:
@@ -235,7 +261,7 @@ class GeminiTTSAdapter(ITTSAdapter):
             meta_error = {}
 
         tts_meta = {"model": self._model, "voice": voice}
-        if 'meta_error' in locals():
+        if "meta_error" in locals():
             tts_meta.update(meta_error)
 
         return TTSResult(

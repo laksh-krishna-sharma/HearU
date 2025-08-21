@@ -44,9 +44,9 @@ class Journal(SQLModel, table=True):
     )
 
     eve_messages: List["EveMessage"] = Relationship(
-        back_populates="journal", sa_relationship_kwargs={"cascade": "all, delete-orphan"}
+        back_populates="journal",
+        sa_relationship_kwargs={"cascade": "all, delete-orphan"},
     )
-
 
     # Relationship back to User
     user: Optional["User"] = Relationship(back_populates="journals")

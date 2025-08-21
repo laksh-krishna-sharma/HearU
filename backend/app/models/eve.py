@@ -33,6 +33,7 @@ class EveSession(SQLModel, table=True):
     Represents an interactive voice session with Eve.
     Stores a system prompt and linked message history.
     """
+
     __tablename__ = "eve_sessions"
 
     id: str = Field(default_factory=gen_uuid, primary_key=True, max_length=36)
@@ -47,13 +48,13 @@ class EveSession(SQLModel, table=True):
     )
 
     # Keep prompt required (nullable handled at Column)
-    system_prompt: str = Field(
-        sa_column=Column(Text, nullable=False)
-    )
+    system_prompt: str = Field(sa_column=Column(Text, nullable=False))
     is_active: bool = Field(default=True)
 
     created_at: datetime = Field(
-        sa_column=Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+        sa_column=Column(
+            DateTime(timezone=True), server_default=func.now(), nullable=False
+        )
     )
     ended_at: Optional[datetime] = Field(default=None)
 
@@ -75,6 +76,7 @@ class EveMessage(SQLModel, table=True):
       - a Journal (one-shot reply context), or
       - an EveSession (interactive voice chat).
     """
+
     __tablename__ = "eve_messages"
 
     id: str = Field(default_factory=gen_uuid, primary_key=True, max_length=36)
@@ -95,7 +97,7 @@ class EveMessage(SQLModel, table=True):
             ForeignKey("journals.id", ondelete="SET NULL"),
             index=True,
             nullable=True,
-        )
+        ),
     )
 
     # Session link is optional; if session is deleted, cascade delete messages at relationship level
@@ -107,7 +109,7 @@ class EveMessage(SQLModel, table=True):
             ForeignKey("eve_sessions.id", ondelete="SET NULL"),
             index=True,
             nullable=True,
-        )
+        ),
     )
 
     # Role constrained at app level via Enum; stored as short string
@@ -117,15 +119,15 @@ class EveMessage(SQLModel, table=True):
     )
 
     # Required text body
-    text: str = Field(
-        sa_column=Column(Text, nullable=False)
-    )
+    text: str = Field(sa_column=Column(Text, nullable=False))
 
     # Optional pointer to audio asset (GCS signed URL, gs:// path, or local path)
     audio_path: Optional[str] = Field(default=None, max_length=512)
 
     created_at: datetime = Field(
-        sa_column=Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+        sa_column=Column(
+            DateTime(timezone=True), server_default=func.now(), nullable=False
+        )
     )
 
     # Relationships

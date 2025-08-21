@@ -5,6 +5,7 @@ from datetime import datetime
 
 # -------------------- Journal --------------------
 
+
 class JournalBase(BaseModel):
     title: str
     content: str
@@ -46,6 +47,7 @@ class JournalEveResponse(BaseModel):
 
 # -------------------- Voice Session --------------------
 
+
 class VoiceSessionStartRequest(BaseModel):
     system_prompt: str
 
@@ -83,6 +85,7 @@ class VoiceSessionEndResponse(BaseModel):
 
 # -------------------- Voice Session CRUD --------------------
 
+
 class VoiceSessionResponse(BaseModel):
     id: str
     user_id: str
@@ -100,6 +103,7 @@ class VoiceSessionListResponse(BaseModel):
 
 
 # -------------------- Eve Message --------------------
+
 
 class EveMessageCreateRequest(BaseModel):
     text: str

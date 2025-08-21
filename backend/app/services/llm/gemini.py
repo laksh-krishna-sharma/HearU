@@ -1,9 +1,8 @@
 from typing import List
 from google import genai
-from google.genai import types
 import os
 
-from models.eve import EveSession, EveMessage
+from models.eve import EveSession
 
 
 class GeminiService:

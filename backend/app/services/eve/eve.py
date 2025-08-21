@@ -1,5 +1,5 @@
-from typing import Optional, List, Tuple
-from sqlalchemy import select, update, delete
+from typing import Optional, List
+from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from datetime import datetime
@@ -8,7 +8,7 @@ import asyncio
 from models.eve import EveMessage, EveSession, EveRole
 from models.journal import Journal
 from models.user import User
-from utilities.tts import ITTSAdapter, TTSResult, GeminiTTSAdapter
+from utilities.tts import TTSResult, GeminiTTSAdapter
 from utilities.stt import SpeechToText
 from services.llm.gemini import GeminiService
 from config import settings
@@ -36,7 +36,9 @@ class EveService:
         self.stt = SpeechToText()
 
     # ---------- Journal → Eve (one-shot voice reply) ----------
-    async def journal_reply(self, journal_id: str, user: User) -> Optional[JournalEveResponse]:
+    async def journal_reply(
+        self, journal_id: str, user: User
+    ) -> Optional[JournalEveResponse]:
         """Generate Eve's supportive reply to a journal entry."""
         # Get journal with existing Eve messages
         stmt = (
@@ -46,7 +48,7 @@ class EveService:
         )
         result = await self.db.execute(stmt)
         journal = result.scalar_one_or_none()
-        
+
         if not journal:
             return None
 
@@ -84,20 +86,22 @@ class EveService:
         for msg in sorted(journal.eve_messages, key=lambda x: x.created_at):
             role_name = "User" if msg.role == EveRole.USER else "Eve"
             previous_messages.append(f"{role_name}: {msg.text}")
-        
+
         context_parts = [
             f"Journal Title: {journal.title}",
             f"Journal Content: {journal.content}",
         ]
-        
+
         if previous_messages:
             context_parts.append("Previous conversation:")
             context_parts.extend(previous_messages)
-        
+
         return "\n".join(context_parts)
 
     # ---------- Interactive voice session ----------
-    async def start_voice_session(self, system_prompt: str, user: User) -> VoiceSessionStartResponse:
+    async def start_voice_session(
+        self, system_prompt: str, user: User
+    ) -> VoiceSessionStartResponse:
         """Start a new voice session."""
         session = EveSession(
             user_id=user.id,
@@ -115,7 +119,9 @@ class EveService:
             created_at=session.created_at,
         )
 
-    async def voice_turn(self, session_id: str, audio_bytes: bytes, user: User) -> Optional[VoiceSessionTurnResponse]:
+    async def voice_turn(
+        self, session_id: str, audio_bytes: bytes, user: User
+    ) -> Optional[VoiceSessionTurnResponse]:
         """Process a voice turn in an active session."""
         # Get active session
         stmt = (
@@ -124,12 +130,12 @@ class EveService:
             .where(
                 EveSession.id == session_id,
                 EveSession.user_id == user.id,
-                EveSession.is_active == True,
+                EveSession.is_active,
             )
         )
         result = await self.db.execute(stmt)
         session = result.scalar_one_or_none()
-        
+
         if not session:
             return None
 
@@ -185,12 +191,12 @@ class EveService:
             .where(
                 EveSession.id == session_id,
                 EveSession.user_id == user.id,
-                EveSession.is_active == True,
+                EveSession.is_active,
             )
         )
         result = await self.db.execute(stmt)
         session = result.scalar_one_or_none()
-        
+
         if not session:
             return None
 
@@ -203,12 +209,12 @@ class EveService:
         # Mark session as ended and delete messages (as per requirements)
         session.is_active = False
         session.ended_at = datetime.utcnow()
-        
+
         # Delete all messages associated with this session
         await self.db.execute(
             delete(EveMessage).where(EveMessage.session_id == session_id)
         )
-        
+
         await self.db.commit()
 
         return VoiceSessionEndResponse(
@@ -220,10 +226,14 @@ class EveService:
     # ---------- Journal CRUD (simplified for Eve context) ----------
     async def list_journals(self, user: User) -> List[JournalResponse]:
         """List user's journals."""
-        stmt = select(Journal).where(Journal.user_id == user.id).order_by(Journal.created_at.desc())
+        stmt = (
+            select(Journal)
+            .where(Journal.user_id == user.id)
+            .order_by(Journal.created_at.desc())
+        )
         result = await self.db.execute(stmt)
         journals = result.scalars().all()
-        
+
         return [
             JournalResponse(
                 id=j.id,
@@ -236,15 +246,19 @@ class EveService:
             for j in journals
         ]
 
-    async def get_journal(self, journal_id: str, user: User) -> Optional[JournalResponse]:
+    async def get_journal(
+        self, journal_id: str, user: User
+    ) -> Optional[JournalResponse]:
         """Get a specific journal."""
-        stmt = select(Journal).where(Journal.id == journal_id, Journal.user_id == user.id)
+        stmt = select(Journal).where(
+            Journal.id == journal_id, Journal.user_id == user.id
+        )
         result = await self.db.execute(stmt)
         journal = result.scalar_one_or_none()
-        
+
         if not journal:
             return None
-            
+
         return JournalResponse(
             id=journal.id,
             user_id=journal.user_id,
@@ -254,7 +268,9 @@ class EveService:
             updated_at=journal.updated_at,
         )
 
-    async def create_journal(self, payload: JournalCreateRequest, user: User) -> JournalResponse:
+    async def create_journal(
+        self, payload: JournalCreateRequest, user: User
+    ) -> JournalResponse:
         """Create a new journal."""
         journal = Journal(
             user_id=user.id,
@@ -264,7 +280,7 @@ class EveService:
         self.db.add(journal)
         await self.db.commit()
         await self.db.refresh(journal)
-        
+
         return JournalResponse(
             id=journal.id,
             user_id=journal.user_id,
@@ -274,23 +290,27 @@ class EveService:
             updated_at=journal.updated_at,
         )
 
-    async def update_journal(self, journal_id: str, payload: JournalUpdateRequest, user: User) -> Optional[JournalResponse]:
+    async def update_journal(
+        self, journal_id: str, payload: JournalUpdateRequest, user: User
+    ) -> Optional[JournalResponse]:
         """Update a journal."""
-        stmt = select(Journal).where(Journal.id == journal_id, Journal.user_id == user.id)
+        stmt = select(Journal).where(
+            Journal.id == journal_id, Journal.user_id == user.id
+        )
         result = await self.db.execute(stmt)
         journal = result.scalar_one_or_none()
-        
+
         if not journal:
             return None
-            
+
         if payload.title is not None:
             journal.title = payload.title
         if payload.content is not None:
             journal.content = payload.content
-            
+
         await self.db.commit()
         await self.db.refresh(journal)
-        
+
         return JournalResponse(
             id=journal.id,
             user_id=journal.user_id,
@@ -302,19 +322,23 @@ class EveService:
 
     async def delete_journal(self, journal_id: str, user: User) -> bool:
         """Delete a journal."""
-        stmt = select(Journal).where(Journal.id == journal_id, Journal.user_id == user.id)
+        stmt = select(Journal).where(
+            Journal.id == journal_id, Journal.user_id == user.id
+        )
         result = await self.db.execute(stmt)
         journal = result.scalar_one_or_none()
-        
+
         if not journal:
             return False
-            
+
         await self.db.delete(journal)
         await self.db.commit()
         return True
 
     # ---------- Eve Message CRUD ----------
-    async def list_messages(self, journal_id: str, user: User) -> List[EveMessageResponse]:
+    async def list_messages(
+        self, journal_id: str, user: User
+    ) -> List[EveMessageResponse]:
         """List messages for a journal."""
         stmt = (
             select(EveMessage)
@@ -323,7 +347,7 @@ class EveService:
         )
         result = await self.db.execute(stmt)
         messages = result.scalars().all()
-        
+
         return [
             EveMessageResponse(
                 id=m.id,
@@ -338,7 +362,9 @@ class EveService:
             for m in messages
         ]
 
-    async def create_message(self, journal_id: str, payload: EveMessageCreateRequest, user: User) -> EveMessageResponse:
+    async def create_message(
+        self, journal_id: str, payload: EveMessageCreateRequest, user: User
+    ) -> EveMessageResponse:
         """Create a new message."""
         message = EveMessage(
             user_id=user.id,
@@ -349,7 +375,7 @@ class EveService:
         self.db.add(message)
         await self.db.commit()
         await self.db.refresh(message)
-        
+
         return EveMessageResponse(
             id=message.id,
             user_id=message.user_id,
@@ -361,21 +387,25 @@ class EveService:
             created_at=message.created_at,
         )
 
-    async def update_message(self, message_id: str, payload: EveMessageUpdateRequest, user: User) -> Optional[EveMessageResponse]:
+    async def update_message(
+        self, message_id: str, payload: EveMessageUpdateRequest, user: User
+    ) -> Optional[EveMessageResponse]:
         """Update a message."""
-        stmt = select(EveMessage).where(EveMessage.id == message_id, EveMessage.user_id == user.id)
+        stmt = select(EveMessage).where(
+            EveMessage.id == message_id, EveMessage.user_id == user.id
+        )
         result = await self.db.execute(stmt)
         message = result.scalar_one_or_none()
-        
+
         if not message:
             return None
-            
+
         if payload.text is not None:
             message.text = payload.text
-            
+
         await self.db.commit()
         await self.db.refresh(message)
-        
+
         return EveMessageResponse(
             id=message.id,
             user_id=message.user_id,
@@ -389,13 +419,15 @@ class EveService:
 
     async def delete_message(self, message_id: str, user: User) -> bool:
         """Delete a message."""
-        stmt = select(EveMessage).where(EveMessage.id == message_id, EveMessage.user_id == user.id)
+        stmt = select(EveMessage).where(
+            EveMessage.id == message_id, EveMessage.user_id == user.id
+        )
         result = await self.db.execute(stmt)
         message = result.scalar_one_or_none()
-        
+
         if not message:
             return False
-            
+
         await self.db.delete(message)
         await self.db.commit()
         return True

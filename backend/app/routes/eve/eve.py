@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, UploadFile, File, HTTPException, Form
+from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List
 
@@ -11,7 +11,6 @@ from routes.eve.schema.eve import (
     JournalEveResponse,
     VoiceSessionStartRequest,
     VoiceSessionStartResponse,
-    VoiceSessionTurnRequest,
     VoiceSessionTurnResponse,
     VoiceSessionEndRequest,
     VoiceSessionEndResponse,
@@ -24,6 +23,7 @@ from routes.eve.schema.eve import (
 )
 
 router = APIRouter(prefix="/api/eve", tags=["Eve"])
+
 
 # --- Journal Reply (Feature A) ---
 @router.post("/journal-reply", response_model=JournalEveResponse)
