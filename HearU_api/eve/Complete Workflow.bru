@@ -1,0 +1,73 @@
+meta {
+  name: Complete Workflow
+  type: http
+  seq: 11
+}
+
+post {
+  url: {{baseUrl}}/api/journals
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "title": "Workflow Test Journal",
+    "content": "I'm testing the complete Eve workflow. I feel a bit nervous about whether all the features will work together properly. This journal entry is specifically for testing Eve's response capabilities.",
+    "tags": ["test", "workflow", "eve"],
+    "entry_date": "2025-08-21T08:39:40Z"
+  }
+}
+
+assert {
+  res.status: eq 201
+}
+
+tests {
+  test("Workflow test journal created", function() {
+    const body = res.getBody();
+    
+    expect(body).to.have.property('id');
+    expect(body).to.have.property('title', 'Workflow Test Journal');
+    
+    // Store journal ID for workflow testing
+    bru.setVar("workflowJournalId", body.id);
+    
+    console.log("Created workflow test journal:", body.id);
+    console.log("Journal title:", body.title);
+  });
+}
+
+docs {
+  # Complete Eve Workflow Test
+  
+  This test creates a journal specifically for testing the complete Eve workflow.
+  
+  ## Workflow Steps:
+  1. Create a journal entry (this test)
+  2. Generate Eve's reply to the journal
+  3. Start a voice session
+  4. Have a voice conversation
+  5. End the session with summary
+  6. Verify all data is properly stored/cleaned up
+  
+  ## Test Journal Content
+  The journal content is designed to be suitable for Eve's supportive responses
+  and to test the context-building capabilities.
+  
+  ## Next Steps
+  After running this test:
+  1. Run "Journal Reply" with the created journal
+  2. Run the voice session workflow tests
+  3. Verify that all features work together seamlessly
+  
+  ## Success Criteria
+  - Journal created successfully
+  - Journal ID stored for subsequent tests
+  - Content is appropriate for Eve's AI processing
+}

@@ -4,15 +4,15 @@ from typing import Optional, List, Any
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
-from utilities.db import get_db
-from services.auth.auth import (
+from app.utilities.db import get_db
+from app.services.auth.auth import (
     register_user,
     authenticate_user,
     create_default_admin_if_missing,
 )
-from utilities.jwt import create_access_token, decode_token, revoke_jti
-from models.user import User
-from routes.auth.schema.auth import RegisterRequest, LoginRequest, UserOut
+from app.utilities.jwt import create_access_token, decode_token, revoke_jti
+from app.models.user import User
+from app.routes.auth.schema.auth import RegisterRequest, LoginRequest, UserOut
 
 router = APIRouter(prefix="/api", tags=["auth"])
 
@@ -131,7 +131,7 @@ async def me(current_user: User = Depends(get_current_user)) -> UserOut:
 async def list_users(
     admin: User = Depends(admin_required), db: AsyncSession = Depends(get_db)
 ) -> List[UserOut]:
-    stmt = select(User).where(User.is_admin.is_(False))
+    stmt = select(User).where(getattr(User.is_admin, "is_")(False))
     res = await db.execute(stmt)
     users = res.scalars().all()
     return [UserOut(**u.to_dict()) for u in users]

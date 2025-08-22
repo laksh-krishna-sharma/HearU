@@ -16,5 +16,9 @@ class Settings(BaseSettings):
     root_path: str = Field("", env="ROOT_PATH")
     logging_level: str = Field("INFO", env="LOGGING_LEVEL")
 
+    # TTS/STT settings
+    tts_model: str = Field("gemini-2.5-flash-preview-tts", env="TTS_MODEL")
+    stt_model: str = Field("gemini-2.5-flash", env="STT_MODEL")
+
 
 settings = Settings()
