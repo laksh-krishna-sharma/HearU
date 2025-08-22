@@ -172,11 +172,7 @@ const Login = () => {
           )}
 
           {/* Crisis Support Notice */}
-          <div className="mt-6 p-4 bg-ocean-accent bg-opacity-10 rounded-lg border border-ocean-accent border-opacity-20">
-            <p className="text-sm text-ocean-text text-center">
-              <span className="font-semibold text-ocean-accent">In crisis?</span> Call 988 or text "HELLO" to 741741
-            </p>
-          </div>
+
 
           {/* Sign up link */}
           <div className="mt-6 text-center">

@@ -411,11 +411,7 @@ const Signup = () => {
           )}
 
           {/* Crisis Support Notice */}
-          <div className="mt-6 p-4 bg-ocean-primary bg-opacity-10 rounded-lg border border-ocean-primary border-opacity-20">
-            <p className="text-sm text-ocean-text text-center">
-              <span className="font-semibold text-ocean-primary">Need immediate help?</span> Call 988 or text "HELLO" to 741741
-            </p>
-          </div>
+
 
           {/* Login link */}
           <div className="mt-6 text-center">
