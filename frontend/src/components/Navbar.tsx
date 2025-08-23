@@ -46,7 +46,7 @@ const Navbar = () => {
   return (
     <nav ref={navRef} className="bg-ocean-navbar px-4 py-4 shadow-sm opacity-0">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <Link to={isAuthenticated ? "/landing" : "/"} className="flex items-center">
+        <Link to={isAuthenticated ? "/journal" : "/"} className="flex items-center">
           <div ref={logoRef} className="text-2xl md:text-3xl font-bold text-ocean-text hover:opacity-80 transition-all duration-300">
             <span className="text-ocean-primary">Hear</span>
             <span className="text-ocean-secondary">U</span>
@@ -60,10 +60,22 @@ const Navbar = () => {
             <div className="hidden md:flex space-x-6">
               <ul className="flex space-x-6">
                 <Link 
+                  to="/journal"
+                  className="nav-link text-ocean-text hover:text-ocean-primary transition-all duration-300 font-medium"
+                >
+                  <li>Journal</li>
+                </Link>
+                <Link 
                   to="/dashboard"
                   className="nav-link text-ocean-text hover:text-ocean-primary transition-all duration-300 font-medium"
                 >
                   <li>Dashboard</li>
+                </Link>
+                <Link 
+                  to="/landing"
+                  className="nav-link text-ocean-text hover:text-ocean-primary transition-all duration-300 font-medium"
+                >
+                  <li>Home</li>
                 </Link>
                 <Link 
                   to="/blogs"
