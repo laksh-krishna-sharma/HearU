@@ -11,3 +11,5 @@ google-genai
 httpx
 google-generativeai
 sqlmodel
+python-multipart
+gunicorn

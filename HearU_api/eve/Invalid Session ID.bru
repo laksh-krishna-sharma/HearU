@@ -1,0 +1,65 @@
+meta {
+  name: Invalid Session ID
+  type: http
+  seq: 10
+}
+
+post {
+  url: {{baseUrl}}/api/eve/voice/end
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "session_id": "00000000-0000-0000-0000-000000000000",
+    "save_summary": false
+  }
+}
+
+assert {
+  res.status: eq 404
+}
+
+tests {
+  test("Invalid session ID returns 404", function() {
+    expect(res.status).to.eq(404);
+    
+    const body = res.getBody();
+    if (body && body.detail) {
+      expect(body.detail).to.contain("not found");
+      console.log("Error message:", body.detail);
+    }
+    
+    console.log("✓ Invalid session ID properly handled with 404");
+  });
+}
+
+docs {
+  # Invalid Session ID Error Test
+  
+  This test verifies that attempting to end a non-existent voice session
+  returns a proper 404 error.
+  
+  ## Test Scenario
+  - Uses a valid UUID format but non-existent session ID
+  - User is authenticated (so it's not a 401 issue)
+  - Should return 404 with appropriate error message
+  
+  ## Expected Behavior
+  - Status: 404 Not Found
+  - Body should include error details about session not found
+  
+  ## Security Note
+  The API should only return 404 for sessions that don't exist OR
+  sessions that belong to other users (to prevent information leakage).
+  
+  ## Coverage
+  This test covers the voice session end endpoint, but similar behavior
+  should be expected for voice/turn endpoint with invalid session IDs.
+}

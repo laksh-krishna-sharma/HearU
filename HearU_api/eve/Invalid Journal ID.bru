@@ -1,0 +1,60 @@
+meta {
+  name: Invalid Journal ID
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{baseUrl}}/api/eve/journal-reply
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "journal_id": "00000000-0000-0000-0000-000000000000"
+  }
+}
+
+assert {
+  res.status: eq 404
+}
+
+tests {
+  test("Invalid journal ID returns 404", function() {
+    expect(res.status).to.eq(404);
+    
+    const body = res.getBody();
+    if (body && body.detail) {
+      expect(body.detail).to.contain("not found");
+      console.log("Error message:", body.detail);
+    }
+    
+    console.log("✓ Invalid journal ID properly handled with 404");
+  });
+}
+
+docs {
+  # Invalid Journal ID Error Test
+  
+  This test verifies that attempting to get an Eve reply for a non-existent
+  journal returns a proper 404 error.
+  
+  ## Test Scenario
+  - Uses a valid UUID format but non-existent journal ID
+  - User is authenticated (so it's not a 401 issue)
+  - Should return 404 with appropriate error message
+  
+  ## Expected Behavior
+  - Status: 404 Not Found
+  - Body should include error details about journal not found
+  
+  ## Security Note
+  The API should only return 404 for journals that don't exist OR
+  journals that belong to other users (to prevent information leakage).
+}

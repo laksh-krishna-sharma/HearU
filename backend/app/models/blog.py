@@ -6,7 +6,7 @@ from sqlmodel import SQLModel, Field, Relationship
 from sqlalchemy import Column, DateTime, func, Text
 
 if TYPE_CHECKING:
-    from models.user import User
+    from app.models.user import User
 
 
 def gen_uuid() -> str:

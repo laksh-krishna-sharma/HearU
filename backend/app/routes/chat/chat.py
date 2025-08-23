@@ -5,13 +5,13 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
-from utilities.db import get_db, async_session
-from routes.auth.auth import get_current_user
-from models.user import User
-from models.chat import Message
-from services.chat.chat import ChatService, GeminiProvider
+from app.utilities.db import get_db, async_session
+from app.routes.auth.auth import get_current_user
+from app.models.user import User
+from app.models.chat import Message
+from app.services.chat.chat import ChatService, GeminiProvider
 
-from .schema.chat import (
+from app.routes.chat.schema.chat import (
     CreateSessionRequest,
     SessionOut,
     SendMessageRequest,
@@ -141,6 +141,7 @@ async def agent_endpoint(
         )
         session_id = cs.id
 
+    assert session_id is not None
     reply = await _chat_service.send_user_message_and_get_reply(
         session_id=session_id, user_text=payload.text
     )

@@ -1,10 +1,10 @@
 from typing import Optional, List, Tuple
-from sqlalchemy import select, func
+from sqlalchemy import select, func, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from models.blog import Blog
-from models.user import User
+from app.models.blog import Blog
+from app.models.user import User
 
 
 async def create_blog(
@@ -36,12 +36,13 @@ async def list_blogs(
     limit: int = 10,
     q: Optional[str] = None,
 ) -> Tuple[List[Blog], int]:
-    stmt = (
-        select(Blog).options(selectinload(Blog.user)).order_by(Blog.created_at.desc())
-    )
+    stmt = select(Blog).options(selectinload(Blog.user)).order_by(desc(Blog.created_at))
     if q:
         pattern = f"%{q}%"
-        stmt = stmt.where((Blog.title.ilike(pattern)) | (Blog.content.ilike(pattern)))
+        stmt = stmt.where(
+            (getattr(Blog.title, "ilike")(pattern))
+            | (getattr(Blog.content, "ilike")(pattern))
+        )
     total_stmt = select(func.count()).select_from(stmt.subquery())
     res = await db.execute(stmt.offset(skip).limit(limit))
     items = res.scalars().all()
@@ -99,7 +100,7 @@ async def delete_blog(db: AsyncSession, *, blog_id: str, user: User) -> bool:
 async def get_user_blogs(
     db: AsyncSession, *, user_id: str, skip: int = 0, limit: int = 10
 ) -> List[Blog]:
-    stmt = select(Blog).where(Blog.user_id == user_id).order_by(Blog.created_at.desc())
+    stmt = select(Blog).where(Blog.user_id == user_id).order_by(desc(Blog.created_at))
     res = await db.execute(stmt.offset(skip).limit(limit))
     items = res.scalars().all()
     return items

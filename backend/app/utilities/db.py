@@ -11,8 +11,8 @@ from sqlalchemy import create_engine, Engine
 from sqlalchemy.pool import NullPool
 from sqlmodel import SQLModel
 
-from config import settings
-from utilities.logger import logger
+from app.config import settings
+from app.utilities.logger import logger
 
 log = logger(__name__)
 
