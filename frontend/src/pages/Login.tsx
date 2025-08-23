@@ -1,59 +1,43 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import {useSelector } from 'react-redux';
-import { login } from '../store/slices/authSlice';
-import type { RootState } from '../store/store'; 
-import { useAppDispatch } from '@/hooks/hooks';
-import { pageTransitions, hoverAnimations, createTimeline } from '../utils/animations';
+import React, { useState, useEffect, useRef } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { login } from "../store/slices/authSlice";
+import type { RootState } from "../store/store";
+import { useAppDispatch } from "@/hooks/hooks";
+import { pageTransitions, hoverAnimations, createTimeline } from "../utils/animations";
 
 const Login = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const authState = useSelector((state: RootState) => state.auth);
-  const [formData, setFormData] = useState({
-    email: '',
-    password: ''
-  });
+
+  const [formData, setFormData] = useState({ email: "", password: "" });
+
   const headerRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLDivElement>(null);
   const submitBtnRef = useRef<HTMLButtonElement>(null);
+  const imageRef = useRef<HTMLDivElement>(null);
 
-  // Redirect to landing page after successful login
+  // Redirect after successful login
   useEffect(() => {
     if (authState.user && authState.access_token) {
-      navigate('/landing');
+      navigate("/landing");
     }
   }, [authState.user, authState.access_token, navigate]);
 
-  // Animations on mount
+  // Animations
   useEffect(() => {
     const tl = createTimeline({ delay: 0.2 });
-    
-    if (headerRef.current && formRef.current) {
+
+    if (headerRef.current && formRef.current && imageRef.current) {
       tl.add(pageTransitions.fadeInUp(headerRef.current, 0))
-        .add(pageTransitions.fadeInScale(formRef.current, 0.2), "-=0.3");
+        .add(pageTransitions.fadeInScale(formRef.current, 0.2), "-=0.3")
+        .add(pageTransitions.fadeInUp(imageRef.current, 0.1), "-=0.2");
     }
 
-    // Add button animations
     if (submitBtnRef.current) {
       hoverAnimations.buttonPress(submitBtnRef.current);
     }
-
-    // Add input focus animations
-    const inputs = document.querySelectorAll('input[type="email"], input[type="password"]');
-    inputs.forEach(input => {
-      input.addEventListener('focus', (e) => {
-        const target = e.target as HTMLElement;
-        target.style.transform = 'scale(1.02)';
-        target.style.boxShadow = '0 0 20px rgba(107, 203, 119, 0.2)';
-      });
-      
-      input.addEventListener('blur', (e) => {
-        const target = e.target as HTMLElement;
-        target.style.transform = 'scale(1)';
-        target.style.boxShadow = 'none';
-      });
-    });
 
     return () => {
       tl.kill();
@@ -61,10 +45,7 @@ const Login = () => {
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -73,118 +54,123 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-ocean-background flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        {/* Header */}
-        <div ref={headerRef} className="text-center opacity-0">
-          <Link to="/" className="inline-block">
-            <div className="text-3xl font-bold text-ocean-text mb-2">
-              <span className="text-ocean-primary">Hear</span>
-              <span className="text-ocean-secondary">U</span>
-            </div>
-          </Link>
-          <h2 className="text-2xl font-semibold text-ocean-text">
-            Welcome back
-          </h2>
-          <p className="mt-2 text-ocean-text opacity-70">
-            Sign in to continue your wellness journey
-          </p>
-        </div>
+    <div className="min-h-screen bg-[#DFD3B6] flex items-center justify-center px-8">
+      <div className="relative max-w-7xl w-full flex items-center justify-between gap-12">
+        
+        {/* Left Side - Form */}
+        <div className="w-full max-w-md xl:max-w-lg space-y-8 z-10">
+          {/* Header */}
+          <div ref={headerRef} className="text-center opacity-0">
+            <Link to="/" className="inline-block">
+              <div className="text-4xl font-bold text-black mb-2">HearU</div>
+            </Link>
+            <h2 className="text-3xl font-semibold text-ocean-text">Welcome back</h2>
+            <p className="mt-2 text-lg text-ocean-text opacity-70">
+              Sign in to continue your wellness journey
+            </p>
+          </div>
 
-        {/* Login Form */}
-        <div ref={formRef} className="bg-white rounded-xl shadow-lg p-8 opacity-0">
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-ocean-text mb-2">
-                Email address
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                value={formData.email}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-ocean-primary focus:border-ocean-primary transition-all duration-300 outline-none"
-                placeholder="Enter your email"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-ocean-text mb-2">
-                Password
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                value={formData.password}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-ocean-primary focus:border-ocean-primary transition-all duration-300 outline-none"
-                placeholder="Enter your password"
-              />
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <input
-                  id="remember-me"
-                  name="remember-me"
-                  type="checkbox"
-                  className="h-4 w-4 text-ocean-primary focus:ring-ocean-primary border-gray-300 rounded"
-                />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-ocean-text">
-                  Remember me
+          {/* Login Form */}
+          <div ref={formRef} className="bg-[#DFD3B6] rounded-xl shadow-lg p-10 opacity-0">
+            <form className="space-y-6" onSubmit={handleSubmit}>
+              {/* Email */}
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-[#6E664E] mb-2">
+                  Email address
                 </label>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="Enter your email"
+                  className="w-full px-5 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-ocean-primary focus:border-ocean-primary transition-all duration-300 outline-none text-base"
+                />
               </div>
 
-              <div className="text-sm">
-                <a href="#" className="text-ocean-primary hover:text-ocean-primary-dark transition-all duration-300">
+              {/* Password */}
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-ocean-text mb-2">
+                  Password
+                </label>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  autoComplete="current-password"
+                  required
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="Enter your password"
+                  className="w-full px-5 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-ocean-primary focus:border-ocean-primary transition-all duration-300 outline-none text-base"
+                />
+              </div>
+
+              {/* Remember + Forgot */}
+              <div className="flex items-center justify-between">
+                <label className="flex items-center text-sm text-ocean-text">
+                  <input
+                    id="remember-me"
+                    name="remember-me"
+                    type="checkbox"
+                    className="h-4 w-4 text-ocean-primary focus:ring-ocean-primary border-gray-300 rounded mr-2"
+                  />
+                  Remember me
+                </label>
+                <a href="#" className="text-ocean-primary hover:text-ocean-primary-dark transition">
                   Forgot your password?
                 </a>
               </div>
-            </div>
 
-            <div>
+              {/* Submit */}
               <button
                 ref={submitBtnRef}
                 type="submit"
-                className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-white font-medium transform transition-all duration-300 ${
-                  authState.loading 
-                    ? 'bg-gray-400 cursor-not-allowed' 
-                    : 'bg-ocean-primary hover:bg-ocean-primary-dark hover:scale-105'
-                }`}
                 disabled={authState.loading}
-                >
-                {authState.loading ? 'Signing in...' : 'Sign in'}
+                className={`w-full flex justify-center py-4 px-4 rounded-lg shadow-sm text-white font-medium transform transition-all duration-300 ${
+                  authState.loading
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-ocean-primary hover:bg-ocean-primary-dark hover:scale-105"
+                }`}
+              >
+                {authState.loading ? "Signing in..." : "Sign in"}
               </button>
+            </form>
+
+            {/* Error */}
+            {authState.error && (
+              <div className="mt-4 p-3 bg-red-100 text-red-700 rounded-lg text-center">
+                {authState.error}
+              </div>
+            )}
+
+            {/* Sign Up */}
+            <div className="mt-6 text-center">
+              <p className="text-sm text-ocean-text">
+                Don’t have an account?{" "}
+                <Link
+                  to="/signup"
+                  className="text-ocean-primary hover:text-ocean-primary-dark font-medium transition"
+                >
+                  Sign up here
+                </Link>
+              </p>
             </div>
-          </form>
-
-          {/* Display error message */}
-          {authState.error && (
-            <div className="mt-4 p-3 bg-red-100 text-red-700 rounded-lg text-center">
-              {authState.error}
-            </div>
-          )}
-
-          {/* Crisis Support Notice */}
-
-
-          {/* Sign up link */}
-          <div className="mt-6 text-center">
-            <p className="text-sm text-ocean-text">
-              Don't have an account?{' '}
-              <Link to="/signup" className="text-ocean-primary hover:text-ocean-primary-dark font-medium transition-all duration-300">
-                Sign up here
-              </Link>
-            </p>
           </div>
         </div>
+
+        
       </div>
+      <div className="absolute right-0 top-0 h-full w-1/2 sm:w-1/3 overflow-hidden pointer-events-none">
+            <img
+              src="/buddhaFace3.jpg"
+              alt="Buddha Face Right"
+              className="h-full w-full object-cover object-left opacity-40 hover:opacity-40 transition-opacity duration-500"
+            />
+          </div>
     </div>
   );
 };

@@ -119,10 +119,10 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen bg-ocean-background flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+    <div className="min-h-screen flex items-center bg-[#DFD3B6] justify-center py-12 px-8 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8 ">
         {/* Header */}
-        <div className="text-center">
+        <div className="text-center items-center justify-between gap-12 relative">
           <Link to="/" className="inline-block">
             <div className="text-3xl font-bold text-ocean-text mb-2">
               <span className="text-ocean-primary">Hear</span>
@@ -423,6 +423,13 @@ const Signup = () => {
             </p>
           </div>
         </div>
+        <div className="absolute right-0 top-0 h-full w-1/2 sm:w-1/3 overflow-hidden pointer-events-none">
+            <img
+              src="/buddhaFace3.jpg"
+              alt="Buddha Face Right"
+              className="h-full w-full object-cover object-left opacity-40 hover:opacity-40 transition-opacity duration-500"
+            />
+          </div>
       </div>
     </div>
   );
