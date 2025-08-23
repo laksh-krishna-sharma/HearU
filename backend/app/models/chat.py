@@ -6,7 +6,7 @@ from sqlmodel import SQLModel, Field, Relationship
 from sqlalchemy import Column, DateTime, Text
 
 if TYPE_CHECKING:
-    from models.user import User
+    from app.models.user import User
 
 
 class Role(str, Enum):

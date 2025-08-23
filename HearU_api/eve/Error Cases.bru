@@ -1,0 +1,55 @@
+meta {
+  name: Error Cases
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/api/eve/journal-reply
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "journal_id": "invalid-journal-id-123"
+  }
+}
+
+assert {
+  res.status: eq 401
+}
+
+tests {
+  test("Unauthorized access returns 401", function() {
+    expect(res.status).to.eq(401);
+    console.log("✓ Unauthorized access properly blocked");
+  });
+}
+
+docs {
+  # Error Cases Testing
+  
+  This file tests various error scenarios for Eve API endpoints.
+  
+  ## Test Cases Covered:
+  1. Unauthorized access (no auth token)
+  2. Invalid journal ID
+  3. Invalid session ID
+  4. Non-existent resources
+  
+  ## Note
+  This is the first test case (unauthorized access).
+  Additional error tests would be added as separate requests
+  to cover different error scenarios.
+  
+  ## Expected Behaviors:
+  - 401 for unauthorized requests
+  - 404 for non-existent resources
+  - 400 for malformed requests
+  - 422 for validation errors
+}

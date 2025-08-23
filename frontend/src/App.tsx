@@ -9,6 +9,8 @@ import Chat from './pages/Chat';
 import Dashboard from './pages/Dashboard';
 import Blogs from './pages/Blogs';
 import LandingPage from './pages/LandingPage';
+import Journal from './pages/Journal';
+import JournalEditor from './pages/JournalEditor';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -18,12 +20,12 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
 };
 
-// Public Route Component (redirects to landing if authenticated)
+// Public Route Component (redirects to journal if authenticated)
 const PublicRoute = ({ children }: { children: React.ReactNode }) => {
   const { access_token, user } = useAppSelector((state) => state.auth);
   const isAuthenticated = !!access_token && !!user;
   
-  return !isAuthenticated ? <>{children}</> : <Navigate to="/landing" replace />;
+  return !isAuthenticated ? <>{children}</> : <Navigate to="/journal" replace />;
 };
 
 function App() {
@@ -69,6 +71,21 @@ function App() {
           <Route path="/chat" element={
             <ProtectedRoute>
               <Chat />
+            </ProtectedRoute>
+          } />
+          <Route path="/journal" element={
+            <ProtectedRoute>
+              <Journal />
+            </ProtectedRoute>
+          } />
+          <Route path="/journal/new" element={
+            <ProtectedRoute>
+              <JournalEditor />
+            </ProtectedRoute>
+          } />
+          <Route path="/journal/edit/:id" element={
+            <ProtectedRoute>
+              <JournalEditor />
             </ProtectedRoute>
           } />
           

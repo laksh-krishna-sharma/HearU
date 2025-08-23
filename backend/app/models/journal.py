@@ -1,12 +1,13 @@
 import uuid
 from datetime import datetime
-from typing import Optional, TYPE_CHECKING
+from typing import List, Optional, TYPE_CHECKING
 
 from sqlmodel import SQLModel, Field, Relationship
 from sqlalchemy import Column, DateTime, func, Text
 
 if TYPE_CHECKING:
-    from models.user import User
+    from app.models.user import User
+    from app.models.eve import EveMessage
 
 
 def gen_uuid() -> str:
@@ -40,6 +41,11 @@ class Journal(SQLModel, table=True):
     updated_at: Optional[datetime] = Field(
         sa_column=Column("updated_at", DateTime(timezone=True), onupdate=func.now()),
         default=None,
+    )
+
+    eve_messages: List["EveMessage"] = Relationship(
+        back_populates="journal",
+        sa_relationship_kwargs={"cascade": "all, delete-orphan"},
     )
 
     # Relationship back to User

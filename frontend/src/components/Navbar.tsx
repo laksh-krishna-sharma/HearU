@@ -142,6 +142,7 @@ const Navbar = ({ showCenterOval = true }: NavbarProps) => {
             >
               Logout
             </Button>
+
           </>
         ) : (
           <>

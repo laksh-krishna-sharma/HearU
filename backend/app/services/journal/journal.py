@@ -1,11 +1,11 @@
 from typing import Optional, List, Tuple
 from datetime import datetime
-from sqlalchemy import select, func
+from sqlalchemy import select, func, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from models.journal import Journal
-from models.user import User
+from app.models.journal import Journal
+from app.models.user import User
 
 
 async def create_journal(
@@ -47,16 +47,22 @@ async def list_journals(
     skip: int = 0,
     limit: int = 10,
     q: Optional[str] = None,
+    user_id: Optional[str] = None,
 ) -> Tuple[List[Journal], int]:
     stmt = (
         select(Journal)
         .options(selectinload(Journal.user))
-        .order_by(Journal.created_at.desc())
+        .order_by(desc(Journal.created_at))
     )
+
+    if user_id:
+        stmt = stmt.where(Journal.user_id == user_id)
+
     if q:
         pattern = f"%{q}%"
         stmt = stmt.where(
-            (Journal.title.ilike(pattern)) | (Journal.content.ilike(pattern))
+            (getattr(Journal.title, "ilike")(pattern))
+            | (getattr(Journal.content, "ilike")(pattern))
         )
 
     total_stmt = select(func.count()).select_from(stmt.subquery())
@@ -128,7 +134,7 @@ async def get_user_journals(
     stmt = (
         select(Journal)
         .where(Journal.user_id == user_id)
-        .order_by(Journal.created_at.desc())
+        .order_by(desc(Journal.created_at))
     )
     res = await db.execute(stmt.offset(skip).limit(limit))
     return res.scalars().all()

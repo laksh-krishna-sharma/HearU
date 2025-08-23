@@ -2,17 +2,17 @@ from typing import Dict, List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from utilities.db import get_db
-from routes.auth.auth import get_current_user
-from models.user import User
-from services.journal.journal import (
+from app.utilities.db import get_db
+from app.routes.auth.auth import get_current_user
+from app.models.user import User
+from app.services.journal.journal import (
     create_journal,
     get_journal,
     list_journals,
     update_journal,
     delete_journal,
 )
-from routes.journal.schema.journal import JournalCreate, JournalUpdate, JournalOut
+from app.routes.journal.schema.journal import JournalCreate, JournalUpdate, JournalOut
 
 router = APIRouter(prefix="/api/journals", tags=["journals"])
 
@@ -49,14 +49,20 @@ async def list_journals_endpoint(
     db: AsyncSession = Depends(get_db),
     skip: int = Query(0, ge=0),
     limit: int = Query(10, ge=1, le=100),
+    current_user: User = Depends(get_current_user),
     q: Optional[str] = Query(None),
 ) -> List[JournalOut]:
-    items, total = await list_journals(db, skip=skip, limit=limit, q=q)
+    items, total = await list_journals(
+        db,
+        skip=skip,
+        limit=limit,
+        q=q,
+        user_id=current_user.id,
+    )
+
     out = []
     for j in items:
-        author_name = None
-        if j.user:
-            author_name = j.user.name or j.user.username
+        author_name = j.user.name or j.user.username if j.user else None
         out.append(
             JournalOut(
                 id=j.id,
