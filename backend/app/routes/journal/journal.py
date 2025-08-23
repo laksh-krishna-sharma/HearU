@@ -79,7 +79,6 @@ async def list_journals_endpoint(
     return out
 
 
-
 @router.get("/{journal_id}", response_model=JournalOut)
 async def get_journal_endpoint(
     journal_id: str, db: AsyncSession = Depends(get_db)

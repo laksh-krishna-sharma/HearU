@@ -47,7 +47,7 @@ async def list_journals(
     skip: int = 0,
     limit: int = 10,
     q: Optional[str] = None,
-    user_id: Optional[int] = None,
+    user_id: Optional[str] = None,
 ) -> Tuple[List[Journal], int]:
     stmt = (
         select(Journal)
@@ -73,7 +73,6 @@ async def list_journals(
     total = total_res.scalar_one()
 
     return items, int(total)
-
 
 
 async def update_journal(
