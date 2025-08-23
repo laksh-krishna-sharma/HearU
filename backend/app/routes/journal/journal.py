@@ -49,14 +49,20 @@ async def list_journals_endpoint(
     db: AsyncSession = Depends(get_db),
     skip: int = Query(0, ge=0),
     limit: int = Query(10, ge=1, le=100),
+    current_user: User = Depends(get_current_user),
     q: Optional[str] = Query(None),
 ) -> List[JournalOut]:
-    items, total = await list_journals(db, skip=skip, limit=limit, q=q)
+    items, total = await list_journals(
+        db,
+        skip=skip,
+        limit=limit,
+        q=q,
+        user_id=current_user.id,
+    )
+
     out = []
     for j in items:
-        author_name = None
-        if j.user:
-            author_name = j.user.name or j.user.username
+        author_name = j.user.name or j.user.username if j.user else None
         out.append(
             JournalOut(
                 id=j.id,

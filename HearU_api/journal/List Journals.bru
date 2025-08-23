@@ -6,6 +6,8 @@ meta {
 
 get {
   url: {{baseUrl}}/api/journals?skip=0&limit=10
+  body: none
+  auth: none
 }
 
 headers {
@@ -21,7 +23,7 @@ tests {
     const body = res.getBody();
     expect(Array.isArray(body)).to.be.true;
   });
-
+  
   test("First journal item has required fields when present", function() {
     const arr = res.getBody();
     if (arr.length > 0) {
