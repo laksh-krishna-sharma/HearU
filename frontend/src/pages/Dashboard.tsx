@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useAppSelector, useAppDispatch } from '@/hooks/hooks';
 import { fetchUser } from '@/store/slices/authSlice';
 

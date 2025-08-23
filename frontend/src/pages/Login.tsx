@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {useSelector } from 'react-redux';
 import { login } from '../store/slices/authSlice';
 import type { RootState } from '../store/store'; 
 import { useAppDispatch } from '@/hooks/hooks';
+import { pageTransitions, hoverAnimations, createTimeline } from '../utils/animations';
 
 const Login = () => {
   const dispatch = useAppDispatch();
@@ -13,6 +14,9 @@ const Login = () => {
     email: '',
     password: ''
   });
+  const headerRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLDivElement>(null);
+  const submitBtnRef = useRef<HTMLButtonElement>(null);
 
   // Redirect to landing page after successful login
   useEffect(() => {
@@ -20,6 +24,41 @@ const Login = () => {
       navigate('/landing');
     }
   }, [authState.user, authState.access_token, navigate]);
+
+  // Animations on mount
+  useEffect(() => {
+    const tl = createTimeline({ delay: 0.2 });
+    
+    if (headerRef.current && formRef.current) {
+      tl.add(pageTransitions.fadeInUp(headerRef.current, 0))
+        .add(pageTransitions.fadeInScale(formRef.current, 0.2), "-=0.3");
+    }
+
+    // Add button animations
+    if (submitBtnRef.current) {
+      hoverAnimations.buttonPress(submitBtnRef.current);
+    }
+
+    // Add input focus animations
+    const inputs = document.querySelectorAll('input[type="email"], input[type="password"]');
+    inputs.forEach(input => {
+      input.addEventListener('focus', (e) => {
+        const target = e.target as HTMLElement;
+        target.style.transform = 'scale(1.02)';
+        target.style.boxShadow = '0 0 20px rgba(107, 203, 119, 0.2)';
+      });
+      
+      input.addEventListener('blur', (e) => {
+        const target = e.target as HTMLElement;
+        target.style.transform = 'scale(1)';
+        target.style.boxShadow = 'none';
+      });
+    });
+
+    return () => {
+      tl.kill();
+    };
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -37,7 +76,7 @@ const Login = () => {
     <div className="min-h-screen bg-ocean-background flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         {/* Header */}
-        <div className="text-center">
+        <div ref={headerRef} className="text-center opacity-0">
           <Link to="/" className="inline-block">
             <div className="text-3xl font-bold text-ocean-text mb-2">
               <span className="text-ocean-primary">Hear</span>
@@ -53,7 +92,7 @@ const Login = () => {
         </div>
 
         {/* Login Form */}
-        <div className="bg-white rounded-xl shadow-lg p-8">
+        <div ref={formRef} className="bg-white rounded-xl shadow-lg p-8 opacity-0">
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-ocean-text mb-2">
@@ -111,11 +150,12 @@ const Login = () => {
 
             <div>
               <button
+                ref={submitBtnRef}
                 type="submit"
-                className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-white font-medium ${
+                className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-white font-medium transform transition-all duration-300 ${
                   authState.loading 
                     ? 'bg-gray-400 cursor-not-allowed' 
-                    : 'bg-ocean-primary hover:bg-ocean-primary-dark'
+                    : 'bg-ocean-primary hover:bg-ocean-primary-dark hover:scale-105'
                 }`}
                 disabled={authState.loading}
                 >

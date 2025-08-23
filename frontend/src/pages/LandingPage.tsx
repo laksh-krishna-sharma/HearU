@@ -1,15 +1,69 @@
-import React from 'react';
+import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppSelector } from '@/hooks/hooks';
+import { pageTransitions, scrollAnimations, counterAnimation, hoverAnimations, createTimeline } from '../utils/animations';
 
 const LandingPage = () => {
   const { user } = useAppSelector((state) => state.auth);
+  const welcomeRef = useRef<HTMLDivElement>(null);
+  const cardsRef = useRef<HTMLDivElement>(null);
+  const statsRef = useRef<HTMLDivElement>(null);
+  const crisisRef = useRef<HTMLDivElement>(null);
+  const counter1Ref = useRef<HTMLDivElement>(null);
+  const counter2Ref = useRef<HTMLDivElement>(null);
+  const counter3Ref = useRef<HTMLDivElement>(null);
+  const counter4Ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Initial page animations
+    const tl = createTimeline({ delay: 0.2 });
+    
+    if (welcomeRef.current) {
+      tl.add(pageTransitions.fadeInUp(welcomeRef.current, 0));
+    }
+
+    // Animate cards with stagger
+    const cards = cardsRef.current?.children;
+    if (cards) {
+      pageTransitions.staggerIn(Array.from(cards), 0.5);
+      
+      // Add hover effects to cards
+      Array.from(cards).forEach(card => {
+        hoverAnimations.lift(card);
+      });
+    }
+
+    // Animate stats section on scroll
+    if (statsRef.current) {
+      scrollAnimations.fadeInOnScroll(statsRef.current);
+      
+      // Animate counters when stats section is in view
+      scrollAnimations.scaleInOnScroll(statsRef.current, {
+        onComplete: () => {
+          // Start counter animations
+          if (counter1Ref.current) counterAnimation(counter1Ref.current, 7, 1);
+          if (counter2Ref.current) counterAnimation(counter2Ref.current, 12, 1.2);
+          if (counter3Ref.current) counterAnimation(counter3Ref.current, 5, 1.4);
+          if (counter4Ref.current) counterAnimation(counter4Ref.current, 85, 1.6);
+        }
+      });
+    }
+
+    // Animate crisis section
+    if (crisisRef.current) {
+      scrollAnimations.fadeInOnScroll(crisisRef.current);
+    }
+
+    return () => {
+      tl.kill();
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-ocean-background">
       <div className="max-w-7xl mx-auto px-4 py-12">
         {/* Welcome Section */}
-        <div className="text-center mb-16">
+        <div ref={welcomeRef} className="text-center mb-16 opacity-0">
           <h1 className="text-4xl md:text-6xl font-bold text-ocean-text mb-6">
             Welcome back, {user?.name || user?.username || 'Friend'}!
           </h1>
@@ -19,7 +73,7 @@ const LandingPage = () => {
         </div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+        <div ref={cardsRef} className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
           <Link 
             to="/dashboard"
             className="group bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-all duration-300 hover:scale-105"
@@ -67,32 +121,32 @@ const LandingPage = () => {
         </div>
 
         {/* Wellness Stats */}
-        <div className="bg-white rounded-xl shadow-lg p-8 mb-16">
+        <div ref={statsRef} className="bg-white rounded-xl shadow-lg p-8 mb-16 opacity-0">
           <h2 className="text-2xl font-bold text-ocean-text mb-6 text-center">
             Your Wellness Journey
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="text-center">
-              <div className="text-3xl font-bold text-ocean-primary mb-2">7</div>
+              <div ref={counter1Ref} className="text-3xl font-bold text-ocean-primary mb-2">0</div>
               <div className="text-sm text-ocean-text opacity-70">Days Active</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-ocean-secondary mb-2">12</div>
+              <div ref={counter2Ref} className="text-3xl font-bold text-ocean-secondary mb-2">0</div>
               <div className="text-sm text-ocean-text opacity-70">Articles Read</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-ocean-accent mb-2">5</div>
+              <div ref={counter3Ref} className="text-3xl font-bold text-ocean-accent mb-2">0</div>
               <div className="text-sm text-ocean-text opacity-70">Chat Sessions</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-ocean-primary mb-2">85%</div>
+              <div ref={counter4Ref} className="text-3xl font-bold text-ocean-primary mb-2">0</div>
               <div className="text-sm text-ocean-text opacity-70">Wellness Score</div>
             </div>
           </div>
         </div>
 
         {/* Crisis Support */}
-        <div className="p-6 bg-ocean-accent bg-opacity-10 rounded-lg border border-ocean-accent border-opacity-20">
+        <div ref={crisisRef} className="p-6 bg-ocean-accent bg-opacity-10 rounded-lg border border-ocean-accent border-opacity-20 opacity-0">
           <p className="text-center text-ocean-text">
             <span className="font-semibold text-ocean-accent">Need immediate help?</span> Call 988 or text "HELLO" to 741741
           </p>
