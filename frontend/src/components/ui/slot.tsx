@@ -7,29 +7,32 @@ interface SlotProps extends React.HTMLAttributes<HTMLElement> {
 const Slot = React.forwardRef<HTMLElement, SlotProps>(
   ({ children, ...props }, ref) => {
     if (React.isValidElement(children)) {
-      // Create a new props object that merges our props with the child's props
-      const newProps: Record<string, any> = { ...props }
-      
-      // Add the ref to the new props
+      // Use Partial<React.HTMLProps<HTMLElement>> so we can safely add `ref`
+      const newProps: Partial<React.HTMLProps<HTMLElement>> = { ...props }
+
       if (ref) {
-        newProps.ref = ref
+        newProps.ref = ref as React.Ref<HTMLElement>
       }
-      
-      // Merge with existing child props, giving precedence to child props
-      if (children.props && typeof children.props === 'object') {
+
+      if (children.props && typeof children.props === "object") {
         Object.assign(newProps, children.props)
       }
-      
+
       return React.cloneElement(children, newProps)
     }
-    
+
     if (React.Children.count(children) > 1) {
       React.Children.only(null)
     }
-    
-    return <span ref={ref as React.Ref<HTMLSpanElement>} {...props}>{children}</span>
+
+    return (
+      <span ref={ref as React.Ref<HTMLSpanElement>} {...props}>
+        {children}
+      </span>
+    )
   }
 )
+
 Slot.displayName = "Slot"
 
 export { Slot }
