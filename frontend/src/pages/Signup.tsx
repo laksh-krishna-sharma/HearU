@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { signup } from '../store/slices/authSlice';
 import { useAppDispatch } from '@/hooks/hooks';
@@ -23,8 +23,16 @@ interface FormData {
 
 const Signup = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const authState = useSelector((state: RootState) => state.auth);
   const [currentStep, setCurrentStep] = useState(1);
+
+  // Redirect to landing page after successful signup
+  useEffect(() => {
+    if (authState.user && authState.access_token) {
+      navigate('/landing');
+    }
+  }, [authState.user, authState.access_token, navigate]);
   const [formData, setFormData] = useState<FormData>({
     firstName: '',
     lastName: '',

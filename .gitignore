@@ -16,7 +16,6 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
 lib64/
 parts/
 sdist/
@@ -250,3 +249,5 @@ out/
 # Misc
 *.log
 
+HearU_api/auth/Get Me.bru
+HearU_api/auth/Login User.bru
