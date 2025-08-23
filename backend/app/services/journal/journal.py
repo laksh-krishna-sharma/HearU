@@ -47,12 +47,17 @@ async def list_journals(
     skip: int = 0,
     limit: int = 10,
     q: Optional[str] = None,
+    user_id: Optional[int] = None,
 ) -> Tuple[List[Journal], int]:
     stmt = (
         select(Journal)
         .options(selectinload(Journal.user))
         .order_by(desc(Journal.created_at))
     )
+
+    if user_id:
+        stmt = stmt.where(Journal.user_id == user_id)
+
     if q:
         pattern = f"%{q}%"
         stmt = stmt.where(
@@ -68,6 +73,7 @@ async def list_journals(
     total = total_res.scalar_one()
 
     return items, int(total)
+
 
 
 async def update_journal(
