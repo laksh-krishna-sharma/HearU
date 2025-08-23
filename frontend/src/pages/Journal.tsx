@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Plus, BookOpen, Calendar } from 'lucide-react';
 import { listJournals } from '@/store/slices/journalSlice';
 import { useAppDispatch, useAppSelector } from '@/hooks/hooks';
+import toast from 'react-hot-toast';
 
 
 
@@ -14,8 +15,14 @@ const Journal: React.FC = () => {
   const {entries, loading, error} = useAppSelector((state) => state.journal);
 
   useEffect(() => {
-    dispatch(listJournals({}));
-  }, [dispatch]);
+    const token = localStorage.getItem('token');
+    if (token) {
+      dispatch(listJournals({}));
+    } else {
+      toast.error('Please log in to view your journals');
+      navigate('/login'); // Redirect to login if no token
+    }
+  }, [dispatch, navigate]);
 
   const handleCreateNew = () => {
     navigate('/journal/new');
@@ -63,7 +70,7 @@ const Journal: React.FC = () => {
           {entries.map((journal) => (
             <Card
               key={journal.id || journal.title} // Fallback to title if id is missing
-              onClick={() => handleOpenJournal(journal.id)}
+              onClick={() => journal.id && handleOpenJournal(journal.id)}
               className="cursor-pointer hover:shadow-lg transition-shadow"
             >
               <CardHeader>
@@ -78,8 +85,9 @@ const Journal: React.FC = () => {
                 </p>
                 <div className="flex items-center gap-2 text-xs text-gray-500">
                   <Calendar className="h-3 w-3" />
-                  <span>Created at {journal.created_at}</span>
-                <span>• Updated at {journal.updated_at}</span>
+                  <span>Created: {journal.created_at ? new Date(journal.created_at).toLocaleDateString() : 'N/A'}</span>
+                  <Calendar className="h-3 w-3" />
+                  <span>Updated: {journal.updated_at ? new Date(journal.updated_at).toLocaleDateString() : 'N/A'}</span>
                 </div>
               </CardContent>
             </Card>

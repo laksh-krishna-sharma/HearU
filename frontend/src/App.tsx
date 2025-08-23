@@ -83,7 +83,7 @@ function App() {
               <JournalEditor />
             </ProtectedRoute>
           } />
-          <Route path="/journal/:id" element={
+          <Route path="/journal/edit/:id" element={
             <ProtectedRoute>
               <JournalEditor />
             </ProtectedRoute>
