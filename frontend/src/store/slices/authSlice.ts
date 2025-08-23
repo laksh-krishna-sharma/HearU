@@ -82,6 +82,35 @@ export const signup = createAsyncThunk(
   }
 })
 
+export const fetchUser = createAsyncThunk(
+  "auth/fetchUser",
+  async (_, thunkAPI) => {
+    try {
+      const token = localStorage.getItem("token"); // or from cookies/sessionStorage
+      
+      if (!token) {
+        return thunkAPI.rejectWithValue("No access token found");
+      }
+
+      const response = await axios.get(`${API_URL}/api/me`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      console.log('Fetched user:', response.data);
+      return response.data;
+
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        return thunkAPI.rejectWithValue(error.response?.data || "Failed to fetch user");
+      }
+      return thunkAPI.rejectWithValue("Failed to fetch user");
+    }
+  }
+);
+
+
 export const authslice = createSlice({
     name: 'auth',
     initialState,
@@ -134,6 +163,17 @@ export const authslice = createSlice({
                 state.loading = false
                 state.error = action.payload as string || 'Signup failed'
                 toast.error(action.payload as string || 'Signup failed')
+            })
+            .addCase(fetchUser.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(fetchUser.fulfilled, (state, action) => {
+                  state.loading = false;
+                  state.user = action.payload;
+            })
+            .addCase(fetchUser.rejected, (state, action) => {
+                  state.loading = false;
+                  state.error = action.payload as string;
             })
     }
 })
