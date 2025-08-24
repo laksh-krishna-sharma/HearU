@@ -1,151 +1,95 @@
+import { Link, useNavigate } from "react-router-dom";
+import { useAppSelector, useAppDispatch } from "@/hooks/hooks";
+import { logout } from "@/store/slices/authSlice";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { TbActivityHeartbeat } from "react-icons/tb";
 
-import { Link, useNavigate } from 'react-router-dom';
-import { useAppSelector, useAppDispatch } from '@/hooks/hooks';
-import { logout } from '@/store/slices/authSlice';
-import { useEffect, useRef } from 'react';
-import { pageTransitions, hoverAnimations } from '../utils/animations';
+interface NavbarProps {
+  showCenterOval?: boolean;
+}
 
-const Navbar = () => {
+const Navbar = ({ showCenterOval = true }: NavbarProps) => {
   const { user, access_token } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const isAuthenticated = !!access_token && !!user;
-  const navRef = useRef<HTMLElement>(null);
-  const logoRef = useRef<HTMLDivElement>(null);
+
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleLogout = () => {
     dispatch(logout());
-    navigate('/login');
+    navigate("/login");
+    setIsMenuOpen(false);
   };
 
-  useEffect(() => {
-    // Animate navbar on mount
-    if (navRef.current) {
-      pageTransitions.slideInLeft(navRef.current, 0);
-    }
-
-    // Add hover animations to interactive elements
-    const buttons = document.querySelectorAll('.nav-button');
-    const links = document.querySelectorAll('.nav-link');
-    
-    buttons.forEach(button => {
-      hoverAnimations.buttonPress(button);
-      hoverAnimations.glow(button);
-    });
-
-    links.forEach(link => {
-      hoverAnimations.lift(link);
-    });
-
-    // Logo hover effect
-    if (logoRef.current) {
-      hoverAnimations.lift(logoRef.current);
-    }
-  }, []);
-
   return (
-    <nav ref={navRef} className="bg-ocean-navbar px-4 py-4 shadow-sm opacity-0">
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <Link to={isAuthenticated ? "/journal" : "/"} className="flex items-center">
-          <div ref={logoRef} className="text-2xl md:text-3xl font-bold text-ocean-text hover:opacity-80 transition-all duration-300">
-            <span className="text-ocean-primary">Hear</span>
-            <span className="text-ocean-secondary">U</span>
-          </div>
-        </Link>
+    <nav className="flex items-center justify-between p-4 md:p-6 bg-gradient-to-r from-[#EBE8D5] via-[#F5F3EA] to-[#DFD3B5] w-full relative">
+      {/* LEFT - Logo */}
+      <Link
+        to={isAuthenticated ? "/landing" : "/"}
+        className="text-xl md:text-2xl font-bold "
+        onClick={() => setIsMenuOpen(false)}
+      >
+        <span className="text-black">HearU</span>
+      </Link>
 
-        {/* Conditional Navigation Links */}
+      {/* CENTER - Voice Assistant Oval */}
+      {showCenterOval && isAuthenticated && (
+        <div className="absolute left-1/2 -translate-x-1/2 hidden md:flex">
+          <div className="w-[20rem] md:w-[30rem] h-10 md:h-12 bg-[#eae9e2] rounded-full flex items-center border border-ocean-primary/30 px-3 gap-3">
+            <button className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center hover:scale-110 transition">
+              <TbActivityHeartbeat className="h-6 w-6" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Hamburger (only mobile) */}
+      {/* <button
+        onClick={() => setIsMenuOpen(!isMenuOpen)}
+        className="md:hidden p-2 text-ocean-primary hover:text-ocean-accent transition z-20"
+        aria-label="Toggle menu"
+      >
+        {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+      </button> */}
+
+      {/* RIGHT - Buttons (shared for desktop & mobile) */}
+      <div
+        className={`${
+          isMenuOpen ? "flex" : "hidden"
+        } absolute top-full left-0 w-full flex-col items-start bg-[#DFD3B6] p-4 gap-3 md:static md:flex md:flex-row md:items-center md:w-auto md:p-0`}
+      >
         {isAuthenticated ? (
           <>
-            {/* Authenticated Navigation */}
-            <div className="hidden md:flex space-x-6">
-              <ul className="flex space-x-6">
-                <Link 
-                  to="/journal"
-                  className="nav-link text-ocean-text hover:text-ocean-primary transition-all duration-300 font-medium"
-                >
-                  <li>Journal</li>
-                </Link>
-                <Link 
-                  to="/dashboard"
-                  className="nav-link text-ocean-text hover:text-ocean-primary transition-all duration-300 font-medium"
-                >
-                  <li>Dashboard</li>
-                </Link>
-                <Link 
-                  to="/landing"
-                  className="nav-link text-ocean-text hover:text-ocean-primary transition-all duration-300 font-medium"
-                >
-                  <li>Home</li>
-                </Link>
-                <Link 
-                  to="/blogs"
-                  className="nav-link text-ocean-text hover:text-ocean-primary transition-all duration-300 font-medium"
-                >
-                  <li>Blogs</li>
-                </Link>
-                <Link 
-                  to="/chat"
-                  className="nav-link text-ocean-text hover:text-ocean-primary transition-all duration-300 font-medium"
-                >
-                  <li>Chat</li>
-                </Link>
-              </ul>
-            </div>
-
-            {/* User Info and Logout */}
-            <div className="flex items-center space-x-3">
-              <span className="hidden md:block text-sm text-ocean-text">
-                Welcome, {user?.name || user?.username || 'User'}
-              </span>
-              <button
-                onClick={handleLogout}
-                className="nav-button px-4 py-2 md:px-6 md:py-2.5 text-sm md:text-base font-medium text-white bg-ocean-accent rounded-lg transition-all duration-300 hover:bg-ocean-accent-dark focus:outline-none focus:ring-2 focus:ring-ocean-accent focus:ring-offset-2"
-              >
-                Logout
-              </button>
-            </div>
+            <span className="text-sm text-ocean-text">
+              Welcome, {user?.name || user?.username || "User"}
+            </span>
+            <Button
+              onClick={handleLogout}
+              className="bg-ocean-accent hover:bg-ocean-accent-dark text-white w-full md:w-auto"
+            >
+              Logout
+            </Button>
           </>
         ) : (
           <>
-            {/* Unauthenticated Navigation */}
-            <div className="hidden md:flex space-x-6">
-              <ul className="flex space-x-6">
-                <Link 
-                  to="/about"
-                  className="nav-link text-ocean-text hover:text-ocean-primary transition-all duration-300 font-medium"
-                >
-                  <li>About Us</li>
-                </Link>
-                <Link 
-                  to="/services"
-                  className="nav-link text-ocean-text hover:text-ocean-primary transition-all duration-300 font-medium"
-                >
-                  <li>Our Services</li>
-                </Link>
-                <Link 
-                  to="/contact"
-                  className="nav-link text-ocean-text hover:text-ocean-primary transition-all duration-300 font-medium"
-                >
-                  <li>Contact Us</li>
-                </Link>
-              </ul>
-            </div>
-
-            {/* Login/Signup Buttons */}
-            <div className="flex items-center space-x-3">
-              <Link 
-                to="/login"
-                className="nav-button px-4 py-2 md:px-6 md:py-2.5 text-sm md:text-base font-medium text-ocean-text border-2 border-ocean-primary rounded-lg transition-all duration-300 hover:bg-ocean-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-ocean-primary focus:ring-offset-2 text-center"
+            <Link to="/login" onClick={() => setIsMenuOpen(false)} className="w-full md:w-auto ">
+              <Button
+                variant="ghost"
+                className="w-full md:w-autotransition text-white hover:text-amber-100 "
               >
                 Login
-              </Link>
-              <Link 
-                to="/signup"
-                className="nav-button px-4 py-2 md:px-6 md:py-2.5 text-sm md:text-base font-medium text-white bg-ocean-accent rounded-lg transition-all duration-300 hover:bg-ocean-accent-dark focus:outline-none focus:ring-2 focus:ring-ocean-accent focus:ring-offset-2 text-center"
+              </Button>
+            </Link>
+            <Link to="/signup" onClick={() => setIsMenuOpen(false)} className="w-full md:w-auto">
+              <Button
+                variant="outline"
+                className="w-full md:w-autotransition text-white hover:text-amber-100"
               >
                 Sign Up
-              </Link>
-            </div>
+              </Button>
+            </Link>
           </>
         )}
       </div>
