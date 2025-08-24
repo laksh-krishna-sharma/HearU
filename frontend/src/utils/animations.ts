@@ -178,7 +178,7 @@ export const hoverAnimations = {
         scale: 1.02,
         duration: DURATION.fast,
         ease: EASING.smooth,
-        boxShadow: "0 10px 30px rgba(0,0,0,0.1)"
+        boxShadow: "0 0px 0px rgba(0,0,0,0)"
       });
     });
 
@@ -188,7 +188,7 @@ export const hoverAnimations = {
         scale: 1,
         duration: DURATION.fast,
         ease: EASING.smooth,
-        boxShadow: "0 4px 15px rgba(0,0,0,0.05)"
+        boxShadow: "0 0px 0px rgba(0,0,0,0)"
       });
     });
   },
