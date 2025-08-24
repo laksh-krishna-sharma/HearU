@@ -1,65 +1,91 @@
-
-import { Link } from 'react-router-dom';
+import { useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom'; // ✅ import navigate
+import { pageTransitions, createTimeline } from '../utils/animations';
+import { TbActivityHeartbeat } from "react-icons/tb";
 
 const Hero = () => {
+  const ovalRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate(); // ✅ init navigate
+
+    useEffect(() => {
+    const tl = createTimeline({ delay: 0.2 });
+    if (ovalRef.current) {
+      tl.add(pageTransitions.fadeInScale(ovalRef.current, 0.3));
+    }
+    return () => {
+      tl.kill();
+    };
+  }, []);
+
+  // ✅ handler for button
+  const handleStartJournaling = () => {
+    navigate("/login");
+  };
+
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Gradient Background with Wave Effect */}
-      <div className="absolute inset-0 bg-gradient-to-br from-ocean-background via-blue-50 to-green-50">
-        <div className="absolute inset-0 opacity-30">
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-ocean-secondary to-ocean-primary rounded-full mix-blend-multiply filter blur-xl animate-wave"></div>
-          <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-gradient-to-r from-ocean-accent to-ocean-primary rounded-full mix-blend-multiply filter blur-xl animate-wave" style={{ animationDelay: '2s' }}></div>
-          <div className="absolute bottom-1/4 left-1/3 w-96 h-96 bg-gradient-to-r from-ocean-secondary to-ocean-accent rounded-full mix-blend-multiply filter blur-xl animate-wave" style={{ animationDelay: '4s' }}></div>
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-        <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-ocean-text mb-6 leading-tight">
-          You're Not Alone in This
-          <span className="block text-ocean-primary mt-2">Journey</span>
+    <section
+      className="h-screen w-full flex flex-col items-center justify-center text-center bg-gradient-to-br from-[#EBE8D5] via-[#F5F3EA] to-[#DFD3B6]  px-4 sm:px-6 lg:px-8 relative overflow-hidden"
+    >
+      {/* Intro */}
+      <div className="mb-4 sm:mb-6 z-10 max-w-[90%] sm:max-w-2xl">
+        <h1 className="text-xl sm:text-2xl md:text-4xl font-semibold text-ocean-text mb-2">
+          Welcome to Your Safe Space
         </h1>
-        
-        <p className="text-lg md:text-xl lg:text-2xl text-ocean-text opacity-80 mb-8 max-w-3xl mx-auto leading-relaxed">
-          HearU is here to support you through difficult times. Connect with caring professionals, 
-          find resources, and discover that healing is possible. Your mental wellness matters.
+        <p className="text-xs sm:text-sm md:text-lg text-ocean-text/80">
+          Meet Eve, your AI companion for mental wellness journaling. 
+          She's here to listen, understand, and support your journey.
         </p>
+      </div>
 
-        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <Link 
-            to="/signup"
-            className="px-8 py-4 md:px-10 md:py-5 text-lg md:text-xl font-semibold text-white bg-ocean-primary rounded-xl transition-all duration-300 hover:bg-ocean-accent hover:scale-105 focus:outline-none focus:ring-4 focus:ring-ocean-primary focus:ring-opacity-50 shadow-lg text-center inline-block"
+      {/* Oval Mic */}
+      <div
+        ref={ovalRef}
+        className="w-[80%] sm:w-[60%] md:w-[50%] h-12 sm:h-14 md:h-16 lg:h-20 bg-[#EBE8D9] rounded-full flex items-center justify-center border border-ocean-primary/30 px-3 sm:px-6 backdrop-blur-sm shadow-2xl opacity-0 z-10"
+      >
+        <button
+          className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center hover:scale-110 duration-200 flex-shrink-0"
+          style={{ 
+            background: 'none',
+            border: 'none',
+            padding: 0,
+            outline: 'none'
+          }}
+        >
+          <TbActivityHeartbeat className="h-16 w-16 "/>
+        </button>
+      </div>
+
+      {/* Text + Buttons */}
+      <div className="mt-4 sm:mt-6 text-center z-10 max-w-[90%] sm:max-w-xl">
+        <p className="text-xs sm:text-sm md:text-base text-ocean-text/80 mb-2 sm:mb-4">
+          Tap to talk with Eve
+        </p>
+        <p className="text-[10px] sm:text-xs md:text-sm text-ocean-text/70 mb-4 sm:mb-6">
+          "Hi there! I'm Eve, your personal wellness companion. 
+          I'm here to help you process your thoughts and support your mental health journey."
+        </p>
+        <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
+          {/* ✅ added onClick */}
+          <button
+            onClick={handleStartJournaling}
+            className="px-4 py-2 sm:px-6 sm:py-2 rounded-xl bg-ocean-primary text-white shadow-lg hover:bg-ocean-accent hover:text-amber-100 transition text-xs sm:text-sm"
           >
-            Get Started Today
-          </Link>
-          
-          <p className="text-sm md:text-base text-ocean-text opacity-70 mt-2 sm:mt-0">
-            Free • Confidential • Available 24/7
-          </p>
-        </div>
-
-        {/* Trust Indicators */}
-        <div className="mt-12 flex flex-wrap justify-center items-center gap-6 text-sm text-ocean-text opacity-60">
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 bg-ocean-primary rounded-full"></div>
-            <span>Licensed Professionals</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 bg-ocean-secondary rounded-full"></div>
-            <span>Crisis Support</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 bg-ocean-accent rounded-full"></div>
-            <span>Youth Focused</span>
-          </div>
+            Start Journaling
+          </button>
+          <button className="px-4 py-2 sm:px-6 sm:py-2 rounded-xl  text-white border border-ocean-primary/40 shadow hover:bg-ocean-primary/10 hover:text-amber-100 transition text-xs sm:text-sm">
+            View Past Entries
+          </button>
         </div>
       </div>
 
-      {/* Scroll Indicator */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
-        <div className="w-6 h-10 border-2 border-ocean-primary rounded-full flex justify-center">
-          <div className="w-1 h-3 bg-ocean-primary rounded-full mt-2 animate-bounce"></div>
-        </div>
+      {/* Buddha Image Right Side */}
+      <div className="absolute right-0 top-0 h-full w-1/2 sm:w-1/3 pointer-events-none z-0">
+        <img
+          src="/buddhaFace3.jpg"
+          alt="Buddha Face Right"
+          className="h-full w-full object-cover object-left opacity-45"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#EBE8D5] via-transparent to-transparent" />
       </div>
     </section>
   );

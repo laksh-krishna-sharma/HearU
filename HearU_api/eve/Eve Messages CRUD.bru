@@ -1,0 +1,128 @@
+meta {
+  name: Eve Messages CRUD
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{baseUrl}}/api/eve/journals/{{journalId}}/messages
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("List Eve messages for journal successful", function() {
+    const body = res.getBody();
+    
+    // Response should be an array
+    expect(Array.isArray(body)).to.be.true;
+    
+    console.log("Found", body.length, "Eve messages for journal");
+    
+    // If messages exist, validate structure
+    if (body.length > 0) {
+      const message = body[0];
+      expect(message).to.have.property('id');
+      expect(message).to.have.property('user_id');
+      expect(message).to.have.property('journal_id');
+      expect(message).to.have.property('role');
+      expect(message).to.have.property('text');
+      expect(message).to.have.property('created_at');
+      
+      // Validate data types
+      expect(message.id).to.be.a('string');
+      expect(message.user_id).to.be.a('string');
+      expect(message.journal_id).to.be.a('string');
+      expect(message.role).to.be.a('string');
+      expect(message.text).to.be.a('string');
+      expect(message.created_at).to.be.a('string');
+      
+      // Validate role values
+      expect(['user', 'eve']).to.include(message.role);
+      
+      // Audio path should exist for Eve messages
+      if (message.role === 'eve' && message.audio_path) {
+        expect(message.audio_path).to.be.a('string');
+      }
+      
+      // Store message ID for potential follow-up tests
+      bru.setVar("eveMessageId", message.id);
+      
+      console.log("Sample message role:", message.role);
+      console.log("Sample message text:", message.text.substring(0, 50) + "...");
+    }
+  });
+  
+  test("Messages are ordered chronologically", function() {
+    const body = res.getBody();
+    
+    if (body.length > 1) {
+      // Check that messages are in ascending order by created_at
+      for (let i = 1; i < body.length; i++) {
+        const prev = new Date(body[i-1].created_at);
+        const curr = new Date(body[i].created_at);
+        expect(curr.getTime()).to.be.at.least(prev.getTime());
+      }
+      console.log("✓ Messages are properly ordered chronologically");
+    }
+  });
+  
+  test("Journal ID matches in all messages", function() {
+    const body = res.getBody();
+    const expectedJournalId = bru.getVar("journalId");
+    
+    body.forEach(message => {
+      if (message.journal_id) {
+        expect(message.journal_id).to.equal(expectedJournalId);
+      }
+    });
+    
+    if (body.length > 0) {
+      console.log("✓ All messages belong to the correct journal");
+    }
+  });
+}
+
+docs {
+  # Eve Messages CRUD
+  
+  This endpoint retrieves all Eve messages associated with a specific journal.
+  
+  ## Prerequisites
+  - User must be authenticated (authToken required)
+  - A journal must exist (journalId required)
+  
+  ## Expected Response
+  Array of EveMessage objects, each containing:
+  - id: UUID of the message
+  - user_id: UUID of the message owner
+  - journal_id: UUID of the associated journal
+  - session_id: UUID of the session (null for journal messages)
+  - role: "user" or "eve"
+  - text: Message content
+  - audio_path: Path to audio file (for Eve messages, optional)
+  - created_at: Creation timestamp
+  
+  ## Message Flow
+  For journal-based conversations:
+  1. User creates journal entry
+  2. Eve generates reply (via journal-reply endpoint)
+  3. Eve's message is stored with journal_id
+  4. This endpoint retrieves the conversation history
+  
+  ## Message Ordering
+  Messages are returned in chronological order (ascending by created_at)
+  to maintain conversation flow.
+  
+  ## Note
+  This endpoint only returns messages associated with journals.
+  Voice session messages are handled separately and are deleted
+  when sessions end.
+}

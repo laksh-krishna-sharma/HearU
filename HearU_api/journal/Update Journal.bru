@@ -1,0 +1,40 @@
+meta {
+  name: Update Journal
+  type: http
+  seq: 40
+}
+
+put {
+  url: {{baseUrl}}/api/journals/{{journalId}}
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "title": "Evening reflections (updated)",
+    "content": "Updated content: added breathing exercises and gratitude list.",
+    "tags": ["exam", "gratitude"],
+    "entry_date": "2025-02-04T19:30:00Z"
+  }
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Update journal response verifies updated fields", function() {
+    const body = res.getBody();
+    expect(body).to.have.property('id', "{{journalId}}");
+    expect(body).to.have.property('title', "Evening reflections (updated)");
+    expect(body).to.have.property('content');
+    expect(body.tags).to.include("breathing");
+    expect(body.tags).to.include("gratitude");
+  });
+}

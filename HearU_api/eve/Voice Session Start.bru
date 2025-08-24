@@ -1,0 +1,87 @@
+meta {
+  name: Voice Session Start
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/eve/voice/start
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "system_prompt": "You are Eve, a supportive AI companion. Help the user work through their thoughts and feelings with empathy and understanding. Be caring, non-judgmental, and provide thoughtful guidance when appropriate."
+  }
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Voice session started successfully", function() {
+    const body = res.getBody();
+    
+    // Check response structure
+    expect(body).to.have.property('session_id');
+    expect(body).to.have.property('system_prompt');
+    expect(body).to.have.property('is_active');
+    expect(body).to.have.property('created_at');
+    
+    // Validate data types
+    expect(body.session_id).to.be.a('string');
+    expect(body.system_prompt).to.be.a('string');
+    expect(body.is_active).to.be.a('boolean');
+    expect(body.created_at).to.be.a('string');
+    
+    // Validate values
+    expect(body.is_active).to.be.true;
+    expect(body.system_prompt).to.contain('Eve');
+    
+    // Store session ID for subsequent tests
+    bru.setVar("voiceSessionId", body.session_id);
+    
+    console.log("Voice session started:", body.session_id);
+    console.log("Session is active:", body.is_active);
+  });
+  
+  test("Session ID is valid UUID format", function() {
+    const body = res.getBody();
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    expect(body.session_id).to.match(uuidRegex);
+  });
+}
+
+docs {
+  # Voice Session Start (Feature B)
+  
+  This endpoint starts a new interactive voice session with Eve.
+  
+  ## Prerequisites
+  - User must be authenticated (authToken required)
+  
+  ## Flow
+  1. Backend creates a new EveSession with the provided system prompt
+  2. Session is marked as active
+  3. Session details are returned to client
+  4. Client can now use the session_id for voice turns
+  
+  ## Expected Response
+  - session_id: UUID of the created voice session
+  - system_prompt: The system prompt that will guide Eve's responses
+  - is_active: Boolean indicating session is ready for use
+  - created_at: Timestamp of when the session was created
+  
+  ## System Prompt Guidelines
+  The system prompt should:
+  - Establish Eve's role as a supportive companion
+  - Set the tone for empathetic, caring responses
+  - Provide context for the type of conversation expected
+}
