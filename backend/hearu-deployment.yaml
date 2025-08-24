@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: hearu-deployment
 spec:
-  replicas: 5 # Adjust the number of replicas as needed (in production: 2-3)
+  replicas: 3 # Adjust the number of replicas as needed (in production: 2-3)
   selector:
     matchLabels:
       app: hearu
@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: hearu
-          image: hearu:0.5
+          image: hearu:0.6
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
