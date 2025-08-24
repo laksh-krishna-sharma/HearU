@@ -143,13 +143,12 @@ const Signup = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#EBE8D5] via-[#F5F3EA] to-[#DFD3B6] relative overflow-hidden">
       {/* Background Image - Right Side */}
-      <div className="absolute inset-y-0 right-0 w-full sm:w-2/3 md:w-1/2 lg:w-2/5">
+      <div className="absolute right-0 top-0 h-full w-1/2 sm:w-1/3 pointer-events-none z-0">
         <img
-          src="/buddhaFace3.jpg"
-          alt="Buddha Face"
-          className="h-full w-full object-cover object-left opacity-30 sm:opacity-40"
-        />
-        <div className="absolute inset-0 bg-gradient-to-l from-transparent via-transparent to-[#EBE8D5]/30"></div>
+            src="/buddhaFace3.jpg"
+            alt="Buddha Face Right"
+            className="h-full w-full object-cover object-left opacity-45  "
+          />
       </div>
 
       {/* Content Container */}
