@@ -43,6 +43,8 @@ class JournalEveResponse(BaseModel):
     text: str
     audio_path: Optional[str]
     created_at: datetime
+    session_id: str 
+
 
 
 # -------------------- Voice Session --------------------

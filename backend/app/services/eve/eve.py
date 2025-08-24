@@ -44,8 +44,6 @@ class EveService:
     async def journal_reply(
         self, journal_id: str, user: User
     ) -> Optional[JournalEveResponse]:
-        """Generate Eve's supportive reply to a journal entry."""
-        # Get journal with existing Eve messages
         stmt = (
             select(Journal)
             .options(selectinload(Journal.eve_messages))
@@ -53,25 +51,31 @@ class EveService:
         )
         result = await self.db.execute(stmt)
         journal = result.scalar_one_or_none()
-
         if not journal:
             return None
 
-        # Build context from journal and previous Eve messages
         context = self._build_journal_context(journal)
 
-        # Get supportive reply from Gemini
         reply_text = await asyncio.to_thread(self.llm.generate_reply, context)
-
-        # Convert reply to speech
         tts_result: TTSResult = await self.tts.synthesize_to_local(
             reply_text, AUDIO_DIR
         )
 
-        # Store Eve message
+        # ✅ Create session here
+        session = EveSession(
+            user_id=user.id,
+            system_prompt="Supportive reply to journal", 
+            is_active=True,
+        )
+        self.db.add(session)
+        await self.db.commit()
+        await self.db.refresh(session)
+
+        # Store Eve message linked to session + journal
         eve_msg = EveMessage(
             user_id=user.id,
             journal_id=journal.id,
+            session_id=session.id,
             role=EveRole.EVE,
             text=reply_text,
             audio_path=tts_result.tts_meta.get("local_path"),
@@ -85,7 +89,9 @@ class EveService:
             text=eve_msg.text,
             audio_path=eve_msg.audio_path,
             created_at=eve_msg.created_at,
+            session_id=session.id,  
         )
+
 
     def _build_journal_context(self, journal: Journal) -> str:
         """Build context for journal reply."""
