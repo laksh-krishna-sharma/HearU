@@ -48,11 +48,10 @@
 
 a {
   font-weight: 500;
-  color: white;
   text-decoration: inherit;
 }
 a:hover {
-  color: white;
+  color: black
 }
 
 body {

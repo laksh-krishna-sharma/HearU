@@ -3,7 +3,6 @@ import { useAppSelector, useAppDispatch } from "@/hooks/hooks";
 import { logout } from "@/store/slices/authSlice";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
 import { TbActivityHeartbeat } from "react-icons/tb";
 
 interface NavbarProps {
@@ -47,13 +46,13 @@ const Navbar = ({ showCenterOval = true }: NavbarProps) => {
       )}
 
       {/* Hamburger (only mobile) */}
-      <button
+      {/* <button
         onClick={() => setIsMenuOpen(!isMenuOpen)}
         className="md:hidden p-2 text-ocean-primary hover:text-ocean-accent transition z-20"
         aria-label="Toggle menu"
       >
         {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-      </button>
+      </button> */}
 
       {/* RIGHT - Buttons (shared for desktop & mobile) */}
       <div
@@ -78,7 +77,7 @@ const Navbar = ({ showCenterOval = true }: NavbarProps) => {
             <Link to="/login" onClick={() => setIsMenuOpen(false)} className="w-full md:w-auto ">
               <Button
                 variant="ghost"
-                className="w-full md:w-autotransition hover:text-amber-100 "
+                className="w-full md:w-autotransition text-white hover:text-amber-100 "
               >
                 Login
               </Button>
@@ -86,7 +85,7 @@ const Navbar = ({ showCenterOval = true }: NavbarProps) => {
             <Link to="/signup" onClick={() => setIsMenuOpen(false)} className="w-full md:w-auto">
               <Button
                 variant="outline"
-                className="w-full md:w-autotransition hover:text-amber-100"
+                className="w-full md:w-autotransition text-white hover:text-amber-100"
               >
                 Sign Up
               </Button>

@@ -68,11 +68,11 @@ const Login = () => {
           
           {/* Header */}
           <div ref={headerRef} className="text-left mb-8 opacity-0">
-            <Link to="/" className="inline-block mb-4">
+            {/* <Link to="/" className="inline-block mb-4">
               <div className="text-3xl sm:text-4xl lg:text-5xl font-bold text-black">
                 HearU
               </div>
-            </Link>
+            </Link> */}
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-[#6E664E] mb-2">
               Welcome back
             </h1>
@@ -198,13 +198,13 @@ const Login = () => {
             )}
 
             {/* Sign Up Link */}
-            <div className="mt-8 text-center">
+            <div className="mt-8 text-center ">
               <p className="text-sm text-[#6E664E]">
                 Don't have an account?{" "}
                 <Link
                   to="/signup"
-                  className="text-ocean-primary hover:text-ocean-primary-dark 
-                           font-semibold transition-colors duration-200 hover:underline"
+                  className="text-ocean-primary hover:text-black
+                           font-semibold  duration-200 "
                 >
                   Sign up here
                 </Link>

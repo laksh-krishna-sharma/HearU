@@ -27,7 +27,6 @@ const Signup = () => {
 
   const headerRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLDivElement>(null);
-  const progressRef = useRef<HTMLDivElement>(null);
 
   const [formData, setFormData] = useState<FormData>({
     firstName: '',
@@ -53,9 +52,8 @@ const Signup = () => {
   useEffect(() => {
     const tl = createTimeline({ delay: 0.2 });
 
-    if (headerRef.current && formRef.current && progressRef.current) {
+    if (headerRef.current && formRef.current ) { 
       tl.add(pageTransitions.fadeInUp(headerRef.current, 0))
-        .add(pageTransitions.fadeInScale(progressRef.current, 0.1), "-=0.3")
         .add(pageTransitions.fadeInScale(formRef.current, 0.2), "-=0.2");
     }
 
@@ -157,45 +155,13 @@ const Signup = () => {
           
           {/* Header */}
           <div ref={headerRef} className="text-left mb-6 opacity-0">
-            <Link to="/" className="inline-block mb-4">
-              <div className="text-3xl sm:text-4xl font-bold text-black">
-                HearU
-              </div>
-            </Link>
             <h1 className="text-2xl sm:text-3xl font-semibold text-[#6E664E] mb-2">
               Join our community
             </h1>
             <p className="text-base text-[#6E664E]/80 max-w-md">
               Start your mental wellness journey today
             </p>
-          </div>
-
-          {/* Progress Indicator */}
-          <div ref={progressRef} className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-white/20 p-4 mb-6 opacity-0">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
-                  currentStep >= 1 ? 'bg-ocean-primary text-white' : 'bg-gray-200 text-gray-600'
-                }`}>
-                  1
-                </div>
-                <span className="ml-2 text-xs sm:text-sm font-medium text-[#6E664E]">Personal</span>
-              </div>
-              <div className="flex-1 mx-3">
-                <div className={`h-1 rounded-full transition-all duration-500 ${
-                  currentStep >= 2 ? 'bg-ocean-primary' : 'bg-gray-200'
-                }`}></div>
-              </div>
-              <div className="flex items-center">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
-                  currentStep >= 2 ? 'bg-ocean-primary text-white' : 'bg-gray-200 text-gray-600'
-                }`}>
-                  2
-                </div>
-                <span className="ml-2 text-xs sm:text-sm font-medium text-[#6E664E]">Account</span>
-              </div>
-            </div>
-          </div>
+          </div>          
 
           {/* Signup Form */}
           <div ref={formRef} className="bg-white/80 backdrop-blur-sm rounded-xl shadow-xl border border-white/20 p-6 sm:p-8 opacity-0 max-w-md">
@@ -446,7 +412,7 @@ const Signup = () => {
                   to="/login"
                   className="text-ocean-primary hover:text-ocean-primary-dark font-semibold transition-colors duration-200 hover:underline"
                 >
-                  Sign in here
+                  Login here
                 </Link>
               </p>
             </div>
