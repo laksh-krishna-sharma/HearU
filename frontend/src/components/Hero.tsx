@@ -13,7 +13,7 @@ const Hero = () => {
 
   return (
     <section
-      className="h-screen w-full flex flex-col items-center justify-center text-center bg-[#DFD3B6] px-4 sm:px-6 lg:px-8 relative overflow-hidden"
+      className="h-screen w-full flex flex-col items-center justify-center text-center bg-gradient-to-br from-[#EBE8D5] via-[#F5F3EA] to-[#DFD3B6]  px-4 sm:px-6 lg:px-8 relative overflow-hidden"
     >
       {/* Intro */}
       <div className="mb-4 sm:mb-6 z-10 max-w-[90%] sm:max-w-2xl">
@@ -32,7 +32,7 @@ const Hero = () => {
         className="w-[80%] sm:w-[60%] md:w-[50%] h-12 sm:h-14 md:h-16 lg:h-20 bg-[#EBE8D9] rounded-full flex items-center justify-center border border-ocean-primary/30 px-3 sm:px-6 backdrop-blur-sm shadow-2xl opacity-0 z-10"
       >
             <button
-              className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center hover:scale-110 transition-all duration-200 flex-shrink-0"
+              className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center hover:scale-110  duration-200 flex-shrink-0"
               style={{ 
                 background: 'none',
                 border: 'none',
@@ -64,11 +64,11 @@ const Hero = () => {
       </div>
 
       {/* Buddha Image Right Side */}
-      <div className="absolute right-0 top-0 h-full w-1/2 sm:w-1/3 overflow-hidden pointer-events-none">
+      <div className="absolute right-0 top-0 h-full w-1/2 sm:w-1/3 pointer-events-none z-0">
         <img
             src="/buddhaFace3.jpg"
             alt="Buddha Face Right"
-            className="h-full w-full object-cover object-left opacity-40 hover:opacity-40 transition-opacity duration-500"
+            className="h-full w-full object-cover object-left opacity-45  "
           />
       </div>
     </section>
