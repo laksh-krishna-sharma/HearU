@@ -17,7 +17,7 @@ headers {
 
 body:json {
   {
-    "title": "Evening reflections",
+    "title": "Evening reflections 2",
     "content": "Today I felt anxious about exams but tried 4-7-8 breathing. It helped a bit.",
     "tags": ["exam", "reflection"],
     "entry_date": "2025-02-04T19:30:00Z"
@@ -44,7 +44,7 @@ tests {
     expect(body).to.have.property('updated_at');
     expect(body).to.have.property('author_name');
   });
-
+  
   // Optional: persist journal id for subsequent tests (runner-specific)
   // e.g. setEnv("journalId", res.getBody().id);
 }

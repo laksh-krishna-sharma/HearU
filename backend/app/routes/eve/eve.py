@@ -62,10 +62,17 @@ async def voice_turn(
     """Process a voice turn in an active session."""
     service = EveService(db)
     audio_bytes = await audio.read()
-    result = await service.voice_turn(session_id, audio_bytes, current_user)
+    result = await service.voice_turn(
+        session_id,
+        audio_bytes,
+        current_user,
+        original_filename=audio.filename,
+        content_type=audio.content_type,
+    )
     if not result:
         raise HTTPException(status_code=404, detail="Session not found or inactive")
     return result
+
 
 
 @router.post("/voice/end", response_model=VoiceSessionEndResponse)
