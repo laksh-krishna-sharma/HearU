@@ -1,11 +1,12 @@
 from typing import Optional, List
-from sqlalchemy import select, delete, desc, asc
+from sqlalchemy import select, desc, asc
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from datetime import datetime
 import asyncio
 import os
-
+import uuid
+import mimetypes
 from app.models.eve import EveMessage, EveSession, EveRole
 from app.models.journal import Journal
 from app.models.user import User
@@ -26,8 +27,13 @@ from app.routes.eve.schema.eve import (
     EveMessageResponse,
 )
 
-AUDIO_DIR = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "../../../../audio")
+
+USER_AUDIO_DIR = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "../../../../audio/user")
+)
+
+EVE_AUDIO_DIR = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "../../../../audio/eve")
 )
 
 
@@ -57,21 +63,23 @@ class EveService:
         context = self._build_journal_context(journal)
 
         reply_text = await asyncio.to_thread(self.llm.generate_reply, context)
-        tts_result: TTSResult = await self.tts.synthesize_to_local(
-            reply_text, AUDIO_DIR
-        )
 
-        # ✅ Create session here
+        # create session (set system_prompt to journal title/content)
+        system_prompt = (
+            f"Journal Title: {journal.title}\nJournal Content: {journal.content}"
+        )
         session = EveSession(
-            user_id=user.id,
-            system_prompt="Supportive reply to journal", 
-            is_active=True,
+            user_id=user.id, system_prompt=system_prompt, is_active=True
         )
         self.db.add(session)
         await self.db.commit()
         await self.db.refresh(session)
 
-        # Store Eve message linked to session + journal
+        # create/eve tts
+        tts_result: TTSResult = await self.tts.synthesize_to_local(
+            reply_text, EVE_AUDIO_DIR
+        )
+
         eve_msg = EveMessage(
             user_id=user.id,
             journal_id=journal.id,
@@ -89,9 +97,8 @@ class EveService:
             text=eve_msg.text,
             audio_path=eve_msg.audio_path,
             created_at=eve_msg.created_at,
-            session_id=session.id,  
+            session_id=session.id,
         )
-
 
     def _build_journal_context(self, journal: Journal) -> str:
         """Build context for journal reply."""
@@ -133,9 +140,17 @@ class EveService:
         )
 
     async def voice_turn(
-        self, session_id: str, audio_bytes: bytes, user: User
+        self,
+        session_id: str,
+        audio_bytes: bytes,
+        user: User,
+        original_filename: Optional[str] = None,
+        content_type: Optional[str] = None,
     ) -> Optional[VoiceSessionTurnResponse]:
-        """Process a voice turn in an active session."""
+        """Process a voice turn in an active session.
+
+        Saves incoming audio to USER_AUDIO_DIR and uses EVE_AUDIO_DIR for TTS output.
+        """
         # Get active session
         stmt = (
             select(EveSession)
@@ -152,9 +167,29 @@ class EveService:
         if not session:
             return None
 
-        # Convert speech to text
+        # ensure directories exist
+        os.makedirs(USER_AUDIO_DIR, exist_ok=True)
+        os.makedirs(EVE_AUDIO_DIR, exist_ok=True)
+
+        # determine file extension
+        ext = None
+        if original_filename:
+            _, ext = os.path.splitext(original_filename)
+        if not ext and content_type:
+            ext = mimetypes.guess_extension(content_type)
+        if not ext:
+            ext = ".wav"  # fallback
+
+        # save incoming user audio
+        user_filename = f"user_{uuid.uuid4().hex}{ext}"
+        user_audio_path = os.path.join(USER_AUDIO_DIR, user_filename)
+        with open(user_audio_path, "wb") as f:
+            f.write(audio_bytes)
+
+        # Convert speech to text (STT). Provide mime type if available (fallback to audio/wav)
+        mime = content_type or "audio/wav"
         user_text = await asyncio.to_thread(
-            self.stt.transcribe_from_bytes, audio_bytes, "audio/wav"
+            self.stt.transcribe_from_bytes, audio_bytes, mime
         )
 
         # Get Eve's reply using session context
@@ -162,15 +197,18 @@ class EveService:
             self.llm.chat_with_context, session, user_text
         )
 
-        # Convert Eve's reply to speech
-        tts_result: TTSResult = await self.tts.synthesize_to_gcs(eve_reply)
+        # Convert Eve's reply to speech (saved in EVE_AUDIO_DIR)
+        tts_result: TTSResult = await self.tts.synthesize_to_local(
+            eve_reply, EVE_AUDIO_DIR
+        )
 
-        # Store both user and eve messages
+        # Store both user and eve messages (store local paths so you can serve or re-send them)
         user_msg = EveMessage(
             user_id=user.id,
             session_id=session.id,
             role=EveRole.USER,
             text=user_text,
+            audio_path=user_audio_path,
         )
         eve_msg = EveMessage(
             user_id=user.id,
@@ -191,6 +229,7 @@ class EveService:
             user_text=user_msg.text,
             eve_text=eve_msg.text,
             audio_path=eve_msg.audio_path,
+            user_audio_path=user_msg.audio_path,
             created_at=eve_msg.created_at,
         )
 
@@ -214,19 +253,32 @@ class EveService:
             return None
 
         summary = None
+        notes_journal_id = None
+        notes_content = None
+
         if save_summary and session.messages:
-            # Generate summary before deletion
             history = " ".join([m.text for m in session.messages])
             summary = await asyncio.to_thread(self.llm.summarize, history)
 
-        # Mark session as ended and delete messages (as per requirements)
+            # Using summarize with a specific prompt for refactoring notes
+            notes_prompt = "Refactor the transcript into 6-8 short, actionable notes oriented for the user, each one line. Prefix with bullet numbers. Keep sensitive info out."
+            notes_content = await asyncio.to_thread(
+                self.llm.summarize, f"{notes_prompt}\n\nTranscript:\n{history}"
+            )
+
+            notes_journal = Journal(
+                user_id=user.id,
+                title=f"Session Notes - {session.id} - {datetime.utcnow().date()}",
+                content=notes_content,
+            )
+            self.db.add(notes_journal)
+            await self.db.commit()
+            await self.db.refresh(notes_journal)
+            notes_journal_id = notes_journal.id
+
+        # Mark session as ended
         session.is_active = False
         session.ended_at = datetime.utcnow()
-
-        # Delete all messages associated with this session
-        await self.db.execute(
-            delete(EveMessage).where(EveMessage.session_id == session_id)
-        )
 
         await self.db.commit()
 
@@ -234,6 +286,8 @@ class EveService:
             session_id=session.id,
             status="ended",
             summary=summary,
+            notes_journal_id=notes_journal_id,
+            notes_content=notes_content,
         )
 
     # ---------- Journal CRUD (simplified for Eve context) ----------
