@@ -43,8 +43,7 @@ class JournalEveResponse(BaseModel):
     text: str
     audio_path: Optional[str]
     created_at: datetime
-    session_id: str 
-
+    session_id: str
 
 
 # -------------------- Voice Session --------------------
@@ -71,6 +70,7 @@ class VoiceSessionTurnResponse(BaseModel):
     user_text: str
     eve_text: str
     audio_path: Optional[str]
+    user_audio_path: Optional[str] = None
     created_at: datetime
 
 
@@ -83,6 +83,8 @@ class VoiceSessionEndResponse(BaseModel):
     session_id: str
     status: str
     summary: Optional[str] = None
+    notes_journal_id: Optional[str] = None
+    notes_content: Optional[str] = None
 
 
 # -------------------- Voice Session CRUD --------------------
