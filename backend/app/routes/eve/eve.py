@@ -74,7 +74,6 @@ async def voice_turn(
     return result
 
 
-
 @router.post("/voice/end", response_model=VoiceSessionEndResponse)
 async def end_voice_session(
     payload: VoiceSessionEndRequest,

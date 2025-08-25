@@ -1,5 +1,5 @@
 from typing import Optional, List
-from sqlalchemy import select, delete, desc, asc
+from sqlalchemy import select, desc, asc
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from datetime import datetime
@@ -36,6 +36,7 @@ EVE_AUDIO_DIR = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "../../../../audio/eve")
 )
 
+
 class EveService:
     """Unified service for handling Eve interactions."""
 
@@ -62,16 +63,22 @@ class EveService:
         context = self._build_journal_context(journal)
 
         reply_text = await asyncio.to_thread(self.llm.generate_reply, context)
-        
+
         # create session (set system_prompt to journal title/content)
-        system_prompt = f"Journal Title: {journal.title}\nJournal Content: {journal.content}"
-        session = EveSession(user_id=user.id, system_prompt=system_prompt, is_active=True)
+        system_prompt = (
+            f"Journal Title: {journal.title}\nJournal Content: {journal.content}"
+        )
+        session = EveSession(
+            user_id=user.id, system_prompt=system_prompt, is_active=True
+        )
         self.db.add(session)
         await self.db.commit()
         await self.db.refresh(session)
 
         # create/eve tts
-        tts_result: TTSResult = await self.tts.synthesize_to_local(reply_text, EVE_AUDIO_DIR)
+        tts_result: TTSResult = await self.tts.synthesize_to_local(
+            reply_text, EVE_AUDIO_DIR
+        )
 
         eve_msg = EveMessage(
             user_id=user.id,
@@ -92,7 +99,6 @@ class EveService:
             created_at=eve_msg.created_at,
             session_id=session.id,
         )
-
 
     def _build_journal_context(self, journal: Journal) -> str:
         """Build context for journal reply."""
@@ -192,7 +198,9 @@ class EveService:
         )
 
         # Convert Eve's reply to speech (saved in EVE_AUDIO_DIR)
-        tts_result: TTSResult = await self.tts.synthesize_to_local(eve_reply, EVE_AUDIO_DIR)
+        tts_result: TTSResult = await self.tts.synthesize_to_local(
+            eve_reply, EVE_AUDIO_DIR
+        )
 
         # Store both user and eve messages (store local paths so you can serve or re-send them)
         user_msg = EveMessage(
@@ -251,12 +259,18 @@ class EveService:
         if save_summary and session.messages:
             history = " ".join([m.text for m in session.messages])
             summary = await asyncio.to_thread(self.llm.summarize, history)
-            
+
             # Using summarize with a specific prompt for refactoring notes
             notes_prompt = "Refactor the transcript into 6-8 short, actionable notes oriented for the user, each one line. Prefix with bullet numbers. Keep sensitive info out."
-            notes_content = await asyncio.to_thread(self.llm.summarize, f"{notes_prompt}\n\nTranscript:\n{history}")
+            notes_content = await asyncio.to_thread(
+                self.llm.summarize, f"{notes_prompt}\n\nTranscript:\n{history}"
+            )
 
-            notes_journal = Journal(user_id=user.id, title=f"Session Notes - {session.id} - {datetime.utcnow().date()}", content=notes_content)
+            notes_journal = Journal(
+                user_id=user.id,
+                title=f"Session Notes - {session.id} - {datetime.utcnow().date()}",
+                content=notes_content,
+            )
             self.db.add(notes_journal)
             await self.db.commit()
             await self.db.refresh(notes_journal)
