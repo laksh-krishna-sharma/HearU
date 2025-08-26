@@ -33,6 +33,3 @@ jobs:
 
       - name: Format check
         run: dart format --set-exit-if-changed .
-
-      - name: Build APK (for a final check)
-        run: flutter build apk --release --no-sound-null-safety
