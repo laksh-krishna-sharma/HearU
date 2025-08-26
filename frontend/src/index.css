@@ -14,17 +14,17 @@
   -moz-osx-font-smoothing: grayscale;
   
   /* Ocean Breeze Color Scheme */
-  --primary: #6BCB77;        /* Fresh Teal */
+  --primary: #DFD3B6     /* Fresh Teal */
   --secondary: #4D96FF;      /* Soft Ocean Blue */
   --accent: #FF6B6B;         /* Gentle Coral */
-  --background: #F1FAEE;     /* Pale Mint White */
+  --background: #F5F3EA;     /* Pale Mint White */
   --text: #2C3E50;           /* Deep Slate */
-  --navbar-bg: #F0FCF2;      /* Slightly tinted navbar background */
+  --navbar-bg: #F5F3EA;      /* Slightly tinted navbar background */
   --warm: #EBE8D5;
   
   /* Additional shades for depth */
-  --primary-light: #7DD87F;
-  --primary-dark: #5BB965;
+  /* --primary-light: #7DD87F;
+  --primary-dark: #5BB965; */
   --secondary-light: #6BA6FF;
   --secondary-dark: #3D86EF;
   --accent-light: #FF7F7F;
