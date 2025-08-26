@@ -1,3 +1,1 @@
-class AuthRemoteRepository {
-  
-}
+class AuthRemoteRepository {}

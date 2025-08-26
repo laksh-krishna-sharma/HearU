@@ -102,7 +102,8 @@ class SignupScreen extends StatelessWidget {
                     labelText: 'Password',
                     labelStyle: const TextStyle(color: Colors.grey),
                     suffixIcon: IconButton(
-                      icon: const Icon(Icons.remove_red_eye, color: Colors.grey),
+                      icon:
+                          const Icon(Icons.remove_red_eye, color: Colors.grey),
                       onPressed: () {
                         // Toggle password visibility
                       },
@@ -114,7 +115,8 @@ class SignupScreen extends StatelessWidget {
                       borderSide: BorderSide(color: Color(0xFF33334F)),
                     ),
                     floatingLabelBehavior: FloatingLabelBehavior.never,
-                    helperText: 'Must contain a number and at least 6 characters',
+                    helperText:
+                        'Must contain a number and at least 6 characters',
                     helperStyle: const TextStyle(color: Colors.grey),
                   ),
                 ),
@@ -142,7 +144,8 @@ class SignupScreen extends StatelessWidget {
                     onPressed: () {},
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF33334F),
-                      padding: EdgeInsets.symmetric(vertical: screenHeight * 0.02),
+                      padding:
+                          EdgeInsets.symmetric(vertical: screenHeight * 0.02),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -172,7 +175,8 @@ class SignupScreen extends StatelessWidget {
                         onTap: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => const LoginScreen()),
+                            MaterialPageRoute(
+                                builder: (context) => const LoginScreen()),
                           );
                         },
                         child: const Text(

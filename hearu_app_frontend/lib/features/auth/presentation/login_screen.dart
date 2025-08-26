@@ -78,7 +78,8 @@ class LoginScreen extends StatelessWidget {
                     labelText: 'Password',
                     labelStyle: const TextStyle(color: Colors.grey),
                     suffixIcon: IconButton(
-                      icon: const Icon(Icons.remove_red_eye, color: Colors.grey),
+                      icon:
+                          const Icon(Icons.remove_red_eye, color: Colors.grey),
                       onPressed: () {
                         // Toggle password visibility
                       },
@@ -114,7 +115,8 @@ class LoginScreen extends StatelessWidget {
                     onPressed: () {},
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF33334F),
-                      padding: EdgeInsets.symmetric(vertical: screenHeight * 0.02),
+                      padding:
+                          EdgeInsets.symmetric(vertical: screenHeight * 0.02),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -144,7 +146,8 @@ class LoginScreen extends StatelessWidget {
                         onTap: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => const SignupScreen()),
+                            MaterialPageRoute(
+                                builder: (context) => const SignupScreen()),
                           );
                         },
                         child: const Text(

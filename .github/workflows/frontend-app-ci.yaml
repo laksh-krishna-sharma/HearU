@@ -1,0 +1,38 @@
+name: Flutter App CI
+
+on:
+  push:
+    paths:
+      - 'hearu_app_frontend/**'
+  pull_request:
+    paths:
+      - 'hearu_app_frontend/**'
+
+defaults:
+  run:
+    working-directory: hearu_app_frontend
+
+jobs:
+  checks:
+    name: Code Quality Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.x'
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Lint and Type check
+        run: flutter analyze --no-fatal-warnings
+
+      - name: Format check
+        run: dart format --set-exit-if-changed .
+
+      - name: Build APK (for a final check)
+        run: flutter build apk --release --no-sound-null-safety
