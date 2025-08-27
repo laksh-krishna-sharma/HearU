@@ -99,12 +99,12 @@ const Journal: React.FC = () => {
                 <p className="text-gray-600 text-sm line-clamp-3 mb-3">
                   {journal.content}
                 </p>
-                {/* <div className="flex items-center gap-2 text-xs text-gray-500">
+                <div className="flex items-center gap-2 text-xs text-gray-500">
                   <Calendar className="h-3 w-3" />
-                  <span>Created: {journal.created_at ? new Date(journal.created_at).toLocaleDateString() : 'N/A'}</span>
-                  <Calendar className="h-3 w-3" />
-                  <span>Updated: {journal.updated_at ? new Date(journal.updated_at).toLocaleDateString() : 'N/A'}</span>
-                </div> */}
+                  <span> {journal.created_at ? new Date(journal.created_at).toLocaleDateString() : 'N/A'}</span>
+                  {/* <Calendar className="h-3 w-3" />
+                  <span>Updated: {journal.updated_at ? new Date(journal.updated_at).toLocaleDateString() : 'N/A'}</span> */}
+                </div>
               </CardContent>
             </Card>
           ))}

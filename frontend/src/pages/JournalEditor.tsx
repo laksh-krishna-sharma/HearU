@@ -6,8 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { 
-  Save, 
-  Upload, 
+  Save,  
   Mic, 
   Bot,
   ArrowLeft
@@ -258,7 +257,7 @@ const JournalEditor: React.FC = () => {
                 />
 
                 {/* Tags Input */}
-                {/* <div className="mt-4">
+                <div className="mt-4">
                   <label className="block text-sm font-medium text-gray-700 mb-1">Tags</label>
                   <div className="flex gap-2  flex-wrap">
                     {tags.map((tag, idx) => (
@@ -290,12 +289,12 @@ const JournalEditor: React.FC = () => {
                     }}
                     className="mt-2 w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ocean-primary"
                   />
-                </div> */}
+                </div>
 
                 {/* File Upload */}
                 <div className="flex items-center gap-2">
                   <Button variant="outline" onClick={handleUpload} className="flex items-center gap-2">
-                    <Upload className="h-4 w-4" /> Upload
+                    Upload
                   </Button>
                 </div>
               </CardContent>
