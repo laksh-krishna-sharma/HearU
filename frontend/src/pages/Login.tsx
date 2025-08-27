@@ -68,11 +68,6 @@ const Login = () => {
           
           {/* Header */}
           <div ref={headerRef} className="text-left mb-8 opacity-0">
-            {/* <Link to="/" className="inline-block mb-4">
-              <div className="text-3xl sm:text-4xl lg:text-5xl font-bold text-black">
-                HearU
-              </div>
-            </Link> */}
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-[#6E664E] mb-2">
               Welcome back
             </h1>
