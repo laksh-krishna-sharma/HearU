@@ -184,7 +184,7 @@ const JournalEditor: React.FC = () => {
               {/* <ArrowLeft className="h-4 w-4" /> */}
                Back
             </Button>
-            <h1 className="text-3xl font-bold text-ocean-text flex justify-end">{isEditing ? 'Edit Journal' : 'New Journal Entry'}</h1>
+            <h1 className="text-3xl font-bold text-ocean-text flex justify-end">{!isEditing ? 'Edit Journal' : 'New Journal Entry'}</h1>
           </div>
           <div className="space-x-2 flex">
             {isEditing && (
@@ -198,7 +198,7 @@ const JournalEditor: React.FC = () => {
               className="flex items-center gap-2"
             >
               <Save className="h-4 w-4" />
-              {isSaving ? 'Saving...' : isEditing ? 'Update' : 'Save'}
+              {isSaving ? 'Saving...' : !isEditing ? 'Update' : 'Save'}
             </Button>
           </div>
         </div>
