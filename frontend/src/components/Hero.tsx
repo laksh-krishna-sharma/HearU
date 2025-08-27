@@ -51,7 +51,7 @@ const Hero = () => {
             outline: 'none'
           }}
         >
-          <TbActivityHeartbeat className="h-16 w-16 "/>
+          <TbActivityHeartbeat className="h-16 w-16 text-[#0b132b]"/>
         </button>
       </div>
 
