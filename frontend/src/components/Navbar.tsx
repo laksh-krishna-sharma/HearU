@@ -24,7 +24,7 @@ const Navbar = ({ showCenterOval = true }: NavbarProps) => {
   };
 
   return (
-    <nav className="flex items-center justify-between p-4 md:p-6 bg-gradient-to-r from-[#EBE8D5] via-[#F5F3EA] to-[#DFD3B5] w-full relative">
+    <nav className="flex items-center justify-between p-4 md:p-6 bg-gradient-to-r from-[#EBE8D5] via-[#F5F3EA]  w-full relative">
       {/* LEFT - Logo */}
       <Link
         to={isAuthenticated ? "/landing" : "/"}
@@ -37,9 +37,17 @@ const Navbar = ({ showCenterOval = true }: NavbarProps) => {
       {/* CENTER - Voice Assistant Oval */}
       {showCenterOval && isAuthenticated && (
         <div className="absolute left-1/2 -translate-x-1/2 hidden md:flex">
-          <div className="w-[20rem] md:w-[30rem] h-10 md:h-12 bg-[#eae9e2] rounded-full flex items-center border border-ocean-primary/30 px-3 gap-3">
-            <button className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center hover:scale-110 transition">
-              <TbActivityHeartbeat className="h-6 w-6" />
+          <div className="w-[20rem] md:w-[30rem] h-10 md:h-12 bg-[#eae9e2] rounded-full     flex items-center justify-center border ">
+            <button
+            className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center hover:scale-110 duration-200 "
+              style={{ 
+              background: 'none',
+              border: 'none',
+              padding: 0,
+              outline: 'none'
+              }}
+            >
+            <TbActivityHeartbeat className="h-16 w-16 text-[#0b132b] "/>
             </button>
           </div>
         </div>
@@ -58,11 +66,11 @@ const Navbar = ({ showCenterOval = true }: NavbarProps) => {
       <div
         className={`${
           isMenuOpen ? "flex" : "hidden"
-        } absolute top-full left-0 w-full flex-col items-start bg-[#DFD3B6] p-4 gap-3 md:static md:flex md:flex-row md:items-center md:w-auto md:p-0`}
+        } absolute top-full left-0 w-full flex-col items-start  p-4 gap-3 md:static md:flex md:flex-row md:items-center md:w-auto md:p-0`}
       >
         {isAuthenticated ? (
           <>
-            <span className="text-sm text-ocean-text">
+            <span className="text-sm ">
               Welcome, {user?.name || user?.username || "User"}
             </span>
             <Button

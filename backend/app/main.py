@@ -57,6 +57,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
     allow_origins=["*"],
+
 )
 
 app.include_router(auth_router)

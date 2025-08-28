@@ -6,8 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { 
-  Save, 
-  Upload, 
+  Save,  
   Mic, 
   Bot,
   ArrowLeft
@@ -15,6 +14,8 @@ import {
 import { useAppDispatch, useAppSelector } from '@/hooks/hooks';
 import { createJournalEntry, updateJournal, deleteJournal, getJournal } from '@/store/slices/journalSlice';
 import toast from 'react-hot-toast';
+// import { TbActivityHeartbeat } from "react-icons/tb";
+
 
 interface ChatMessage {
   id: string;
@@ -179,10 +180,11 @@ const JournalEditor: React.FC = () => {
       <div className="max-w-7xl mx-auto">
         <div className="mb-6 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Button variant="outline" onClick={() => navigate('/journal')} className="flex items-center gap-2">
-              <ArrowLeft className="h-4 w-4" /> Back
+            <Button variant="outline" onClick={() => navigate('/journal')} className="flex items-center gap-2 text-white">
+              {/* <ArrowLeft className="h-4 w-4" /> */}
+               Back
             </Button>
-            <h1 className="text-3xl font-bold text-ocean-text">{isEditing ? 'Edit Journal' : 'New Journal Entry'}</h1>
+            <h1 className="text-3xl font-bold text-ocean-text flex justify-end">{!isEditing ? 'Edit Journal' : 'New Journal Entry'}</h1>
           </div>
           <div className="space-x-2 flex">
             {isEditing && (
@@ -196,7 +198,7 @@ const JournalEditor: React.FC = () => {
               className="flex items-center gap-2"
             >
               <Save className="h-4 w-4" />
-              {isSaving ? 'Saving...' : isEditing ? 'Update' : 'Save'}
+              {isSaving ? 'Saving...' : !isEditing ? 'Update' : 'Save'}
             </Button>
           </div>
         </div>
@@ -209,7 +211,7 @@ const JournalEditor: React.FC = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Left Column - Notes */}
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 hover:shadow-lg">
             <Card className="h-full">
               <CardHeader><CardTitle className="text-lg">Notes</CardTitle></CardHeader>
               <CardContent>
@@ -237,7 +239,7 @@ const JournalEditor: React.FC = () => {
           </div>
 
           {/* Center Column - Journal Editor */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 hover:shadow-lg">
             <Card className="h-full">
               <CardHeader><CardTitle>Journal Content</CardTitle></CardHeader>
               <CardContent className="space-y-4">
@@ -257,16 +259,16 @@ const JournalEditor: React.FC = () => {
                 {/* Tags Input */}
                 <div className="mt-4">
                   <label className="block text-sm font-medium text-gray-700 mb-1">Tags</label>
-                  <div className="flex gap-2 flex-wrap">
+                  <div className="flex gap-2  flex-wrap">
                     {tags.map((tag, idx) => (
-                      <span key={idx} className="flex items-center gap-1 bg-ocean-primary text-white px-2 py-1 rounded-full text-sm">
+                      <span key={idx} className="flex items-center gap-1 bg-ocean-primary text-black px-2 py-1 rounded-full text-sm">
                         {tag}
                         <button 
                           type="button" 
-                          className="text-white hover:text-gray-200" 
+                          className="w-6 h-6 hover:text-gray-200 p-1" 
                           onClick={() => setTags(tags.filter((t) => t !== tag))}
                         >
-                          ×
+                          x
                         </button>
                       </span>
                     ))}
@@ -292,7 +294,7 @@ const JournalEditor: React.FC = () => {
                 {/* File Upload */}
                 <div className="flex items-center gap-2">
                   <Button variant="outline" onClick={handleUpload} className="flex items-center gap-2">
-                    <Upload className="h-4 w-4" /> Upload
+                    Upload
                   </Button>
                 </div>
               </CardContent>
@@ -300,7 +302,7 @@ const JournalEditor: React.FC = () => {
           </div>
 
           {/* Right Column - AI Assistant */}
-          <div className="lg:col-span-1 flex flex-col">
+          <div className="lg:col-span-1 flex flex-col hover:shadow-lg">
             <Card className="h-full flex flex-col">
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
@@ -308,6 +310,7 @@ const JournalEditor: React.FC = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="flex-1 flex flex-col justify-center">
+                
                 <div className="text-center space-y-6">
                   <div className="w-24 h-24 mx-auto bg-ocean-primary rounded-full flex items-center justify-center">
                     <Mic className="h-10 w-10 text-white" />

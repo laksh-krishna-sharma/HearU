@@ -51,7 +51,7 @@ const Hero = () => {
             outline: 'none'
           }}
         >
-          <TbActivityHeartbeat className="h-16 w-16 "/>
+          <TbActivityHeartbeat className="h-16 w-16 text-[#0b132b]"/>
         </button>
       </div>
 
@@ -72,9 +72,9 @@ const Hero = () => {
           >
             Start Journaling
           </button>
-          <button className="px-4 py-2 sm:px-6 sm:py-2 rounded-xl  text-white border border-ocean-primary/40 shadow hover:bg-ocean-primary/10 hover:text-amber-100 transition text-xs sm:text-sm">
+          {/* <button className="px-4 py-2 sm:px-6 sm:py-2 rounded-xl  text-white border border-ocean-primary/40 shadow hover:bg-ocean-primary/10 hover:text-amber-100 transition text-xs sm:text-sm">
             View Past Entries
-          </button>
+          </button> */}
         </div>
       </div>
 
