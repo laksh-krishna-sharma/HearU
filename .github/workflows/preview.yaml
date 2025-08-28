@@ -1,4 +1,4 @@
-name: Vercel Production Deployment
+name: Vercel Pre Production Deployment
 
 env:
   VERCEL_ORG_ID2: ${{ secrets.VERCEL_ORG_ID2 }}
@@ -11,7 +11,7 @@ on:
 
 jobs:
   deploy:
-    name: Production Deployment
+    name: Pre Production Deployment
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     defaults:
