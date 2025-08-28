@@ -56,7 +56,8 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173", "https://hearu-e8zutv880-lakshs-projects-e8fa6099.vercel.app", "https://hearu-proto.vercel.app"],
+    allow_origins=["*"],
+
 )
 
 app.include_router(auth_router)
