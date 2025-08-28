@@ -19,6 +19,9 @@ dependencies:
   # ⚡ Lightweight storage for flags like isLoggedIn
   shared_preferences: ^2.2.3
 
+  # Add this line
+  http: ^1.2.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

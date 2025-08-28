@@ -1,9 +1,120 @@
 import 'package:flutter/material.dart';
+import '../repositories/auth_remote_repository.dart';
 
-import 'login_screen.dart'; // Import the LoginScreen widget for navigation
+import 'login_screen.dart';
 
-class SignupScreen extends StatelessWidget {
+class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
+
+  @override
+  _SignupScreenState createState() => _SignupScreenState();
+}
+
+class _SignupScreenState extends State<SignupScreen> {
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _genderController = TextEditingController();
+  final TextEditingController _ageController = TextEditingController();
+
+  final AuthRemoteRepository _authRepo = AuthRemoteRepository();
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _usernameController.dispose();
+    _genderController.dispose();
+    _ageController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _showGenderPicker() async {
+    final String? gender = await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          title: const Text('Select Gender'),
+          children: <String>['Male', 'Female', 'Others']
+              .map(
+                (String option) => SimpleDialogOption(
+                  onPressed: () {
+                    Navigator.pop(context, option);
+                  },
+                  child: Text(option),
+                ),
+              )
+              .toList(),
+        );
+      },
+    );
+    if (gender != null) {
+      _genderController.text = gender;
+    }
+  }
+
+  Future<void> _showAgePicker() async {
+    final int? age = await showDialog<int>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Select Age (13+)'),
+          content: SizedBox(
+            height: MediaQuery.of(context).size.height * 0.3,
+            width: double.maxFinite,
+            child: ListView.builder(
+              itemCount: 100, // Provides a range of ages to select from
+              itemBuilder: (context, index) {
+                final int currentAge = 13 + index;
+                return ListTile(
+                  title: Text(currentAge.toString()),
+                  onTap: () {
+                    Navigator.pop(context, currentAge);
+                  },
+                );
+              },
+            ),
+          ),
+        );
+      },
+    );
+    if (age != null) {
+      _ageController.text = age.toString();
+    }
+  }
+
+  void _registerUser() async {
+    final String name = _nameController.text;
+    final String email = _emailController.text;
+    final String password = _passwordController.text;
+    final String username = _usernameController.text;
+    final String gender = _genderController.text;
+    final int age = int.tryParse(_ageController.text) ?? 0;
+
+    try {
+      await _authRepo.signup(
+        name: name,
+        email: email,
+        password: password,
+        username: username,
+        age: age,
+        gender: gender,
+      );
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Registration Successful!')),
+      );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Registration Failed: $e')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,22 +142,7 @@ class SignupScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(height: screenHeight * 0.1),
-                // "HEARU" logo/text
-                const Align(
-                  alignment: Alignment.topLeft,
-                  child: Text(
-                    'HEARU',
-                    style: TextStyle(
-                      fontFamily: 'Alegreya Sans SC',
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF33334F),
-                    ),
-                  ),
-                ),
-                SizedBox(height: screenHeight * 0.05),
-                // "Hi! Welcome" text
+                SizedBox(height: screenHeight * 0.02),
                 const Text(
                   'Hi !\nWelcome',
                   style: TextStyle(
@@ -65,83 +161,110 @@ class SignupScreen extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: screenHeight * 0.05),
-                // Email/Phone Number field
+                // Name field
                 TextField(
-                  decoration: InputDecoration(
-                    labelText: 'Email or Phone Number',
-                    labelStyle: const TextStyle(color: Colors.grey),
-                    enabledBorder: const UnderlineInputBorder(
-                      borderSide: BorderSide(color: Color(0xFF33334F)),
-                    ),
-                    focusedBorder: const UnderlineInputBorder(
-                      borderSide: BorderSide(color: Color(0xFF33334F)),
-                    ),
+                  controller: _nameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Name',
                     floatingLabelBehavior: FloatingLabelBehavior.never,
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Color(0xFF33334F)),
+                    ),
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Color(0xFF33334F)),
+                    ),
                   ),
                 ),
                 SizedBox(height: screenHeight * 0.03),
-                // Full Name field
+                // Email field
                 TextField(
-                  decoration: InputDecoration(
-                    labelText: 'Full Name',
-                    labelStyle: const TextStyle(color: Colors.grey),
-                    enabledBorder: const UnderlineInputBorder(
-                      borderSide: BorderSide(color: Color(0xFF33334F)),
-                    ),
-                    focusedBorder: const UnderlineInputBorder(
-                      borderSide: BorderSide(color: Color(0xFF33334F)),
-                    ),
+                  controller: _emailController,
+                  decoration: const InputDecoration(
+                    labelText: 'Email',
                     floatingLabelBehavior: FloatingLabelBehavior.never,
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Color(0xFF33334F)),
+                    ),
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Color(0xFF33334F)),
+                    ),
                   ),
                 ),
                 SizedBox(height: screenHeight * 0.03),
                 // Password field
                 TextField(
+                  controller: _passwordController,
                   obscureText: true,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Password',
-                    labelStyle: const TextStyle(color: Colors.grey),
-                    suffixIcon: IconButton(
-                      icon:
-                          const Icon(Icons.remove_red_eye, color: Colors.grey),
-                      onPressed: () {
-                        // Toggle password visibility
-                      },
-                    ),
-                    enabledBorder: const UnderlineInputBorder(
-                      borderSide: BorderSide(color: Color(0xFF33334F)),
-                    ),
-                    focusedBorder: const UnderlineInputBorder(
-                      borderSide: BorderSide(color: Color(0xFF33334F)),
-                    ),
                     floatingLabelBehavior: FloatingLabelBehavior.never,
-                    helperText:
-                        'Must contain a number and at least 6 characters',
-                    helperStyle: const TextStyle(color: Colors.grey),
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Color(0xFF33334F)),
+                    ),
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Color(0xFF33334F)),
+                    ),
                   ),
                 ),
                 SizedBox(height: screenHeight * 0.03),
-                // Confirm Password field
+                // Username field
                 TextField(
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: 'Confirm Password',
-                    labelStyle: const TextStyle(color: Colors.grey),
-                    enabledBorder: const UnderlineInputBorder(
-                      borderSide: BorderSide(color: Color(0xFF33334F)),
-                    ),
-                    focusedBorder: const UnderlineInputBorder(
-                      borderSide: BorderSide(color: Color(0xFF33334F)),
-                    ),
+                  controller: _usernameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Username',
                     floatingLabelBehavior: FloatingLabelBehavior.never,
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Color(0xFF33334F)),
+                    ),
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Color(0xFF33334F)),
+                    ),
                   ),
                 ),
-                SizedBox(height: screenHeight * 0.06),
+                SizedBox(height: screenHeight * 0.03),
+                // Gender field
+                TextField(
+                  controller: _genderController,
+                  readOnly: true,
+                  onTap: _showGenderPicker,
+                  decoration: const InputDecoration(
+                    labelText: 'Gender',
+                    floatingLabelBehavior: FloatingLabelBehavior.never,
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Color(0xFF33334F)),
+                    ),
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Color(0xFF33334F)),
+                    ),
+                    suffixIcon:
+                        Icon(Icons.arrow_drop_down, color: Color(0xFF33334F)),
+                  ),
+                ),
+                SizedBox(height: screenHeight * 0.03),
+                // Age field
+                TextField(
+                  controller: _ageController,
+                  readOnly: true,
+                  onTap: _showAgePicker,
+                  decoration: const InputDecoration(
+                    labelText: 'Age',
+                    floatingLabelBehavior: FloatingLabelBehavior.never,
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Color(0xFF33334F)),
+                    ),
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Color(0xFF33334F)),
+                    ),
+                    suffixIcon:
+                        Icon(Icons.arrow_drop_down, color: Color(0xFF33334F)),
+                  ),
+                ),
+                const Spacer(),
                 // Sign Up button
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: _registerUser,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF33334F),
                       padding:
@@ -190,6 +313,7 @@ class SignupScreen extends StatelessWidget {
                     ],
                   ),
                 ),
+                SizedBox(height: screenHeight * 0.05),
               ],
             ),
           ),
