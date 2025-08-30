@@ -3,7 +3,8 @@ import { useAppSelector, useAppDispatch } from "@/hooks/hooks";
 import { logout } from "@/store/slices/authSlice";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { TbActivityHeartbeat } from "react-icons/tb";
+// import { TbActivityHeartbeat } from "react-icons/tb";
+import Eve from "@/components/eve/Eve";
 
 interface NavbarProps {
   showCenterOval?: boolean;
@@ -22,7 +23,10 @@ const Navbar = ({ showCenterOval = true }: NavbarProps) => {
     navigate("/login");
     setIsMenuOpen(false);
   };
-
+  // const handleVoiceClick = () => {
+  //   // Add your voice functionality here
+  //   // Could navigate to voice chat or start voice recording
+  // };
   return (
     <nav className="flex items-center justify-between p-4 md:p-6 bg-gradient-to-r from-[#EBE8D5] via-[#F5F3EA]  w-full relative">
       {/* LEFT - Logo */}
@@ -35,23 +39,7 @@ const Navbar = ({ showCenterOval = true }: NavbarProps) => {
       </Link>
 
       {/* CENTER - Voice Assistant Oval */}
-      {showCenterOval && isAuthenticated && (
-        <div className="absolute left-1/2 -translate-x-1/2 hidden md:flex">
-          <div className="w-[20rem] md:w-[30rem] h-10 md:h-12 bg-[#eae9e2] rounded-full     flex items-center justify-center border ">
-            <button
-            className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center hover:scale-110 duration-200 "
-              style={{ 
-              background: 'none',
-              border: 'none',
-              padding: 0,
-              outline: 'none'
-              }}
-            >
-            <TbActivityHeartbeat className="h-16 w-16 text-[#0b132b] "/>
-            </button>
-          </div>
-        </div>
-      )}
+      {showCenterOval && isAuthenticated && (<Eve />)}
 
       {/* Hamburger (only mobile) */}
       {/* <button

@@ -14,7 +14,7 @@ import {
 import { useAppDispatch, useAppSelector } from '@/hooks/hooks';
 import { createJournalEntry, updateJournal, deleteJournal, getJournal } from '@/store/slices/journalSlice';
 import toast from 'react-hot-toast';
-// import { TbActivityHeartbeat } from "react-icons/tb";
+import { TbActivityHeartbeat } from 'react-icons/tb';
 
 
 interface ChatMessage {
@@ -38,7 +38,7 @@ const JournalEditor: React.FC = () => {
   const { loading, error } = useAppSelector((state) => state.journal);
 
   const { id } = useParams();
-  const isEditing = id !== 'new';
+  const isEditing = !!id && id !== 'new';
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -184,7 +184,7 @@ const JournalEditor: React.FC = () => {
               {/* <ArrowLeft className="h-4 w-4" /> */}
                Back
             </Button>
-            <h1 className="text-3xl font-bold text-ocean-text flex justify-end">{!isEditing ? 'Edit Journal' : 'New Journal Entry'}</h1>
+            <h1 className="text-3xl font-bold text-ocean-text flex justify-end">{isEditing ? 'Edit Journal' : 'New Journal Entry'}</h1>
           </div>
           <div className="space-x-2 flex">
             {isEditing && (
@@ -198,7 +198,7 @@ const JournalEditor: React.FC = () => {
               className="flex items-center gap-2"
             >
               <Save className="h-4 w-4" />
-              {isSaving ? 'Saving...' : !isEditing ? 'Update' : 'Save'}
+              {isSaving ? 'Saving...' : isEditing ? 'Update' : 'Save'}
             </Button>
           </div>
         </div>
@@ -259,13 +259,13 @@ const JournalEditor: React.FC = () => {
                 {/* Tags Input */}
                 <div className="mt-4">
                   <label className="block text-sm font-medium text-gray-700 mb-1">Tags</label>
-                  <div className="flex gap-2  flex-wrap">
+                  <div className="flex gap-1  flex-wrap">
                     {tags.map((tag, idx) => (
-                      <span key={idx} className="flex items-center gap-1 bg-ocean-primary text-black px-2 py-1 rounded-full text-sm">
+                      <span key={idx} className="flex items-center gap-1 bg-ocean-primary text-black px-1 py-1 rounded-full text-sm">
                         {tag}
                         <button 
                           type="button" 
-                          className="w-6 h-6 hover:text-gray-200 p-1" 
+                          className="w-4 h-4 flex items-center justify-center hover:text-gray-200 p-1" 
                           onClick={() => setTags(tags.filter((t) => t !== tag))}
                         >
                           x
@@ -310,12 +310,22 @@ const JournalEditor: React.FC = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="flex-1 flex flex-col justify-center">
-                
                 <div className="text-center space-y-6">
                   <div className="w-24 h-24 mx-auto bg-ocean-primary rounded-full flex items-center justify-center">
-                    <Mic className="h-10 w-10 text-white" />
+                    {/* <Mic className="h-10 w-10 text-white" /> */}
                   </div>
-                  <Button variant="outline" className="w-full">Start Recording</Button>
+                  <button
+                    className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center hover:scale-110 duration-200 mx-auto "
+                      style={{ 
+                      background: 'none',
+                      border: 'none',
+                      padding: 0,
+                      outline: 'none'
+                      }}
+                    >
+                    <TbActivityHeartbeat className="h-16 w-16 text-[#0b132b] "/>
+                  </button>
+                  <Button variant="outline" className="w-full">Speak</Button>
                   <p className="text-xs text-gray-500">Tap to start voice conversation</p>
                 </div>
               </CardContent>
