@@ -1,0 +1,45 @@
+meta {
+  name: Create Minimal Response
+  type: http
+  seq: 10
+}
+
+post {
+  url: {{baseUrl}}/api/voice-session-responses/
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "session_id": "minimal-session-456",
+    "status": "started"
+  }
+}
+
+assert {
+  res.status: eq 201
+}
+
+tests {
+  test("Create minimal voice session response successful", function() {
+    const body = res.getBody();
+    expect(body).to.have.property('id');
+    expect(body).to.have.property('user_id');
+    expect(body).to.have.property('session_id', 'minimal-session-456');
+    expect(body).to.have.property('status', 'started');
+    expect(body.summary).to.be.null;
+    expect(body.notes_journal_id).to.be.null;
+    expect(body.notes_content).to.be.null;
+    expect(body).to.have.property('created_at');
+    expect(body.updated_at).to.be.null;
+    
+    // Store minimal response ID for cleanup
+    bru.setVar("minimalResponseId", body.id);
+  });
+}

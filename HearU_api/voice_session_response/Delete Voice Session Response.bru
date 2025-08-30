@@ -1,0 +1,26 @@
+meta {
+  name: Delete Voice Session Response
+  type: http
+  seq: 6
+}
+
+delete {
+  url: {{baseUrl}}/api/voice-session-responses/{{voiceResponseId}}
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Delete voice session response successful", function() {
+    const body = res.getBody();
+    expect(body).to.have.property('status', 'deleted');
+  });
+}
