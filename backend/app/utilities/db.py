@@ -1,4 +1,4 @@
-from typing import AsyncGenerator, Optional
+from typing import AsyncGenerator, Optional, Any
 import re
 
 from sqlalchemy.ext.asyncio import (
@@ -73,7 +73,11 @@ async def init_models(engine: Optional[AsyncEngine] = None) -> None:
     """
     eng = engine or async_engine
     async with eng.begin() as conn:
-        await conn.run_sync(SQLModel.metadata.create_all)
+        # Use checkfirst=True to avoid "table already exists" errors
+        def create_tables(connection: Any) -> None:
+            SQLModel.metadata.create_all(connection, checkfirst=True)
+
+        await conn.run_sync(create_tables)
     log.info("Database tables created (if they did not exist).")
 
 

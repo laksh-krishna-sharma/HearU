@@ -1,0 +1,36 @@
+meta {
+  name: Get Responses by Session ID
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/api/voice-session-responses/session/test-session-123
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Get voice session responses by session ID successful", function() {
+    const body = res.getBody();
+    expect(body).to.have.property('responses');
+    expect(Array.isArray(body.responses)).to.be.true;
+    
+    // All responses should have the same session_id
+    body.responses.forEach(response => {
+      expect(response).to.have.property('session_id', 'test-session-123');
+      expect(response).to.have.property('id');
+      expect(response).to.have.property('user_id');
+      expect(response).to.have.property('status');
+      expect(response).to.have.property('created_at');
+    });
+  });
+}

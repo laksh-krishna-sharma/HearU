@@ -1,0 +1,44 @@
+meta {
+  name: Complete Workflow
+  type: http
+  seq: 11
+}
+
+post {
+  url: {{baseUrl}}/api/voice-session-responses/
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "session_id": "workflow-session-789",
+    "status": "in_progress",
+    "summary": "Initial session summary",
+    "notes_journal_id": "workflow-journal-123",
+    "notes_content": "Initial notes from the session"
+  }
+}
+
+assert {
+  res.status: eq 201
+}
+
+tests {
+  test("Complete workflow - Create, Read, Update, Delete", function() {
+    // Step 1: Create response
+    const createBody = res.getBody();
+    expect(createBody).to.have.property('id');
+    expect(createBody).to.have.property('status', 'in_progress');
+    
+    const responseId = createBody.id;
+    bru.setVar("workflowResponseId", responseId);
+    
+    console.log("Created voice session response with ID:", responseId);
+  });
+}

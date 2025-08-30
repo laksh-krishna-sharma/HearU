@@ -1,0 +1,23 @@
+meta {
+  name: Unauthorized Access
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{baseUrl}}/api/voice-session-responses/
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 401
+}
+
+tests {
+  test("Unauthorized access returns 401", function() {
+    expect(res.getStatus()).to.eq(401);
+    const body = res.getBody();
+    expect(body).to.have.property('detail', 'Not authenticated');
+  });
+}
