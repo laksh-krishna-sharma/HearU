@@ -1,0 +1,27 @@
+meta {
+  name: Error Cases
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/api/voice-session-responses/non-existent-id
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+assert {
+  res.status: eq 404
+}
+
+tests {
+  test("Get non-existent voice session response returns 404", function() {
+    expect(res.getStatus()).to.eq(404);
+    const body = res.getBody();
+    expect(body).to.have.property('detail', 'Voice session response not found');
+  });
+}

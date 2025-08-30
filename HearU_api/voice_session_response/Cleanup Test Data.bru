@@ -1,0 +1,33 @@
+meta {
+  name: Cleanup Test Data
+  type: http
+  seq: 12
+}
+
+delete {
+  url: {{baseUrl}}/api/voice-session-responses/{{minimalResponseId}}
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Cleanup minimal response successful", function() {
+    const body = res.getBody();
+    expect(body).to.have.property('status', 'deleted');
+    console.log("Cleaned up minimal response");
+  });
+  
+  // Also cleanup workflow response if it exists
+  const workflowId = bru.getVar("workflowResponseId");
+  if (workflowId) {
+    console.log("Workflow response ID to cleanup:", workflowId);
+  }
+}

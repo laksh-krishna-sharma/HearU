@@ -1,0 +1,42 @@
+meta {
+  name: Update Voice Session Response
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{baseUrl}}/api/voice-session-responses/{{voiceResponseId}}
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "status": "updated",
+    "summary": "Updated summary: User discussed anxiety and received additional coping strategies.",
+    "notes_content": "1. Practice deep breathing exercises\n2. Create a study schedule\n3. Take regular breaks\n4. Use mindfulness techniques"
+  }
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Update voice session response successful", function() {
+    const body = res.getBody();
+    expect(body).to.have.property('id', bru.getVar('voiceResponseId'));
+    expect(body).to.have.property('status', 'updated');
+    expect(body).to.have.property('summary');
+    expect(body.summary).to.include('Updated summary');
+    expect(body).to.have.property('notes_content');
+    expect(body.notes_content).to.include('mindfulness techniques');
+    expect(body).to.have.property('updated_at');
+    expect(body.updated_at).to.not.be.null;
+  });
+}

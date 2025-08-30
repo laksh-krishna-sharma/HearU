@@ -1,0 +1,33 @@
+meta {
+  name: Get Voice Session Response
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/voice-session-responses/33a3379d-d66f-4267-94be-91072451c3cc
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Get specific voice session response successful", function() {
+    const body = res.getBody();
+    expect(body).to.have.property('id', bru.getVar('voiceResponseId'));
+    expect(body).to.have.property('user_id');
+    expect(body).to.have.property('session_id');
+    expect(body).to.have.property('status');
+    expect(body).to.have.property('summary');
+    expect(body).to.have.property('notes_journal_id');
+    expect(body).to.have.property('notes_content');
+    expect(body).to.have.property('created_at');
+  });
+}

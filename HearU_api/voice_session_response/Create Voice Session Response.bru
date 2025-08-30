@@ -1,0 +1,48 @@
+meta {
+  name: Create Voice Session Response
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/voice-session-responses/
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "session_id": "a7bbf0b1-6094-4cec-bc76-98048e8d0b0d",
+    "status": "ended",
+    "summary": "Here's a summary of the therapy-like conversation in clear notes:\n\n**Client's Reported Experience & Feelings:**\n*   Feeling deep exhaustion and frustration.\n*   Overwhelmed and resentful due to Laksh Bhai's constant calls, lack of rest, and feeling perpetually at work.\n*   Personal time and need for rest are consistently overlooked.\n*   Difficulty saying no to Laksh Bhai because he gets work done by \"talking sweetly,\" making it harder to set boundaries despite personal need for a break.\n*   Experienced an intense physical stress reaction: hands started shivering, felt immense pressure, even while attempting breathing exercises.\n*   Felt disoriented and didn't know what to do during the acute distress.\n\n**Therapist's Observations & Validation:**\n*   Validates feelings of overwhelm, resentment, and exhaustion as natural reactions to the situation.\n*   Acknowledges the tricky dynamic of \"sweet-talking\" making boundary-setting difficult, attributing it to the client's good nature.\n*   Emphasizes the client *deserves* moments of peace and quiet.\n*   Validates the intense physical reaction (shivering, pressure) as a profound stress response, not a personal failure.\n*   Interprets the physical reaction as the body \"screaming for a break\" or a need to feel safe.\n\n**Therapist's Guidance & Coping Strategies:**\n*   **General Principles:**\n    *   Energy is a finite resource; it's vital to protect it.\n    *   Reflect on what gentle boundaries might look like.\n    *   Communicate specific needs for breaks or suggest different times for tasks.\n*   **For Acute Physical Distress (like shivering/overwhelm):**\n    *   **Acknowledge it:** Name the feeling/sensation (e.g., \"My hands are shaking, I feel immense pressure, and that's okay. My body is reacting to stress.\")\n    *   **Grounding:** Press feet firmly on the floor or touch a solid object, focusing on its texture, temperature, and weight.\n    *   **Sensory Focus:** Concentrate on a single, simple sense (e.g., one specific sound, one color in the room) for a few seconds.\n    *   **Self-Compassionate Touch:** Gently place a hand over the heart or stomach for comfort.\n\n**Overall Support & Encouragement:**\n*   Reassurance that the client's reaction was valid and their body was communicating something important.\n*   Affirmation that the client is doing great navigating a challenging situation and showing strength by sharing.\n*   Emphasizes the client is not alone and is understood.",
+    "notes_journal_id": "1b6e1fb5-4ead-4c59-b801-544f46abc9f4",
+    "notes_content": "Here are 8 actionable notes from the conversation:\n\n1.  Acknowledge your feelings of exhaustion and frustration as valid and natural.\n2.  Prioritize and protect your personal energy as a valuable, finite resource.\n3.  Explore setting gentle boundaries to safeguard your time and need for rest.\n4.  Communicate your need for specific breaks or suggest alternative times for tasks.\n5.  When feeling overwhelmed, name your physical and emotional sensations to create distance.\n6.  Practice grounding by pressing your feet down or touching a solid object to reconnect.\n7.  Shift focus from internal overwhelm by engaging one simple sense like sound or color.\n8.  Use self-compassionate touch, such as a hand over your heart, for comfort."
+  }
+}
+
+assert {
+  res.status: eq 201
+}
+
+tests {
+  test("Create voice session response successful", function() {
+    const body = res.getBody();
+    expect(body).to.have.property('id');
+    expect(body).to.have.property('user_id');
+    expect(body).to.have.property('session_id', 'test-session-123');
+    expect(body).to.have.property('status', 'completed');
+    expect(body).to.have.property('summary');
+    expect(body).to.have.property('notes_journal_id', 'journal-456');
+    expect(body).to.have.property('notes_content');
+    expect(body).to.have.property('created_at');
+    expect(body.updated_at).to.be.null;
+    
+    // Store response ID for future tests
+    bru.setVar("voiceResponseId", body.id);
+  });
+}
