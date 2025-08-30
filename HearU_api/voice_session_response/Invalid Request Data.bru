@@ -1,0 +1,42 @@
+meta {
+  name: Invalid Request Data
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{baseUrl}}/api/voice-session-responses/
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "status": "completed"
+  }
+}
+
+assert {
+  res.status: eq 422
+}
+
+tests {
+  test("Invalid request data returns 422", function() {
+    expect(res.getStatus()).to.eq(422);
+    const body = res.getBody();
+    expect(body).to.have.property('detail');
+    expect(Array.isArray(body.detail)).to.be.true;
+    
+    // Check that session_id is required
+    const sessionIdError = body.detail.find(error => 
+      error.loc && error.loc.includes('session_id')
+    );
+    expect(sessionIdError).to.exist;
+    expect(sessionIdError.type).to.eq('missing');
+  });
+}

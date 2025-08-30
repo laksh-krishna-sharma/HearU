@@ -14,6 +14,9 @@ from app.routes.chat.chat import router as chat_router
 from app.routes.blog.blog import router as blog_router
 from app.routes.journal.journal import router as journal_router
 from app.routes.eve.eve import router as eve_router
+from app.routes.voice_session_response.voice_session_response import (
+    router as voice_session_response_router,
+)
 
 from app.utilities.db import init_models, async_session
 from app.services.auth.auth import create_default_admin_if_missing
@@ -56,7 +59,12 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173", "https://hearu-e8zutv880-lakshs-projects-e8fa6099.vercel.app", "https://hearu-proto.vercel.app"],
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "https://hearu-e8zutv880-lakshs-projects-e8fa6099.vercel.app",
+        "https://hearu-proto.vercel.app",
+    ],
 )
 
 app.include_router(auth_router)
@@ -64,6 +72,7 @@ app.include_router(chat_router)
 app.include_router(blog_router)
 app.include_router(journal_router)
 app.include_router(eve_router)
+app.include_router(voice_session_response_router)
 
 
 @app.get("/", tags=["Health"])

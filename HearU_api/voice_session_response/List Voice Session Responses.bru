@@ -1,0 +1,36 @@
+meta {
+  name: List Voice Session Responses
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/voice-session-responses/
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("List voice session responses successful", function() {
+    const body = res.getBody();
+    expect(body).to.have.property('responses');
+    expect(Array.isArray(body.responses)).to.be.true;
+    
+    if (body.responses.length > 0) {
+      const response = body.responses[0];
+      expect(response).to.have.property('id');
+      expect(response).to.have.property('user_id');
+      expect(response).to.have.property('session_id');
+      expect(response).to.have.property('status');
+      expect(response).to.have.property('created_at');
+    }
+  });
+}
