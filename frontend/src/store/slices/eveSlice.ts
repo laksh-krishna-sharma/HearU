@@ -17,6 +17,8 @@ interface VoiceSession {
   system_prompt: string
   is_active: boolean
   created_at: string
+  greeting_message?: string
+  greeting_audio_path?: string
 }
 
 interface VoiceTurn {
@@ -74,7 +76,16 @@ export const getJournalReply = createAsyncThunk(
           Authorization: `Bearer ${token}`
         }
       })
-      return response.data
+      
+      // Transform audio_path to proper URL if it exists
+      const data = response.data
+      if (data.audio_path) {
+        // Extract filename from the full path and construct proper URL
+        const filename = data.audio_path.split(/[/\\]/).pop()
+        data.audio_path = `${API_URL}/audio/eve/${filename}`
+      }
+      
+      return data
     } catch (error: unknown) {
       toast.error('Failed to get journal reply')
       return rejectWithValue((error as any).response.data)
@@ -95,7 +106,7 @@ export const startVoiceSession = createAsyncThunk(
   async (system_prompt: string, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem('token')
-      const response = await axios.post(`${API_URL}/api/eve/start-voice-session`, { system_prompt }, {
+      const response = await axios.post(`${API_URL}/api/eve/voice/start`, { system_prompt }, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -120,15 +131,30 @@ export const startVoiceSession = createAsyncThunk(
 // }
 export const voiceTurn = createAsyncThunk(
   'voice/turn',
-  async ({session_id, audio}: {session_id: string; audio: string}, { rejectWithValue }) => {
+  async ({session_id, audio}: {session_id: string; audio: File | Blob}, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem('token')
-      const response = await axios.post(`${API_URL}/api/eve/voice-turn`, { session_id, audio }, {
+      const formData = new FormData()
+      formData.append('audio', audio)
+      
+      const response = await axios.post(`${API_URL}/api/eve/voice/turn/${session_id}`, formData, {
         headers: {
           Authorization: `Bearer ${token}`
         }
       })
-      return response.data
+      
+      // Transform audio paths to proper URLs
+      const data = response.data
+      if (data.audio_path) {
+        const filename = data.audio_path.split(/[/\\]/).pop()
+        data.audio_path = `${API_URL}/audio/eve/${filename}`
+      }
+      if (data.user_audio_path) {
+        const filename = data.user_audio_path.split(/[/\\]/).pop()
+        data.user_audio_path = `${API_URL}/audio/user/${filename}`
+      }
+      
+      return data
     } catch (error: unknown) {
       toast.error('Failed to process voice turn')
       return rejectWithValue((error as any).response.data)
@@ -150,7 +176,7 @@ export const voiceEnd = createAsyncThunk(
   async ({session_id, save_summary}: {session_id: string; save_summary: boolean}, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem('token')
-      const response = await axios.post(`${API_URL}/api/eve/voice-end`, { session_id, save_summary }, {
+      const response = await axios.post(`${API_URL}/api/eve/voice/end`, { session_id, save_summary }, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -198,7 +224,21 @@ export const eveSlice = createSlice({
     })
     builder.addCase(startVoiceSession.fulfilled, (state, action) => {
       state.loading = false
-      state.session = action.payload
+      const sessionData = { ...action.payload } // Create a new object to ensure immutability
+      
+      // console.log("Raw session data from backend:", sessionData);
+      
+      // Transform greeting audio path if it exists
+      if (sessionData.greeting_audio_path) {
+        const filename = sessionData.greeting_audio_path.split(/[/\\]/).pop()
+        sessionData.greeting_audio_path = `${API_URL}/audio/eve/${filename}`
+        // console.log("Transformed greeting audio path:", sessionData.greeting_audio_path);
+      }
+      
+      // Ensure we're creating a new reference for React to detect the change
+      state.session = sessionData
+      state.error = null // Clear any previous errors
+      // console.log("Session set in state:", state.session);
     })
     builder.addCase(startVoiceSession.rejected, (state, action) => {
       state.loading = false

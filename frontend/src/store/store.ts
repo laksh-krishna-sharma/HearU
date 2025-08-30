@@ -9,7 +9,19 @@ export const store = configureStore({
     journal: journalSlice.reducer,
     eve: eveSlice.reducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE'],
+      },
+    }),
 });
 
 export type RootState = ReturnType<typeof store.getState>
 export type AppDispatch = typeof store.dispatch
+
+// Debug: Log store state changes (remove in production)
+// store.subscribe(() => {
+//   const state = store.getState();
+//   console.log("Store state changed - eve session:", state.eve.session);
+// });

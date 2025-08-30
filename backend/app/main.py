@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 import uvicorn
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from app.config import settings
 from app.utilities.logger import logger
@@ -64,6 +65,11 @@ app.include_router(chat_router)
 app.include_router(blog_router)
 app.include_router(journal_router)
 app.include_router(eve_router)
+
+# Mount static files for audio serving
+import os
+audio_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../audio"))
+app.mount("/audio", StaticFiles(directory=audio_dir), name="audio")
 
 
 @app.get("/", tags=["Health"])

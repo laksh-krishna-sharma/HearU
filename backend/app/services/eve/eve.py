@@ -122,7 +122,7 @@ class EveService:
     async def start_voice_session(
         self, system_prompt: str, user: User
     ) -> VoiceSessionStartResponse:
-        """Start a new voice session."""
+        """Start a new voice session with an initial greeting."""
         session = EveSession(
             user_id=user.id,
             system_prompt=system_prompt,
@@ -132,11 +132,37 @@ class EveService:
         await self.db.commit()
         await self.db.refresh(session)
 
+        # Generate initial greeting
+        greeting_text = await asyncio.to_thread(
+            self.llm.generate_reply, 
+            f"{system_prompt}\n\nGenerate a warm, friendly greeting to start the conversation. Keep it brief (under 30 seconds when spoken) and invite the user to share what's on their mind."
+        )
+
+        # Create TTS for greeting
+        os.makedirs(EVE_AUDIO_DIR, exist_ok=True)
+        tts_result: TTSResult = await self.tts.synthesize_to_local(
+            greeting_text, EVE_AUDIO_DIR
+        )
+
+        # Store the greeting message
+        greeting_msg = EveMessage(
+            user_id=user.id,
+            session_id=session.id,
+            role=EveRole.EVE,
+            text=greeting_text,
+            audio_path=tts_result.tts_meta.get("local_path"),
+        )
+        self.db.add(greeting_msg)
+        await self.db.commit()
+        await self.db.refresh(greeting_msg)
+
         return VoiceSessionStartResponse(
             session_id=session.id,
             system_prompt=session.system_prompt,
             is_active=session.is_active,
             created_at=session.created_at,
+            greeting_message=greeting_msg.text,
+            greeting_audio_path=greeting_msg.audio_path,
         )
 
     async def voice_turn(
