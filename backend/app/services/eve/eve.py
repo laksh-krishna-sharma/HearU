@@ -13,7 +13,9 @@ from app.models.user import User
 from app.utilities.tts import TTSResult, GeminiTTSAdapter
 from app.utilities.stt import SpeechToText
 from app.services.llm.gemini import GeminiService
-from app.services.voice_session_response.voice_session_response import VoiceSessionResponseService
+from app.services.voice_session_response.voice_session_response import (
+    VoiceSessionResponseService,
+)
 from app.config import settings
 from app.routes.eve.schema.eve import (
     JournalEveResponse,

@@ -1,15 +1,13 @@
 import time
 from typing import Any, Callable, TypeVar, Dict, AsyncGenerator
 from contextlib import asynccontextmanager
-
+import os
 import uvicorn
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-
 from app.config import settings
 from app.utilities.logger import logger
-
 from app.routes.auth.auth import router as auth_router
 from app.routes.chat.chat import router as chat_router
 from app.routes.blog.blog import router as blog_router
@@ -76,7 +74,7 @@ app.include_router(eve_router)
 app.include_router(voice_session_response_router)
 
 # Mount static files for audio serving
-import os
+
 audio_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../audio"))
 app.mount("/audio", StaticFiles(directory=audio_dir), name="audio")
 
