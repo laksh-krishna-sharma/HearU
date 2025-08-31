@@ -13,6 +13,7 @@ from app.models.user import User
 from app.utilities.tts import TTSResult, GeminiTTSAdapter
 from app.utilities.stt import SpeechToText
 from app.services.llm.gemini import GeminiService
+from app.services.voice_session_response.voice_session_response import VoiceSessionResponseService
 from app.config import settings
 from app.routes.eve.schema.eve import (
     JournalEveResponse,
@@ -25,6 +26,9 @@ from app.routes.eve.schema.eve import (
     EveMessageCreateRequest,
     EveMessageUpdateRequest,
     EveMessageResponse,
+)
+from app.routes.voice_session_response.schema.voice_session_response import (
+    VoiceSessionResponseCreateRequest,
 )
 
 
@@ -279,7 +283,6 @@ class EveService:
             return None
 
         summary = None
-        notes_journal_id = None
         notes_content = None
 
         if save_summary and session.messages:
@@ -292,27 +295,29 @@ class EveService:
                 self.llm.summarize, f"{notes_prompt}\n\nTranscript:\n{history}"
             )
 
-            notes_journal = Journal(
-                user_id=user.id,
-                title=f"Session Notes - {session.id} - {datetime.utcnow().date()}",
-                content=notes_content,
-            )
-            self.db.add(notes_journal)
-            await self.db.commit()
-            await self.db.refresh(notes_journal)
-            notes_journal_id = notes_journal.id
-
         # Mark session as ended
         session.is_active = False
         session.ended_at = datetime.utcnow()
 
         await self.db.commit()
 
+        # Create voice session response record instead of journal entry
+        if save_summary:
+            voice_response_service = VoiceSessionResponseService(self.db)
+            voice_response_payload = VoiceSessionResponseCreateRequest(
+                session_id=session.id,
+                status="ended",
+                summary=summary,
+                notes_journal_id=None,  # No longer creating journal entries
+                notes_content=notes_content,
+            )
+            await voice_response_service.create_response(voice_response_payload, user)
+
         return VoiceSessionEndResponse(
             session_id=session.id,
             status="ended",
             summary=summary,
-            notes_journal_id=notes_journal_id,
+            notes_journal_id=None,  # No longer returning journal ID
             notes_content=notes_content,
         )
 
