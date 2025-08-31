@@ -13,6 +13,7 @@ from app.models.user import User
 from app.utilities.tts import TTSResult, GeminiTTSAdapter
 from app.utilities.stt import SpeechToText
 from app.services.llm.gemini import GeminiService
+from app.services.voice_session_response.voice_session_response import VoiceSessionResponseService
 from app.config import settings
 from app.routes.eve.schema.eve import (
     JournalEveResponse,
@@ -25,6 +26,9 @@ from app.routes.eve.schema.eve import (
     EveMessageCreateRequest,
     EveMessageUpdateRequest,
     EveMessageResponse,
+)
+from app.routes.voice_session_response.schema.voice_session_response import (
+    VoiceSessionResponseCreateRequest,
 )
 
 
@@ -122,7 +126,7 @@ class EveService:
     async def start_voice_session(
         self, system_prompt: str, user: User
     ) -> VoiceSessionStartResponse:
-        """Start a new voice session with an initial greeting."""
+        """Start a new voice session."""
         session = EveSession(
             user_id=user.id,
             system_prompt=system_prompt,
@@ -132,37 +136,11 @@ class EveService:
         await self.db.commit()
         await self.db.refresh(session)
 
-        # Generate initial greeting
-        greeting_text = await asyncio.to_thread(
-            self.llm.generate_reply, 
-            f"{system_prompt}\n\nGenerate a warm, friendly greeting to start the conversation. Keep it brief (under 30 seconds when spoken) and invite the user to share what's on their mind."
-        )
-
-        # Create TTS for greeting
-        os.makedirs(EVE_AUDIO_DIR, exist_ok=True)
-        tts_result: TTSResult = await self.tts.synthesize_to_local(
-            greeting_text, EVE_AUDIO_DIR
-        )
-
-        # Store the greeting message
-        greeting_msg = EveMessage(
-            user_id=user.id,
-            session_id=session.id,
-            role=EveRole.EVE,
-            text=greeting_text,
-            audio_path=tts_result.tts_meta.get("local_path"),
-        )
-        self.db.add(greeting_msg)
-        await self.db.commit()
-        await self.db.refresh(greeting_msg)
-
         return VoiceSessionStartResponse(
             session_id=session.id,
             system_prompt=session.system_prompt,
             is_active=session.is_active,
             created_at=session.created_at,
-            greeting_message=greeting_msg.text,
-            greeting_audio_path=greeting_msg.audio_path,
         )
 
     async def voice_turn(
@@ -279,7 +257,6 @@ class EveService:
             return None
 
         summary = None
-        notes_journal_id = None
         notes_content = None
 
         if save_summary and session.messages:
@@ -292,27 +269,29 @@ class EveService:
                 self.llm.summarize, f"{notes_prompt}\n\nTranscript:\n{history}"
             )
 
-            notes_journal = Journal(
-                user_id=user.id,
-                title=f"Session Notes - {session.id} - {datetime.utcnow().date()}",
-                content=notes_content,
-            )
-            self.db.add(notes_journal)
-            await self.db.commit()
-            await self.db.refresh(notes_journal)
-            notes_journal_id = notes_journal.id
-
         # Mark session as ended
         session.is_active = False
         session.ended_at = datetime.utcnow()
 
         await self.db.commit()
 
+        # Create voice session response record instead of journal entry
+        if save_summary:
+            voice_response_service = VoiceSessionResponseService(self.db)
+            voice_response_payload = VoiceSessionResponseCreateRequest(
+                session_id=session.id,
+                status="ended",
+                summary=summary,
+                notes_journal_id=None,  # No longer creating journal entries
+                notes_content=notes_content,
+            )
+            await voice_response_service.create_response(voice_response_payload, user)
+
         return VoiceSessionEndResponse(
             session_id=session.id,
             status="ended",
             summary=summary,
-            notes_journal_id=notes_journal_id,
+            notes_journal_id=None,  # No longer returning journal ID
             notes_content=notes_content,
         )
 
