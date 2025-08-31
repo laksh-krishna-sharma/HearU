@@ -1,7 +1,8 @@
 import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom'; // ✅ import navigate
 import { pageTransitions, createTimeline } from '../utils/animations';
-import { TbActivityHeartbeat } from "react-icons/tb";
+// import { TbActivityHeartbeat } from "react-icons/tb";
+import Eve from "@/components/eve/Eve";
 
 const Hero = () => {
   const ovalRef = useRef<HTMLDivElement>(null);
@@ -38,25 +39,10 @@ const Hero = () => {
       </div>
 
       {/* Oval Mic */}
-      <div
-        ref={ovalRef}
-        className="w-[80%] sm:w-[60%] md:w-[50%] h-12 sm:h-14 md:h-16 lg:h-20 bg-[#EBE8D9] rounded-full flex items-center justify-center border border-ocean-primary/30 px-3 sm:px-6 backdrop-blur-sm shadow-2xl opacity-0 z-10"
-      >
-        <button
-          className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center hover:scale-110 duration-200 flex-shrink-0"
-          style={{ 
-            background: 'none',
-            border: 'none',
-            padding: 0,
-            outline: 'none'
-          }}
-        >
-          <TbActivityHeartbeat className="h-16 w-16 text-[#0b132b]"/>
-        </button>
-      </div>
+      <Eve  size="large" />
 
       {/* Text + Buttons */}
-      <div className="mt-4 sm:mt-6 text-center z-10 max-w-[90%] sm:max-w-xl">
+      <div className="mt-16 sm:mt-20 md:mt-24 text-center z-10 max-w-[90%] sm:max-w-xl">
         <p className="text-xs sm:text-sm md:text-base text-ocean-text/80 mb-2 sm:mb-4">
           Tap to talk with Eve
         </p>
