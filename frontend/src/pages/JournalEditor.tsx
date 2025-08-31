@@ -25,20 +25,8 @@ const JournalEditor: React.FC = () => {
   const { loading, error } = useAppSelector((state) => state.journal);
   const eveState = useAppSelector((state) => state.eve);
   const { session, turns, journalReply, loading: eveLoading, error: eveError } = eveState;
-  
-  // Debug logs (remove in production)
-  // useEffect(() => {
-  //   console.log("Full eve state:", eveState);
-  // }, [eveState]);
-  
-  // useEffect(() => {
-  //   console.log("Session state changed:", session);
-  //   console.log("Session object keys:", session ? Object.keys(session) : 'null');
-  //   console.log("Session session_id:", session?.session_id);
-  // }, [session]);
 
   const { id } = useParams();
-  const isEditing = !!id && id !== 'new';
   const isEditing = !!id && id !== 'new';
 
   const [title, setTitle] = useState('');
