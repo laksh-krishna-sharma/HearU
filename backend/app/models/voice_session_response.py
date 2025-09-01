@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from typing import Optional, TYPE_CHECKING
 
-from sqlmodel import SQLModel, Field
+from sqlmodel import SQLModel, Field, Relationship
 from sqlalchemy import (
     Column,
     Text,
@@ -12,7 +12,7 @@ from sqlalchemy import (
 )
 
 if TYPE_CHECKING:
-    pass
+    from app.models.journal import Journal
 
 
 def gen_uuid() -> str:
@@ -47,8 +47,15 @@ class VoiceSessionResponseData(SQLModel, table=True):
     # Optional summary content
     summary: Optional[str] = Field(default=None, sa_column=Column(Text, nullable=True))
 
-    # Optional notes journal ID
-    notes_journal_id: Optional[str] = Field(default=None, max_length=36)
+    # Optional notes journal ID - Foreign Key to Journal
+    notes_journal_id: Optional[str] = Field(
+        default=None,
+        sa_column=Column(
+            ForeignKey("journals.id", ondelete="SET NULL"),
+            index=True,
+            nullable=True,
+        ),
+    )
 
     # Optional notes content
     notes_content: Optional[str] = Field(
@@ -63,5 +70,5 @@ class VoiceSessionResponseData(SQLModel, table=True):
     )
     updated_at: Optional[datetime] = Field(default=None)
 
-    # Relationships - we don't define back_populates since User model might not have this relationship
-    # user: Optional["User"] = Relationship(back_populates="voice_session_responses")
+    # Relationships
+    journal: Optional["Journal"] = Relationship(back_populates="voice_session_response")
