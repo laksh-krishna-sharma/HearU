@@ -30,3 +30,20 @@ class JournalOut(JournalBase):
 
     class Config:
         from_attributes = True
+
+
+class VoiceSessionNotes(BaseModel):
+    """Schema for voice session notes and summary"""
+
+    session_id: str
+    status: str
+    summary: Optional[str] = None
+    notes_content: Optional[str] = None
+    created_at: datetime
+    updated_at: Optional[datetime] = None
+
+
+class JournalWithNotesOut(JournalOut):
+    """Journal with associated voice session notes"""
+
+    voice_session_notes: Optional[VoiceSessionNotes] = None
