@@ -95,3 +95,19 @@ async def delete_voice_session_response(
     if not success:
         raise HTTPException(status_code=404, detail="Voice session response not found")
     return {"status": "deleted"}
+
+
+@router.get("/journal/{journal_id}", response_model=VoiceSessionResponseResponse)
+async def get_voice_session_response_by_journal(
+    journal_id: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> VoiceSessionResponseResponse:
+    """Get voice session response by journal ID."""
+    service = VoiceSessionResponseService(db)
+    response = await service.get_response_by_journal_id(journal_id, current_user)
+    if not response:
+        raise HTTPException(
+            status_code=404, detail="Voice session response not found for this journal"
+        )
+    return response

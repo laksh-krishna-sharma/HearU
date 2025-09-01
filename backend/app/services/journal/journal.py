@@ -6,6 +6,8 @@ from sqlalchemy.orm import selectinload
 
 from app.models.journal import Journal
 from app.models.user import User
+from app.models.voice_session_response import VoiceSessionResponseData
+from app.routes.journal.schema.journal import JournalWithNotesOut, VoiceSessionNotes
 
 
 async def create_journal(
@@ -138,3 +140,59 @@ async def get_user_journals(
     )
     res = await db.execute(stmt.offset(skip).limit(limit))
     return res.scalars().all()
+
+
+async def get_journal_with_voice_session(
+    db: AsyncSession, journal_id: str, user: User
+) -> Optional[JournalWithNotesOut]:
+    """Get journal with associated voice session response data."""
+    # First get the journal with user relationship
+    stmt = (
+        select(Journal)
+        .options(selectinload(Journal.user))
+        .where(Journal.id == journal_id)
+    )
+
+    # Add user permission check
+    if not user.is_admin:
+        stmt = stmt.where(Journal.user_id == user.id)
+
+    res = await db.execute(stmt)
+    journal = res.scalar_one_or_none()
+
+    if not journal:
+        return None
+
+    # Get associated voice session response
+    voice_stmt = select(VoiceSessionResponseData).where(
+        VoiceSessionResponseData.notes_journal_id == journal_id
+    )
+    voice_res = await db.execute(voice_stmt)
+    voice_session = voice_res.scalar_one_or_none()
+
+    # Build the response
+    author_name = journal.user.name or journal.user.username if journal.user else None
+
+    voice_session_notes = None
+    if voice_session:
+        voice_session_notes = VoiceSessionNotes(
+            session_id=voice_session.session_id,
+            status=voice_session.status,
+            summary=voice_session.summary,
+            notes_content=voice_session.notes_content,
+            created_at=voice_session.created_at,
+            updated_at=voice_session.updated_at,
+        )
+
+    return JournalWithNotesOut(
+        id=journal.id,
+        user_id=journal.user_id,
+        title=journal.title,
+        content=journal.content,
+        tags=journal.tags.split(",") if journal.tags else [],
+        entry_date=journal.entry_date,
+        created_at=journal.created_at,
+        updated_at=journal.updated_at,
+        author_name=author_name,
+        voice_session_notes=voice_session_notes,
+    )
