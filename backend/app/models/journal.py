@@ -8,6 +8,7 @@ from sqlalchemy import Column, DateTime, func, Text
 if TYPE_CHECKING:
     from app.models.user import User
     from app.models.eve import EveMessage
+    from app.models.voice_session_response import VoiceSessionResponseData
 
 
 def gen_uuid() -> str:
@@ -50,3 +51,8 @@ class Journal(SQLModel, table=True):
 
     # Relationship back to User
     user: Optional["User"] = Relationship(back_populates="journals")
+
+    # One-to-one relationship with VoiceSessionResponseData
+    voice_session_response: Optional["VoiceSessionResponseData"] = Relationship(
+        back_populates="journal"
+    )

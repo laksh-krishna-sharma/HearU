@@ -11,8 +11,14 @@ from app.services.journal.journal import (
     list_journals,
     update_journal,
     delete_journal,
+    get_journal_with_voice_session,
 )
-from app.routes.journal.schema.journal import JournalCreate, JournalUpdate, JournalOut
+from app.routes.journal.schema.journal import (
+    JournalCreate,
+    JournalUpdate,
+    JournalOut,
+    JournalWithNotesOut,
+)
 
 router = APIRouter(prefix="/api/journals", tags=["journals"])
 
@@ -155,3 +161,22 @@ async def delete_journal_endpoint(
             status_code=status.HTTP_404_NOT_FOUND, detail="Journal not found"
         )
     return {"message": "Journal deleted"}
+
+
+@router.get("/{journal_id}/notes", response_model=JournalWithNotesOut)
+async def get_journal_notes_endpoint(
+    journal_id: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> JournalWithNotesOut:
+    """Get journal with associated voice session notes and summary."""
+    journal_with_notes = await get_journal_with_voice_session(
+        db, journal_id, current_user
+    )
+    if not journal_with_notes:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Journal not found or access denied",
+        )
+
+    return journal_with_notes

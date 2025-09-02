@@ -184,3 +184,29 @@ class VoiceSessionResponseService:
         await self.db.delete(response_data)
         await self.db.commit()
         return True
+
+    async def get_response_by_journal_id(
+        self, journal_id: str, user: User
+    ) -> Optional[VoiceSessionResponseResponse]:
+        """Get voice session response by journal ID."""
+        stmt = select(VoiceSessionResponseData).where(
+            VoiceSessionResponseData.notes_journal_id == journal_id,
+            VoiceSessionResponseData.user_id == user.id,
+        )
+        result = await self.db.execute(stmt)
+        response_data = result.scalar_one_or_none()
+
+        if not response_data:
+            return None
+
+        return VoiceSessionResponseResponse(
+            id=response_data.id,
+            user_id=response_data.user_id,
+            session_id=response_data.session_id,
+            status=response_data.status,
+            summary=response_data.summary,
+            notes_journal_id=response_data.notes_journal_id,
+            notes_content=response_data.notes_content,
+            created_at=response_data.created_at,
+            updated_at=response_data.updated_at,
+        )
