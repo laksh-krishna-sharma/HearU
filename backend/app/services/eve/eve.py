@@ -52,7 +52,7 @@ class EveService:
         self.tts = GeminiTTSAdapter(model=settings.tts_model)
         self.stt = SpeechToText()
 
-    # ---------- Journal → Eve (one-shot voice reply) ----------
+    # ---------- Journal Reply (one-shot voice reply) ----------
     async def journal_reply(
         self, journal_id: str, user: User
     ) -> Optional[JournalEveResponse]:
@@ -70,26 +70,16 @@ class EveService:
 
         reply_text = await asyncio.to_thread(self.llm.generate_reply, context)
 
-        # create session (set system_prompt to journal title/content)
-        system_prompt = (
-            f"Journal Title: {journal.title}\nJournal Content: {journal.content}"
-        )
-        session = EveSession(
-            user_id=user.id, system_prompt=system_prompt, is_active=True
-        )
-        self.db.add(session)
-        await self.db.commit()
-        await self.db.refresh(session)
-
-        # create/eve tts
+        # Generate TTS audio for the reply (NO session creation for journal replies)
         tts_result: TTSResult = await self.tts.synthesize_to_local(
             reply_text, EVE_AUDIO_DIR
         )
 
+        # Create Eve message linked to journal (NO session for journal replies)
         eve_msg = EveMessage(
             user_id=user.id,
             journal_id=journal.id,
-            session_id=session.id,
+            session_id=None,  # No session for journal replies
             role=EveRole.EVE,
             text=reply_text,
             audio_path=tts_result.tts_meta.get("local_path"),
@@ -103,7 +93,7 @@ class EveService:
             text=eve_msg.text,
             audio_path=eve_msg.audio_path,
             created_at=eve_msg.created_at,
-            session_id=session.id,
+            session_id="",  # Return empty session_id for journal replies
         )
 
     def _build_journal_context(self, journal: Journal) -> str:
@@ -128,7 +118,7 @@ class EveService:
     async def start_voice_session(
         self, system_prompt: str, user: User
     ) -> VoiceSessionStartResponse:
-        """Start a new voice session."""
+        """Start a new voice session with a greeting."""
         session = EveSession(
             user_id=user.id,
             system_prompt=system_prompt,
@@ -138,11 +128,33 @@ class EveService:
         await self.db.commit()
         await self.db.refresh(session)
 
+        # Generate greeting message
+        greeting_text = "Hi! I'm Eve, your mental wellness companion. I'm here to listen and support you. Feel free to share what's on your mind."
+
+        # Generate greeting audio
+        tts_result: TTSResult = await self.tts.synthesize_to_local(
+            greeting_text, EVE_AUDIO_DIR
+        )
+
+        # Store greeting message
+        greeting_msg = EveMessage(
+            user_id=user.id,
+            session_id=session.id,
+            role=EveRole.EVE,
+            text=greeting_text,
+            audio_path=tts_result.tts_meta.get("local_path"),
+        )
+        self.db.add(greeting_msg)
+        await self.db.commit()
+        await self.db.refresh(greeting_msg)
+
         return VoiceSessionStartResponse(
             session_id=session.id,
             system_prompt=session.system_prompt,
             is_active=session.is_active,
             created_at=session.created_at,
+            greeting_message=greeting_text,
+            greeting_audio_path=greeting_msg.audio_path,
         )
 
     async def voice_turn(
@@ -240,7 +252,11 @@ class EveService:
         )
 
     async def end_voice_session(
-        self, session_id: str, user: User, save_summary: bool = False
+        self,
+        session_id: str,
+        user: User,
+        save_summary: bool = False,
+        journal_id: Optional[str] = None,
     ) -> Optional[VoiceSessionEndResponse]:
         """End a voice session and optionally save summary."""
         stmt = (
@@ -277,14 +293,14 @@ class EveService:
 
         await self.db.commit()
 
-        # Create voice session response record instead of journal entry
+        # Create voice session response record linked to journal if provided
         if save_summary:
             voice_response_service = VoiceSessionResponseService(self.db)
             voice_response_payload = VoiceSessionResponseCreateRequest(
                 session_id=session.id,
                 status="ended",
                 summary=summary,
-                notes_journal_id=None,  # No longer creating journal entries
+                notes_journal_id=journal_id,  # Link to journal if provided
                 notes_content=notes_content,
             )
             await voice_response_service.create_response(voice_response_payload, user)
@@ -293,7 +309,7 @@ class EveService:
             session_id=session.id,
             status="ended",
             summary=summary,
-            notes_journal_id=None,  # No longer returning journal ID
+            notes_journal_id=journal_id,
             notes_content=notes_content,
         )
 

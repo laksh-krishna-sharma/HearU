@@ -4,6 +4,8 @@ import toast from 'react-hot-toast'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
+// --- INTERFACES ---
+
 interface JournalReply {
   message_id: string
   text: string
@@ -39,11 +41,27 @@ interface VoiceEnd {
   notes_content: string
 }
 
+// FIX: Updated interface to match the full API response object.
+export interface VoiceSessionResponse {
+  id: string;
+  user_id: string;
+  session_id: string;
+  status: string;
+  summary: string;
+  notes_journal_id: string | null; // Can be null if not linked
+  notes_content: string;
+  created_at: string;
+  updated_at: string;
+}
+
 interface EveState {
   journalReply: JournalReply | null
   session: VoiceSession | null
   turns: VoiceTurn[]
   endSummary: VoiceEnd | null
+  voiceSessionResponses: VoiceSessionResponse[]
+  // Add separate state to track if we're in journal reply mode vs voice session mode
+  isJournalReplyMode: boolean
   loading: boolean
   error: string | null
 }
@@ -53,19 +71,14 @@ const initialState: EveState = {
   session: null,
   turns: [],
   endSummary: null,
+  voiceSessionResponses: [],
+  isJournalReplyMode: false,
   loading: false,
   error: null
 }
 
-//expected response from /api/eve/journal-reply
-//audio reply based on journal entry
-// { 
-//   "message_id": "string",
-//   "text": "string",
-//   "audio_path": "string",
-//   "created_at": "2025-08-27T19:10:59.964Z",
-//   "session_id": "string"
-// }
+// --- ASYNC THUNKS (Unchanged) ---
+
 export const getJournalReply = createAsyncThunk(
   'journal/getReply',
   async (journal_id: string, { rejectWithValue }) => {
@@ -77,10 +90,8 @@ export const getJournalReply = createAsyncThunk(
         }
       })
       
-      // Transform audio_path to proper URL if it exists
       const data = response.data
       if (data.audio_path) {
-        // Extract filename from the full path and construct proper URL
         const filename = data.audio_path.split(/[/\\]/).pop()
         data.audio_path = `${API_URL}/audio/eve/${filename}`
       }
@@ -93,14 +104,6 @@ export const getJournalReply = createAsyncThunk(
   }
 )
 
-// Start Voice Session for direct audio
-//audio reply based solely on system prompt and direct voice command not for the editor journal
-// {
-//   "session_id": "string",
-//   "system_prompt": "string",
-//   "is_active": true,
-//   "created_at": "2025-08-27T19:12:43.482Z"
-// }
 export const startVoiceSession = createAsyncThunk(
   'voice/startSession',
   async (system_prompt: string, { rejectWithValue }) => {
@@ -119,16 +122,6 @@ export const startVoiceSession = createAsyncThunk(
   }
 )
 
-// Voice Turn - send user audio and get eve response
-// {
-//   "user_message_id": "string",
-//   "eve_message_id": "string",
-//   "user_text": "string",
-//   "eve_text": "string",
-//   "audio_path": "string",
-//   "user_audio_path": "string",
-//   "created_at": "2025-08-27T19:14:28.594Z"
-// }
 export const voiceTurn = createAsyncThunk(
   'voice/turn',
   async ({session_id, audio}: {session_id: string; audio: File | Blob}, { rejectWithValue }) => {
@@ -143,7 +136,6 @@ export const voiceTurn = createAsyncThunk(
         }
       })
       
-      // Transform audio paths to proper URLs
       const data = response.data
       if (data.audio_path) {
         const filename = data.audio_path.split(/[/\\]/).pop()
@@ -162,21 +154,17 @@ export const voiceTurn = createAsyncThunk(
   }
 )
 
-// End Voice Session save_summary=true for journal entry
-// End Voice Session save_summary=false for direct voice talking
-// {
-//   "session_id": "string",
-//   "status": "string",
-//   "summary": "string",
-//   "notes_journal_id": "string",
-//   "notes_content": "string"
-// }
 export const voiceEnd = createAsyncThunk(
   'voice/end',
-  async ({session_id, save_summary}: {session_id: string; save_summary: boolean}, { rejectWithValue }) => {
+  async ({session_id, save_summary, journal_id}: {session_id: string; save_summary: boolean; journal_id?: string}, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem('token')
-      const response = await axios.post(`${API_URL}/api/eve/voice/end`, { session_id, save_summary }, {
+      const payload: any = { session_id, save_summary };
+      if (journal_id) {
+        payload.journal_id = journal_id;
+      }
+      
+      const response = await axios.post(`${API_URL}/api/eve/voice/end`, payload, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -189,6 +177,50 @@ export const voiceEnd = createAsyncThunk(
   }
 )
 
+export const getVoiceSessionResponsesUsingJournalId = createAsyncThunk(
+  'voice/getSessionResponses',
+  async (journalId: string, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('token')
+      const response = await axios.get(`${API_URL}/api/voice-session-responses/journal/${journalId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      // Handle both single response and array responses
+      const data = response.data;
+      return Array.isArray(data) ? data : [data];
+    } catch (error: unknown) {
+      // Don't show error toast if it's just a 404 (no responses found)
+      if ((error as any)?.response?.status !== 404) {
+        toast.error('Failed to get voice session responses')
+      }
+      return rejectWithValue((error as any).response?.data || 'Failed to fetch responses')
+    }
+  }
+)
+
+export const deleteVoiceSessionResponse = createAsyncThunk(
+  'voice/deleteSessionResponse',
+  async (session_id: string, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('token')
+      await axios.delete(`${API_URL}/api/voice-session-responses/${session_id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      // No explicit return, so payload will be undefined on success
+    } catch (error: unknown) {
+      toast.error('Failed to delete voice session response')
+      return rejectWithValue((error as any).response.data)
+    }
+  }
+)
+
+
+// --- SLICE ---
+
 export const eveSlice = createSlice({
   name: 'eve',
   initialState,
@@ -200,6 +232,16 @@ export const eveSlice = createSlice({
       state.endSummary = null
       state.error = null
       state.loading = false
+      state.voiceSessionResponses = []
+      state.isJournalReplyMode = false
+    },
+    clearJournalReply: (state) => {
+      state.journalReply = null
+      state.isJournalReplyMode = false
+      state.error = null
+    },
+    clearError: (state) => {
+      state.error = null
     }
   },
   extraReducers: (builder) => {
@@ -211,6 +253,12 @@ export const eveSlice = createSlice({
     builder.addCase(getJournalReply.fulfilled, (state, action) => {
       state.loading = false
       state.journalReply = action.payload
+      state.isJournalReplyMode = true
+      // COMPLETELY CLEAR voice session when getting journal reply - NO INTERFERENCE
+      state.session = null
+      state.turns = []
+      state.endSummary = null
+      state.error = null
     })
     builder.addCase(getJournalReply.rejected, (state, action) => {
       state.loading = false
@@ -224,21 +272,18 @@ export const eveSlice = createSlice({
     })
     builder.addCase(startVoiceSession.fulfilled, (state, action) => {
       state.loading = false
-      const sessionData = { ...action.payload } // Create a new object to ensure immutability
+      const sessionData = { ...action.payload }
       
-      // console.log("Raw session data from backend:", sessionData);
-      
-      // Transform greeting audio path if it exists
       if (sessionData.greeting_audio_path) {
         const filename = sessionData.greeting_audio_path.split(/[/\\]/).pop()
         sessionData.greeting_audio_path = `${API_URL}/audio/eve/${filename}`
-        // console.log("Transformed greeting audio path:", sessionData.greeting_audio_path);
       }
       
-      // Ensure we're creating a new reference for React to detect the change
       state.session = sessionData
-      state.error = null // Clear any previous errors
-      // console.log("Session set in state:", state.session);
+      state.error = null
+      state.isJournalReplyMode = false
+      // Clear any existing journal reply when starting voice session
+      state.journalReply = null
     })
     builder.addCase(startVoiceSession.rejected, (state, action) => {
       state.loading = false
@@ -267,13 +312,50 @@ export const eveSlice = createSlice({
     builder.addCase(voiceEnd.fulfilled, (state, action) => {
       state.loading = false
       state.endSummary = action.payload
+      // Clear session when voice session ends
+      state.session = null
+      state.turns = []
     })
     builder.addCase(voiceEnd.rejected, (state, action) => {
+      state.loading = false
+      state.error = action.payload as string
+    })
+
+    // Get Session Responses
+    builder.addCase(getVoiceSessionResponsesUsingJournalId.pending, (state) => {
+      state.loading = true
+      state.error = null
+    })
+    builder.addCase(getVoiceSessionResponsesUsingJournalId.fulfilled, (state, action) => {
+      state.loading = false
+      // FIX 4: Correctly assign the payload to the new state property.
+      state.voiceSessionResponses = action.payload
+    })
+    builder.addCase(getVoiceSessionResponsesUsingJournalId.rejected, (state, action) => {
+      state.loading = false
+      state.error = action.payload as string
+    })
+
+    // Delete Session Response
+    builder.addCase(deleteVoiceSessionResponse.pending, (state) => {
+      state.loading = true
+      state.error = null
+    })
+    builder.addCase(deleteVoiceSessionResponse.fulfilled, (state, action) => {
+      state.loading = false
+      // FIX 5: Use `action.meta.arg` to get the session_id passed to the thunk.
+      // `action.payload` is undefined because the thunk doesn't return anything.
+      const deletedSessionId = action.meta.arg;
+      state.voiceSessionResponses = state.voiceSessionResponses.filter(
+        response => response.session_id !== deletedSessionId
+      )
+    })
+    builder.addCase(deleteVoiceSessionResponse.rejected, (state, action) => {
       state.loading = false
       state.error = action.payload as string
     })
   }
 })
 
-export const { resetEveState } = eveSlice.actions
+export const { resetEveState, clearJournalReply, clearError } = eveSlice.actions
 export default eveSlice.reducer

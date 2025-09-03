@@ -79,6 +79,7 @@ class VoiceSessionTurnResponse(BaseModel):
 class VoiceSessionEndRequest(BaseModel):
     session_id: str
     save_summary: Optional[bool] = False
+    journal_id: Optional[str] = None
 
 
 class VoiceSessionEndResponse(BaseModel):

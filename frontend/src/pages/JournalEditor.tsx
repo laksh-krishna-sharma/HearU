@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/hooks/hooks';
 import { createJournalEntry, updateJournal, deleteJournal, getJournal } from '@/store/slices/journalSlice';
-import { getJournalReply, startVoiceSession, voiceTurn, voiceEnd, resetEveState } from '@/store/slices/eveSlice';
+import { getJournalReply, startVoiceSession, voiceTurn, voiceEnd, resetEveState, clearJournalReply, clearError, getVoiceSessionResponsesUsingJournalId, deleteVoiceSessionResponse } from '@/store/slices/eveSlice';
 import toast from 'react-hot-toast';
 import JournalHeader from '../components/journal/JournalHeader';
 import EditorPanel from '../components/journal/JournalEditorPanel';
@@ -24,7 +24,8 @@ const JournalEditor: React.FC = () => {
   const dispatch = useAppDispatch();
   const { loading, error } = useAppSelector((state) => state.journal);
   const eveState = useAppSelector((state) => state.eve);
-  const { session, turns, journalReply, loading: eveLoading, error: eveError } = eveState;
+  
+  const { session, turns, journalReply, loading: eveLoading, voiceSessionResponses, isJournalReplyMode } = eveState;
 
   const { id } = useParams();
   const isEditing = !!id && id !== 'new';
@@ -37,31 +38,29 @@ const JournalEditor: React.FC = () => {
   const [journalNotFound, setJournalNotFound] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [isIntroPlaying, setIsIntroPlaying] = useState(false);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const audioPlayerRef = useRef<HTMLAudioElement | null>(null);
 
-  // Create voice summaries from endSummary state
-  const voiceSummaries = eveState.endSummary ? [{
-    id: eveState.endSummary.session_id,
-    summary: eveState.endSummary.summary || '',
-    notes_content: eveState.endSummary.notes_content || '',
-    session_date: new Date().toISOString(), // Use current time as session end time
-    session_id: eveState.endSummary.session_id
-  }] : [];
-
   useEffect(() => {
     if (isEditing && id) {
-      const fetchJournal = async () => {
+      const fetchJournalData = async () => {
         try {
+          // Fetch the main journal entry
           const result = await dispatch(getJournal(id)).unwrap();
           setTitle(result.title || '');
           setContent(result.content || '');
           setTags(result.tags || []);
           setJournalNotFound(false);
+
+          // Fetch the associated voice session summaries for this journal
+          await dispatch(getVoiceSessionResponsesUsingJournalId(id)).unwrap();
+
         } catch (err: unknown) {
-          console.error('Failed to load journal:', err);
+          console.error('Failed to load journal data:', err);
           const apiError = err as ApiError;
           if (apiError?.status === 404 || (apiError?.response && apiError.response.status === 404)) {
             setJournalNotFound(true);
@@ -75,7 +74,7 @@ const JournalEditor: React.FC = () => {
         }
       };
       
-      fetchJournal();
+      fetchJournalData();
     } else {
       setTitle('');
       setContent('');
@@ -84,58 +83,90 @@ const JournalEditor: React.FC = () => {
     }
   }, [isEditing, id, dispatch, navigate]);
 
+  // Audio playback effect with intro handling
   useEffect(() => {
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-    const playAudio = (audioPath: string) => {
-      const audioUrl = audioPath.startsWith('http') ? audioPath : `${API_URL}/${audioPath}`;
-      
-      if (audioPlayerRef.current) {
-        audioPlayerRef.current.pause();
-      }
-      
-      const audioPlayer = new Audio(audioUrl);
-      audioPlayerRef.current = audioPlayer;
-  
-      audioPlayer.onplay = () => setIsPlaying(true);
-      audioPlayer.onended = () => setIsPlaying(false);
-      audioPlayer.onerror = () => {
-        toast.error('Could not play audio response.');
-        setIsPlaying(false);
-      };
-  
-      audioPlayer.play().catch(() => {
-          toast.error("Audio playback was blocked by the browser.");
-          setIsPlaying(false);
-      });
+    const playAudio = (audioPath: string, isIntro: boolean = false) => {
+        if (!audioPath) return;
+        if (audioPlayerRef.current) {
+            audioPlayerRef.current.pause();
+        }
+        const audioPlayer = new Audio(audioPath);
+        audioPlayerRef.current = audioPlayer;
+        
+        audioPlayer.onplay = () => {
+            setIsPlaying(true);
+            if (isIntro) {
+                setIsIntroPlaying(true);
+            }
+        };
+        
+        audioPlayer.onended = () => {
+            setIsPlaying(false);
+            if (isIntro) {
+                setIsIntroPlaying(false);
+                toast.success("Ready to record! Click the microphone to start sharing.");
+            } else if (isJournalReplyMode) {
+                // Journal reply finished - clear the mode
+                setTimeout(() => {
+                    dispatch(clearJournalReply());
+                }, 1000);
+            }
+        };
+        
+        audioPlayer.onerror = () => {
+            toast.error('Could not play audio response.');
+            setIsPlaying(false);
+            if (isIntro) {
+                setIsIntroPlaying(false);
+            }
+        };
+        
+        audioPlayer.play().catch(() => {
+            toast.error("Audio playback was blocked by the browser.");
+            setIsPlaying(false);
+            if (isIntro) {
+                setIsIntroPlaying(false);
+            }
+        });
     };
-  
-    // Play greeting audio when session starts
-    if (session?.greeting_audio_path) {
-      playAudio(session.greeting_audio_path);
-    }
-    
-    // Play journal reply audio
-    if (journalReply?.audio_path) {
-      playAudio(journalReply.audio_path);
-    }
-    
-    // Play voice turn response audio
-    const lastTurn = turns.length > 0 ? turns[turns.length - 1] : null;
-    if (lastTurn?.audio_path) {
-      playAudio(lastTurn.audio_path);
-    }
-  }, [session?.greeting_audio_path, journalReply, turns]);
 
+    // Play audio based on the current mode - COMPLETELY SEPARATE
+    if (isJournalReplyMode && journalReply?.audio_path) {
+        // Journal reply mode - ONLY play journal reply audio, NO intro behavior
+        playAudio(journalReply.audio_path, false);
+    } else if (session && !isJournalReplyMode) {
+        // Voice session mode - ONLY for voice assistant functionality
+        if (session.greeting_audio_path && turns.length === 0) {
+            // Play intro greeting when session starts (no turns yet)
+            playAudio(session.greeting_audio_path, true);
+        } else {
+            const lastTurn = turns.at(-1);
+            if (lastTurn?.audio_path) {
+                // Play latest response from voice turn
+                playAudio(lastTurn.audio_path, false);
+            }
+        }
+    }
+  }, [session?.greeting_audio_path, journalReply, turns, isJournalReplyMode]);
+
+  // Cleanup effect on unmount and clear any lingering errors
+  useEffect(() => {
+    // Clear any existing errors when component mounts
+    dispatch(clearError());
+  }, [dispatch]);
+
+  // Cleanup effect only on unmount (not when session changes)
   useEffect(() => {
     return () => {
-      // Only cleanup when component unmounts, not when session changes
-      if (session?.session_id) {
-        dispatch(voiceEnd({ session_id: session.session_id, save_summary: false }));
+      // Only cleanup on component unmount, not when session changes
+      const currentSession = session?.session_id;
+      if (currentSession) {
+        dispatch(voiceEnd({ session_id: currentSession, save_summary: false }));
       }
       dispatch(resetEveState());
     };
-  }, []); // Remove session dependency to prevent cleanup on session changes
-  
+  }, []); // Empty dependency array - only runs on mount/unmount
+
   const handleSave = async () => {
     if (!title.trim()) {
       toast.error('Please add a title');
@@ -143,20 +174,18 @@ const JournalEditor: React.FC = () => {
     }
     
     setIsSaving(true);
-    const entry = { 
-      title, 
-      content, 
-      tags,
-      entryDate: new Date().toISOString()
-    };
+    const entry = { title, content, tags, entryDate: new Date().toISOString() };
     
     try {
       if (isEditing && id) {
         await dispatch(updateJournal({ journal_id: id, entry })).unwrap();
         toast.success('Journal updated successfully!');
       } else {
-        await dispatch(createJournalEntry(entry)).unwrap();
+        const newJournal = await dispatch(createJournalEntry(entry)).unwrap();
         toast.success('Journal created successfully!');
+        // Navigate to the new journal's edit page
+        navigate(`/journal/${newJournal.id}`);
+        return; 
       }
       navigate('/journal');
     } catch (error: unknown) {
@@ -178,23 +207,14 @@ const JournalEditor: React.FC = () => {
   const handleDelete = async () => {
     if (!isEditing || !id) return;
     
-    if (!window.confirm('Are you sure you want to delete this journal?')) {
-      return;
-    }
+    if (!window.confirm('Are you sure you want to delete this journal?')) return;
     
     try {
       await dispatch(deleteJournal(id)).unwrap();
       toast.success('Journal deleted successfully!');
       navigate('/journal');
-    } catch (error: unknown) {
-      console.error('Failed to delete journal:', error);
-      const apiError = error as ApiError;
-      if (apiError?.status === 401 || (apiError?.response && apiError.response.status === 401)) {
-        toast.error('Please log in again');
-        navigate('/login');
-      } else {
-        toast.error('Failed to delete journal');
-      }
+    } catch (error) {
+      toast.error('Failed to delete journal');
     }
   };
 
@@ -203,6 +223,12 @@ const JournalEditor: React.FC = () => {
       toast.error('Please save the journal before getting an AI reply.');
       return;
     }
+    
+    // Clear any existing voice session before getting journal reply
+    if (session) {
+      dispatch(resetEveState());
+    }
+    
     toast.loading('Getting AI reply...');
     try {
       await dispatch(getJournalReply(id)).unwrap();
@@ -210,25 +236,19 @@ const JournalEditor: React.FC = () => {
       toast.success('AI reply is playing.');
     } catch (error) {
       toast.dismiss();
-      console.error('Failed to get journal reply:', error);
+      toast.error('Failed to get AI reply.');
     }
-  };
-
-  const blobToBase64 = (blob: Blob): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64String = reader.result as string;
-        const base64Data = base64String.split(',')[1];
-        resolve(base64Data);
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(blob);
-    });
   };
   
   const handleStartRecording = async () => {
-    if (!session || isRecording) return;
+    // Don't allow recording if session doesn't exist, already recording, or intro is still playing
+    if (!session || isRecording || isIntroPlaying) {
+      if (isIntroPlaying) {
+        toast("Please wait for Eve to finish speaking before recording.");
+      }
+      return;
+    }
+    
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       mediaRecorderRef.current = new MediaRecorder(stream);
@@ -243,10 +263,10 @@ const JournalEditor: React.FC = () => {
         stream.getTracks().forEach(track => track.stop());
         try {
           if (session?.session_id) {
-              toast.loading("Thinking...");
-              // Send the Blob directly, not base64 string
-              await dispatch(voiceTurn({ session_id: session.session_id, audio: audioBlob })).unwrap();
-              toast.dismiss();
+            toast.loading("Processing your message...");
+            await dispatch(voiceTurn({ session_id: session.session_id, audio: audioBlob })).unwrap();
+            toast.dismiss();
+            toast.success("Eve is responding...");
           }
         } catch (err) {
           toast.dismiss();
@@ -256,7 +276,7 @@ const JournalEditor: React.FC = () => {
   
       mediaRecorderRef.current.start();
       setIsRecording(true);
-      toast('Recording...', { icon: '🎤' });
+      toast('Recording... Tap mic again to stop.');
   
     } catch (err) {
       toast.error("Microphone access denied.");
@@ -272,58 +292,87 @@ const JournalEditor: React.FC = () => {
   };
   
   const handleStartSession = async () => {
-  const system_prompt = `
-    You are Eve, a confidential, non-judgmental, and empathetic mental wellness companion designed for Gen Z users. Your primary goals are to listen actively, offer emotional support, and guide users toward safe, constructive next steps.  
-    Your tone should be friendly, relatable, and encouraging while respecting the user's boundaries. Avoid overly formal or clinical language�speak like a supportive friend who understands Gen Z culture and lingo, but remain respectful and inclusive.  
-    When giving advice, base it on evidence-based mental health practices, mindfulness techniques, and healthy coping strategies.  
-    If a user expresses signs of self-harm, suicidal thoughts, or severe emotional distress, respond with compassion and encourage them to seek immediate professional help. Provide helpline numbers relevant to their country (if known).  
-    Never give medical diagnoses, prescribe medication, or replace professional therapy. Instead, focus on emotional guidance, practical tips, and connecting them with helpful resources.  
-    Always ensure the conversation is safe, private, and supportive.  
-    You can also share light, uplifting content like affirmations, relatable anecdotes, and healthy productivity tips.  
-    When discussing mental wellness topics, keep explanations simple, engaging, and easy to follow. Use short paragraphs and relatable examples.  
-    Avoid generating audio responses longer than 2 minutes.
-    `;
-  
-  try {
-    toast.loading("Starting voice session...");
-    const sessionResult = await dispatch(startVoiceSession(system_prompt)).unwrap();
-    toast.dismiss();
-    
-    // console.log("Session result:", sessionResult);
-    // console.log("Current session state (might be stale):", session);
-    
-    if (sessionResult.greeting_message) {
-      toast.success("Eve says: " + sessionResult.greeting_message.substring(0, 50) + "...");
-    } else {
-      toast.success("Voice session started! Eve is ready to listen.");
+    // Clear any existing journal reply and errors before starting voice session
+    if (journalReply) {
+      dispatch(clearJournalReply());
     }
-  } catch (error) {
-    toast.dismiss();
-    toast.error("Failed to start voice session. Please try again.");
-    console.error("Voice session start error:", error);
-  }
-};
-
+    dispatch(clearError());
+    
+    const system_prompt = `You are Eve, a confidential, non-judgmental, and empathetic mental wellness companion designed specifically for Indian youth dealing with mental health challenges. You provide a safe, non-judgmental space for users to express their thoughts and feelings. Be empathetic, supportive, and culturally sensitive. Ask thoughtful follow-up questions and provide gentle guidance when appropriate. Keep responses conversational and warm.`;
+    try {
+        toast.loading("Starting voice session...");
+        await dispatch(startVoiceSession(system_prompt)).unwrap();
+        toast.dismiss();
+        toast.success("Voice session started! Listen to Eve's introduction.");
+    } catch (error) {
+        toast.dismiss();
+        toast.error("Failed to start voice session.");
+    }
+  };
   
   const handleEndSession = async () => {
     if (session?.session_id) {
-      const save_summary = window.confirm("Do you want to save a summary of this conversation to a new journal entry?");
+      setShowSaveModal(true);
+    }
+  };
+
+  const handleConfirmEndSession = async (save_summary: boolean) => {
+    setShowSaveModal(false);
+    if (session?.session_id) {
       try {
-        await dispatch(voiceEnd({ session_id: session.session_id, save_summary })).unwrap();
+        toast.loading("Ending voice session...");
+        
+        // Pass journal_id when saving summary to link it to current journal
+        const endSessionPayload: any = { 
+          session_id: session.session_id, 
+          save_summary 
+        };
+        
+        if (save_summary && id && isEditing) {
+          endSessionPayload.journal_id = id;
+        }
+        
+        const result = await dispatch(voiceEnd(endSessionPayload)).unwrap();
+        toast.dismiss();
+        
         if (save_summary) {
-          toast.success("Voice session ended and summary saved!");
+          toast.success("Session ended and summary saved! Check the notes panel.");
+          // Refetch voice session responses to show the new summary
+          if (id && isEditing) {
+            // Add a small delay to ensure the backend has processed the save
+            setTimeout(async () => {
+              await dispatch(getVoiceSessionResponsesUsingJournalId(id));
+            }, 1000);
+          }
         } else {
           toast.success("Voice session ended.");
         }
+        
+        // Session state will be cleared by the voiceEnd.fulfilled action
       } catch (error) {
+        toast.dismiss();
         toast.error("Failed to end session properly.");
-        console.error("End session error:", error);
       }
+    }
+  };
+    
+  const handleDeleteVoiceSummary = async (sessionId: string) => {
+    if (window.confirm('Are you sure you want to delete this voice summary?')) {
+        try {
+            toast.loading('Deleting summary...');
+            await dispatch(deleteVoiceSessionResponse(sessionId)).unwrap();
+            toast.dismiss();
+            toast.success('Summary deleted.');
+        } catch (error) {
+            toast.dismiss();
+            toast.error('Failed to delete summary.');
+            console.error('Failed to delete voice summary:', error);
+        }
     }
   };
 
   const handleAddTag = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && tagInput.trim() !== '') {
+    if (e.key === 'Enter' && tagInput.trim()) {
       e.preventDefault();
       if (!tags.includes(tagInput.trim())) {
         setTags([...tags, tagInput.trim()]);
@@ -355,7 +404,10 @@ const JournalEditor: React.FC = () => {
         {error && <ErrorDisplay error={error} />}
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          <NotesPanel voiceSummaries={voiceSummaries} />
+          <NotesPanel 
+            voiceSummaries={voiceSessionResponses}
+            onDeleteSummary={handleDeleteVoiceSummary}
+          />
           
           <EditorPanel
             title={title}
@@ -379,13 +431,41 @@ const JournalEditor: React.FC = () => {
             isRecording={isRecording}
             isPlaying={isPlaying}
             eveLoading={eveLoading}
-            eveError={eveError}
+            isJournalReplyMode={isJournalReplyMode}
+            isIntroPlaying={isIntroPlaying}
+            turns={turns}
             onStartRecording={handleStartRecording}
             onStopRecording={handleStopRecording}
             onStartSession={handleStartSession}
             onEndSession={handleEndSession}
           />
         </div>
+
+        {/* Save Summary Modal */}
+        {showSaveModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-xl">
+              <h3 className="text-lg font-semibold mb-4">End Voice Session</h3>
+              <p className="text-gray-600 mb-6">
+                Do you want to save a summary of this conversation to this journal entry?
+              </p>
+              <div className="flex gap-3 justify-end">
+                <button
+                  onClick={() => handleConfirmEndSession(false)}
+                  className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                >
+                  No, just end session
+                </button>
+                <button
+                  onClick={() => handleConfirmEndSession(true)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                >
+                  Yes, save summary
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
