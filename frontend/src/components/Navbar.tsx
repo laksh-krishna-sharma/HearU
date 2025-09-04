@@ -4,7 +4,7 @@ import { logout } from "@/store/slices/authSlice";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 // import { TbActivityHeartbeat } from "react-icons/tb";
-import Eve from "@/components/eve/Eve";
+import NavbarVoiceSession from "@/components/NavbarVoiceSession";
 
 interface NavbarProps {
   showCenterOval?: boolean;
@@ -39,7 +39,7 @@ const Navbar = ({ showCenterOval = true }: NavbarProps) => {
       </Link>
 
       {/* CENTER - Voice Assistant Oval */}
-      {showCenterOval && isAuthenticated && (<Eve />)}
+      {showCenterOval && isAuthenticated && (<NavbarVoiceSession />)}
 
       {/* Hamburger (only mobile) */}
       {/* <button

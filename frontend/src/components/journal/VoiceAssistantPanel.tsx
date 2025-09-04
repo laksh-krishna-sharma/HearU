@@ -4,13 +4,13 @@ import { Button } from '@/components/ui/button';
 import { Mic, Bot } from 'lucide-react';
 
 interface VoiceAssistantPanelProps {
-  session: any;
+  session: unknown;
   isRecording: boolean;
   isPlaying: boolean;
   eveLoading: boolean;
   isJournalReplyMode: boolean;
   isIntroPlaying: boolean;
-  turns: any[];
+  turns: unknown[];
   onStartRecording: () => void;
   onStopRecording: () => void;
   onStartSession: () => void;

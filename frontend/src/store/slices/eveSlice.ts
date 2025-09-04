@@ -99,7 +99,7 @@ export const getJournalReply = createAsyncThunk(
       return data
     } catch (error: unknown) {
       toast.error('Failed to get journal reply')
-      return rejectWithValue((error as any).response.data)
+      return rejectWithValue((error as { response: { data: unknown } }).response.data)
     }
   }
 )
@@ -117,7 +117,7 @@ export const startVoiceSession = createAsyncThunk(
       return response.data
     } catch (error: unknown) {
       toast.error('Failed to start voice session')
-      return rejectWithValue((error as any).response.data)
+      return rejectWithValue((error as { response: { data: unknown } }).response.data)
     }
   }
 )
@@ -149,7 +149,7 @@ export const voiceTurn = createAsyncThunk(
       return data
     } catch (error: unknown) {
       toast.error('Failed to process voice turn')
-      return rejectWithValue((error as any).response.data)
+      return rejectWithValue((error as { response: { data: unknown } }).response.data)
     }
   }
 )
@@ -159,7 +159,7 @@ export const voiceEnd = createAsyncThunk(
   async ({session_id, save_summary, journal_id}: {session_id: string; save_summary: boolean; journal_id?: string}, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem('token')
-      const payload: any = { session_id, save_summary };
+      const payload: { session_id: string; save_summary: boolean; journal_id?: string } = { session_id, save_summary };
       if (journal_id) {
         payload.journal_id = journal_id;
       }
@@ -172,7 +172,7 @@ export const voiceEnd = createAsyncThunk(
       return response.data
     } catch (error: unknown) {
       toast.error('Failed to end voice session')
-      return rejectWithValue((error as any).response.data)
+      return rejectWithValue((error as { response: { data: unknown } }).response.data)
     }
   }
 )
@@ -192,10 +192,10 @@ export const getVoiceSessionResponsesUsingJournalId = createAsyncThunk(
       return Array.isArray(data) ? data : [data];
     } catch (error: unknown) {
       // Don't show error toast if it's just a 404 (no responses found)
-      if ((error as any)?.response?.status !== 404) {
+      if ((error as { response?: { status: number } })?.response?.status !== 404) {
         toast.error('Failed to get voice session responses')
       }
-      return rejectWithValue((error as any).response?.data || 'Failed to fetch responses')
+      return rejectWithValue((error as { response?: { data: unknown } }).response?.data || 'Failed to fetch responses')
     }
   }
 )
@@ -213,7 +213,7 @@ export const deleteVoiceSessionResponse = createAsyncThunk(
       // No explicit return, so payload will be undefined on success
     } catch (error: unknown) {
       toast.error('Failed to delete voice session response')
-      return rejectWithValue((error as any).response.data)
+      return rejectWithValue((error as { response: { data: unknown } }).response.data)
     }
   }
 )

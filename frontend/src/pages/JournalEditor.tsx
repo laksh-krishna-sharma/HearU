@@ -147,7 +147,7 @@ const JournalEditor: React.FC = () => {
             }
         }
     }
-  }, [session?.greeting_audio_path, journalReply, turns, isJournalReplyMode]);
+  }, [session?.greeting_audio_path, session, journalReply, turns, isJournalReplyMode, dispatch]);
 
   // Cleanup effect on unmount and clear any lingering errors
   useEffect(() => {
@@ -165,7 +165,7 @@ const JournalEditor: React.FC = () => {
       }
       dispatch(resetEveState());
     };
-  }, []); // Empty dependency array - only runs on mount/unmount
+  }, [dispatch, session?.session_id]); // Include dependencies
 
   const handleSave = async () => {
     if (!title.trim()) {
@@ -213,7 +213,7 @@ const JournalEditor: React.FC = () => {
       await dispatch(deleteJournal(id)).unwrap();
       toast.success('Journal deleted successfully!');
       navigate('/journal');
-    } catch (error) {
+    } catch {
       toast.error('Failed to delete journal');
     }
   };
@@ -234,7 +234,7 @@ const JournalEditor: React.FC = () => {
       await dispatch(getJournalReply(id)).unwrap();
       toast.dismiss();
       toast.success('AI reply is playing.');
-    } catch (error) {
+    } catch {
       toast.dismiss();
       toast.error('Failed to get AI reply.');
     }
@@ -268,7 +268,7 @@ const JournalEditor: React.FC = () => {
             toast.dismiss();
             toast.success("Eve is responding...");
           }
-        } catch (err) {
+        } catch {
           toast.dismiss();
           toast.error("Could not process your request.");
         }
@@ -278,7 +278,7 @@ const JournalEditor: React.FC = () => {
       setIsRecording(true);
       toast('Recording... Tap mic again to stop.');
   
-    } catch (err) {
+    } catch {
       toast.error("Microphone access denied.");
     }
   };
@@ -304,7 +304,7 @@ const JournalEditor: React.FC = () => {
         await dispatch(startVoiceSession(system_prompt)).unwrap();
         toast.dismiss();
         toast.success("Voice session started! Listen to Eve's introduction.");
-    } catch (error) {
+    } catch {
         toast.dismiss();
         toast.error("Failed to start voice session.");
     }
@@ -323,7 +323,7 @@ const JournalEditor: React.FC = () => {
         toast.loading("Ending voice session...");
         
         // Pass journal_id when saving summary to link it to current journal
-        const endSessionPayload: any = { 
+        const endSessionPayload: { session_id: string; save_summary: boolean; journal_id?: string } = { 
           session_id: session.session_id, 
           save_summary 
         };
@@ -332,7 +332,7 @@ const JournalEditor: React.FC = () => {
           endSessionPayload.journal_id = id;
         }
         
-        const result = await dispatch(voiceEnd(endSessionPayload)).unwrap();
+        await dispatch(voiceEnd(endSessionPayload)).unwrap();
         toast.dismiss();
         
         if (save_summary) {
@@ -349,7 +349,7 @@ const JournalEditor: React.FC = () => {
         }
         
         // Session state will be cleared by the voiceEnd.fulfilled action
-      } catch (error) {
+      } catch {
         toast.dismiss();
         toast.error("Failed to end session properly.");
       }
@@ -363,10 +363,10 @@ const JournalEditor: React.FC = () => {
             await dispatch(deleteVoiceSessionResponse(sessionId)).unwrap();
             toast.dismiss();
             toast.success('Summary deleted.');
-        } catch (error) {
+        } catch (deleteError) {
             toast.dismiss();
             toast.error('Failed to delete summary.');
-            console.error('Failed to delete voice summary:', error);
+            console.error('Failed to delete voice summary:', deleteError);
         }
     }
   };
