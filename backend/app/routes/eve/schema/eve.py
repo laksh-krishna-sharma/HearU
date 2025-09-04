@@ -58,6 +58,8 @@ class VoiceSessionStartResponse(BaseModel):
     system_prompt: str
     is_active: bool
     created_at: datetime
+    greeting_message: Optional[str] = None
+    greeting_audio_path: Optional[str] = None
 
 
 class VoiceSessionTurnRequest(BaseModel):
@@ -77,6 +79,7 @@ class VoiceSessionTurnResponse(BaseModel):
 class VoiceSessionEndRequest(BaseModel):
     session_id: str
     save_summary: Optional[bool] = False
+    journal_id: Optional[str] = None
 
 
 class VoiceSessionEndResponse(BaseModel):

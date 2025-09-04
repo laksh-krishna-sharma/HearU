@@ -1,28 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Tabs, TabsContent } from '@/components/ui/tabs';
-import { 
-  Save,  
-  Mic, 
-  Bot,
-  ArrowLeft
-} from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/hooks/hooks';
 import { createJournalEntry, updateJournal, deleteJournal, getJournal } from '@/store/slices/journalSlice';
+import { getJournalReply, startVoiceSession, voiceTurn, voiceEnd, resetEveState, clearJournalReply, clearError, getVoiceSessionResponsesUsingJournalId, deleteVoiceSessionResponse } from '@/store/slices/eveSlice';
 import toast from 'react-hot-toast';
-import { TbActivityHeartbeat } from 'react-icons/tb';
-
-
-interface ChatMessage {
-  id: string;
-  content: string;
-  sender: 'user' | 'assistant';
-  timestamp: string;
-}
+import JournalHeader from '../components/journal/JournalHeader';
+import EditorPanel from '../components/journal/JournalEditorPanel';
+import NotesPanel from '../components/journal/JournalNotesPanel';
+import VoiceAssistantPanel from '../components/journal/VoiceAssistantPanel';
+import ErrorDisplay from '../components/journal/ErrorDisplay';
+import NotFoundView from '../components/journal/NotFoundView';
 
 interface ApiError {
   status?: number;
@@ -30,12 +17,15 @@ interface ApiError {
     status: number;
     data?: unknown;
   };
-} 
+}
 
 const JournalEditor: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { loading, error } = useAppSelector((state) => state.journal);
+  const eveState = useAppSelector((state) => state.eve);
+  
+  const { session, turns, journalReply, loading: eveLoading, voiceSessionResponses, isJournalReplyMode } = eveState;
 
   const { id } = useParams();
   const isEditing = !!id && id !== 'new';
@@ -46,23 +36,31 @@ const JournalEditor: React.FC = () => {
   const [tagInput, setTagInput] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [journalNotFound, setJournalNotFound] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [isIntroPlaying, setIsIntroPlaying] = useState(false);
 
-  const [noteshistory] = useState<ChatMessage[]>([
-    { id: 'h1', content: 'How can I improve my writing?', sender: 'user', timestamp: '2024-01-14T10:30:00Z' },
-    { id: 'h2', content: 'Here are some tips for better writing...', sender: 'assistant', timestamp: '2024-01-14T10:31:00Z' },
-  ]);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const audioPlayerRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     if (isEditing && id) {
-      const fetchJournal = async () => {
+      const fetchJournalData = async () => {
         try {
+          // Fetch the main journal entry
           const result = await dispatch(getJournal(id)).unwrap();
           setTitle(result.title || '');
           setContent(result.content || '');
           setTags(result.tags || []);
           setJournalNotFound(false);
+
+          // Fetch the associated voice session summaries for this journal
+          await dispatch(getVoiceSessionResponsesUsingJournalId(id)).unwrap();
+
         } catch (err: unknown) {
-          console.error('Failed to load journal:', err);
+          console.error('Failed to load journal data:', err);
           const apiError = err as ApiError;
           if (apiError?.status === 404 || (apiError?.response && apiError.response.status === 404)) {
             setJournalNotFound(true);
@@ -76,15 +74,98 @@ const JournalEditor: React.FC = () => {
         }
       };
       
-      fetchJournal();
+      fetchJournalData();
     } else {
-      // Reset form for new entries
       setTitle('');
       setContent('');
       setTags([]);
       setJournalNotFound(false);
     }
   }, [isEditing, id, dispatch, navigate]);
+
+  // Audio playback effect with intro handling
+  useEffect(() => {
+    const playAudio = (audioPath: string, isIntro: boolean = false) => {
+        if (!audioPath) return;
+        if (audioPlayerRef.current) {
+            audioPlayerRef.current.pause();
+        }
+        const audioPlayer = new Audio(audioPath);
+        audioPlayerRef.current = audioPlayer;
+        
+        audioPlayer.onplay = () => {
+            setIsPlaying(true);
+            if (isIntro) {
+                setIsIntroPlaying(true);
+            }
+        };
+        
+        audioPlayer.onended = () => {
+            setIsPlaying(false);
+            if (isIntro) {
+                setIsIntroPlaying(false);
+                toast.success("Ready to record! Click the microphone to start sharing.");
+            } else if (isJournalReplyMode) {
+                // Journal reply finished - clear the mode
+                setTimeout(() => {
+                    dispatch(clearJournalReply());
+                }, 1000);
+            }
+        };
+        
+        audioPlayer.onerror = () => {
+            toast.error('Could not play audio response.');
+            setIsPlaying(false);
+            if (isIntro) {
+                setIsIntroPlaying(false);
+            }
+        };
+        
+        audioPlayer.play().catch(() => {
+            toast.error("Audio playback was blocked by the browser.");
+            setIsPlaying(false);
+            if (isIntro) {
+                setIsIntroPlaying(false);
+            }
+        });
+    };
+
+    // Play audio based on the current mode - COMPLETELY SEPARATE
+    if (isJournalReplyMode && journalReply?.audio_path) {
+        // Journal reply mode - ONLY play journal reply audio, NO intro behavior
+        playAudio(journalReply.audio_path, false);
+    } else if (session && !isJournalReplyMode) {
+        // Voice session mode - ONLY for voice assistant functionality
+        if (session.greeting_audio_path && turns.length === 0) {
+            // Play intro greeting when session starts (no turns yet)
+            playAudio(session.greeting_audio_path, true);
+        } else {
+            const lastTurn = turns.at(-1);
+            if (lastTurn?.audio_path) {
+                // Play latest response from voice turn
+                playAudio(lastTurn.audio_path, false);
+            }
+        }
+    }
+  }, [session?.greeting_audio_path, session, journalReply, turns, isJournalReplyMode, dispatch]);
+
+  // Cleanup effect on unmount and clear any lingering errors
+  useEffect(() => {
+    // Clear any existing errors when component mounts
+    dispatch(clearError());
+  }, [dispatch]);
+
+  // Cleanup effect only on unmount (not when session changes)
+  useEffect(() => {
+    return () => {
+      // Only cleanup on component unmount, not when session changes
+      const currentSession = session?.session_id;
+      if (currentSession) {
+        dispatch(voiceEnd({ session_id: currentSession, save_summary: false }));
+      }
+      dispatch(resetEveState());
+    };
+  }, [dispatch, session?.session_id]); // Include dependencies
 
   const handleSave = async () => {
     if (!title.trim()) {
@@ -93,20 +174,18 @@ const JournalEditor: React.FC = () => {
     }
     
     setIsSaving(true);
-    const entry = { 
-      title, 
-      content, 
-      tags,
-      entryDate: new Date().toISOString() // Keep as ISO string for consistency
-    };
+    const entry = { title, content, tags, entryDate: new Date().toISOString() };
     
     try {
       if (isEditing && id) {
         await dispatch(updateJournal({ journal_id: id, entry })).unwrap();
         toast.success('Journal updated successfully!');
       } else {
-        await dispatch(createJournalEntry(entry)).unwrap();
+        const newJournal = await dispatch(createJournalEntry(entry)).unwrap();
         toast.success('Journal created successfully!');
+        // Navigate to the new journal's edit page
+        navigate(`/journal/${newJournal.id}`);
+        return; 
       }
       navigate('/journal');
     } catch (error: unknown) {
@@ -128,210 +207,265 @@ const JournalEditor: React.FC = () => {
   const handleDelete = async () => {
     if (!isEditing || !id) return;
     
-    if (!window.confirm('Are you sure you want to delete this journal?')) {
-      return;
-    }
+    if (!window.confirm('Are you sure you want to delete this journal?')) return;
     
     try {
       await dispatch(deleteJournal(id)).unwrap();
       toast.success('Journal deleted successfully!');
       navigate('/journal');
-    } catch (error: unknown) {
-      console.error('Failed to delete journal:', error);
-      const apiError = error as ApiError;
-      if (apiError?.status === 401 || (apiError?.response && apiError.response.status === 401)) {
-        toast.error('Please log in again');
-        navigate('/login');
-      } else {
-        toast.error('Failed to delete journal');
-      }
+    } catch {
+      toast.error('Failed to delete journal');
     }
   };
 
-  const handleUpload = () => {
-    toast('File upload functionality coming soon!');
+  const handleGetJournalReply = async () => {
+    if (!isEditing || !id) {
+      toast.error('Please save the journal before getting an AI reply.');
+      return;
+    }
+    
+    // Clear any existing voice session before getting journal reply
+    if (session) {
+      dispatch(resetEveState());
+    }
+    
+    toast.loading('Getting AI reply...');
+    try {
+      await dispatch(getJournalReply(id)).unwrap();
+      toast.dismiss();
+      toast.success('AI reply is playing.');
+    } catch {
+      toast.dismiss();
+      toast.error('Failed to get AI reply.');
+    }
+  };
+  
+  const handleStartRecording = async () => {
+    // Don't allow recording if session doesn't exist, already recording, or intro is still playing
+    if (!session || isRecording || isIntroPlaying) {
+      if (isIntroPlaying) {
+        toast("Please wait for Eve to finish speaking before recording.");
+      }
+      return;
+    }
+    
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorderRef.current = new MediaRecorder(stream);
+      audioChunksRef.current = [];
+  
+      mediaRecorderRef.current.ondataavailable = (event) => {
+        audioChunksRef.current.push(event.data);
+      };
+  
+      mediaRecorderRef.current.onstop = async () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        stream.getTracks().forEach(track => track.stop());
+        try {
+          if (session?.session_id) {
+            toast.loading("Processing your message...");
+            await dispatch(voiceTurn({ session_id: session.session_id, audio: audioBlob })).unwrap();
+            toast.dismiss();
+            toast.success("Eve is responding...");
+          }
+        } catch {
+          toast.dismiss();
+          toast.error("Could not process your request.");
+        }
+      };
+  
+      mediaRecorderRef.current.start();
+      setIsRecording(true);
+      toast('Recording... Tap mic again to stop.');
+  
+    } catch {
+      toast.error("Microphone access denied.");
+    }
+  };
+  
+  const handleStopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+      toast.dismiss();
+    }
+  };
+  
+  const handleStartSession = async () => {
+    // Clear any existing journal reply and errors before starting voice session
+    if (journalReply) {
+      dispatch(clearJournalReply());
+    }
+    dispatch(clearError());
+    
+    const system_prompt = `You are Eve, a confidential, non-judgmental, and empathetic mental wellness companion designed specifically for Indian youth dealing with mental health challenges. You provide a safe, non-judgmental space for users to express their thoughts and feelings. Be empathetic, supportive, and culturally sensitive. Ask thoughtful follow-up questions and provide gentle guidance when appropriate. Keep responses conversational and warm.`;
+    try {
+        toast.loading("Starting voice session...");
+        await dispatch(startVoiceSession(system_prompt)).unwrap();
+        toast.dismiss();
+        toast.success("Voice session started! Listen to Eve's introduction.");
+    } catch {
+        toast.dismiss();
+        toast.error("Failed to start voice session.");
+    }
+  };
+  
+  const handleEndSession = async () => {
+    if (session?.session_id) {
+      setShowSaveModal(true);
+    }
   };
 
-  const formatTime = (timestamp: string) =>
-    new Date(timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+  const handleConfirmEndSession = async (save_summary: boolean) => {
+    setShowSaveModal(false);
+    if (session?.session_id) {
+      try {
+        toast.loading("Ending voice session...");
+        
+        // Pass journal_id when saving summary to link it to current journal
+        const endSessionPayload: { session_id: string; save_summary: boolean; journal_id?: string } = { 
+          session_id: session.session_id, 
+          save_summary 
+        };
+        
+        if (save_summary && id && isEditing) {
+          endSessionPayload.journal_id = id;
+        }
+        
+        await dispatch(voiceEnd(endSessionPayload)).unwrap();
+        toast.dismiss();
+        
+        if (save_summary) {
+          toast.success("Session ended and summary saved! Check the notes panel.");
+          // Refetch voice session responses to show the new summary
+          if (id && isEditing) {
+            // Add a small delay to ensure the backend has processed the save
+            setTimeout(async () => {
+              await dispatch(getVoiceSessionResponsesUsingJournalId(id));
+            }, 1000);
+          }
+        } else {
+          toast.success("Voice session ended.");
+        }
+        
+        // Session state will be cleared by the voiceEnd.fulfilled action
+      } catch {
+        toast.dismiss();
+        toast.error("Failed to end session properly.");
+      }
+    }
+  };
+    
+  const handleDeleteVoiceSummary = async (sessionId: string) => {
+    if (window.confirm('Are you sure you want to delete this voice summary?')) {
+        try {
+            toast.loading('Deleting summary...');
+            await dispatch(deleteVoiceSessionResponse(sessionId)).unwrap();
+            toast.dismiss();
+            toast.success('Summary deleted.');
+        } catch (deleteError) {
+            toast.dismiss();
+            toast.error('Failed to delete summary.');
+            console.error('Failed to delete voice summary:', deleteError);
+        }
+    }
+  };
+
+  const handleAddTag = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && tagInput.trim()) {
+      e.preventDefault();
+      if (!tags.includes(tagInput.trim())) {
+        setTags([...tags, tagInput.trim()]);
+      }
+      setTagInput('');
+    }
+  };
+
+  const handleRemoveTag = (tag: string) => {
+    setTags(tags.filter((t) => t !== tag));
+  };
 
   if (journalNotFound) {
-    return (
-      <div className="min-h-screen bg-ocean-background p-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="mb-6 flex items-center">
-            <Button variant="outline" onClick={() => navigate('/journal')} className="flex items-center gap-2">
-              <ArrowLeft className="h-4 w-4" /> Back to Journals
-            </Button>
-          </div>
-          <div className="flex items-center justify-center h-64">
-            <div className="text-center">
-              <h2 className="text-2xl font-bold text-red-600 mb-2">Journal Not Found</h2>
-              <p className="text-gray-600">The journal you're trying to access doesn't exist or may have been deleted.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+    return <NotFoundView onBack={() => navigate('/journal')} />;
   }
 
   return (
     <div className="min-h-screen bg-ocean-background p-6">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-6 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button variant="outline" onClick={() => navigate('/journal')} className="flex items-center gap-2 text-white">
-              {/* <ArrowLeft className="h-4 w-4" /> */}
-               Back
-            </Button>
-            <h1 className="text-3xl font-bold text-ocean-text flex justify-end">{isEditing ? 'Edit Journal' : 'New Journal Entry'}</h1>
-          </div>
-          <div className="space-x-2 flex">
-            {isEditing && (
-              <Button variant="destructive" onClick={handleDelete} disabled={isSaving || loading}>
-                Delete
-              </Button>
-            )}
-            <Button 
-              onClick={handleSave} 
-              disabled={isSaving || loading}
-              className="flex items-center gap-2"
-            >
-              <Save className="h-4 w-4" />
-              {isSaving ? 'Saving...' : isEditing ? 'Update' : 'Save'}
-            </Button>
-          </div>
-        </div>
+        <JournalHeader
+          isEditing={isEditing}
+          isSaving={isSaving}
+          loading={loading}
+          onBack={() => navigate('/journal')}
+          onSave={handleSave}
+          onDelete={isEditing ? handleDelete : undefined}
+        />
 
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            Error: {typeof error === 'string' ? error : 'An error occurred'}
-          </div>
-        )}
+        {error && <ErrorDisplay error={error} />}
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Left Column - Notes */}
-          <div className="lg:col-span-1 hover:shadow-lg">
-            <Card className="h-full">
-              <CardHeader><CardTitle className="text-lg">Notes</CardTitle></CardHeader>
-              <CardContent>
-                <Tabs defaultValue="chat" className="w-full">
-                  <TabsContent value="chat" className="mt-4">
-                    <div className="space-y-3 max-h-80 overflow-y-auto">
-                      {noteshistory.map((msg) => (
-                        <div key={msg.id} className="p-2 border rounded text-sm">
-                          <div className="flex items-center gap-2 mb-1">
-                            {msg.sender === 'user' ? (
-                              <div className="w-2 h-2 bg-ocean-primary rounded-full" />
-                            ) : (
-                              <Bot className="h-3 w-3 text-ocean-secondary" />
-                            )}
-                            <span className="text-xs text-gray-500">{formatTime(msg.timestamp)}</span>
-                          </div>
-                          <p className="text-gray-700 line-clamp-2">{msg.content}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </TabsContent>
-                </Tabs>
-              </CardContent>
-            </Card>
-          </div>
+          <NotesPanel 
+            voiceSummaries={voiceSessionResponses}
+            onDeleteSummary={handleDeleteVoiceSummary}
+          />
+          
+          <EditorPanel
+            title={title}
+            content={content}
+            tags={tags}
+            tagInput={tagInput}
+            isEditing={isEditing}
+            isPlaying={isPlaying}
+            eveLoading={eveLoading}
+            isSaving={isSaving}
+            onTitleChange={setTitle}
+            onContentChange={setContent}
+            onTagInputChange={setTagInput}
+            onTagInputKeyDown={handleAddTag}
+            onRemoveTag={handleRemoveTag}
+            onGetJournalReply={handleGetJournalReply}
+          />
 
-          {/* Center Column - Journal Editor */}
-          <div className="lg:col-span-2 hover:shadow-lg">
-            <Card className="h-full">
-              <CardHeader><CardTitle>Journal Content</CardTitle></CardHeader>
-              <CardContent className="space-y-4">
-                <Input 
-                  placeholder="Enter journal title..." 
-                  value={title} 
-                  onChange={(e) => setTitle(e.target.value)} 
-                  className="text-lg font-semibold" 
-                />
-                <Textarea 
-                  placeholder="Write your journal entry here..." 
-                  value={content} 
-                  onChange={(e) => setContent(e.target.value)} 
-                  className="min-h-96 resize-none" 
-                />
-
-                {/* Tags Input */}
-                <div className="mt-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Tags</label>
-                  <div className="flex gap-1  flex-wrap">
-                    {tags.map((tag, idx) => (
-                      <span key={idx} className="flex items-center gap-1 bg-ocean-primary text-black px-1 py-1 rounded-full text-sm">
-                        {tag}
-                        <button 
-                          type="button" 
-                          className="w-4 h-4 flex items-center justify-center hover:text-gray-200 p-1" 
-                          onClick={() => setTags(tags.filter((t) => t !== tag))}
-                        >
-                          x
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                  <input
-                    type="text"
-                    placeholder="Add a tag and press Enter"
-                    value={tagInput}
-                    onChange={(e) => setTagInput(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && tagInput.trim() !== '') {
-                        e.preventDefault();
-                        if (!tags.includes(tagInput.trim())) {
-                          setTags([...tags, tagInput.trim()]);
-                        }
-                        setTagInput('');
-                      }
-                    }}
-                    className="mt-2 w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ocean-primary"
-                  />
-                </div>
-
-                {/* File Upload */}
-                <div className="flex items-center gap-2">
-                  <Button variant="outline" onClick={handleUpload} className="flex items-center gap-2">
-                    Upload
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Right Column - AI Assistant */}
-          <div className="lg:col-span-1 flex flex-col hover:shadow-lg">
-            <Card className="h-full flex flex-col">
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Mic className="h-4 w-4" /> Voice Assistant
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="flex-1 flex flex-col justify-center">
-                <div className="text-center space-y-6">
-                  <div className="w-24 h-24 mx-auto bg-ocean-primary rounded-full flex items-center justify-center">
-                    {/* <Mic className="h-10 w-10 text-white" /> */}
-                  </div>
-                  <button
-                    className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center hover:scale-110 duration-200 mx-auto "
-                      style={{ 
-                      background: 'none',
-                      border: 'none',
-                      padding: 0,
-                      outline: 'none'
-                      }}
-                    >
-                    <TbActivityHeartbeat className="h-16 w-16 text-[#0b132b] "/>
-                  </button>
-                  <Button variant="outline" className="w-full">Speak</Button>
-                  <p className="text-xs text-gray-500">Tap to start voice conversation</p>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          <VoiceAssistantPanel
+            session={session}
+            isRecording={isRecording}
+            isPlaying={isPlaying}
+            eveLoading={eveLoading}
+            isJournalReplyMode={isJournalReplyMode}
+            isIntroPlaying={isIntroPlaying}
+            turns={turns}
+            onStartRecording={handleStartRecording}
+            onStopRecording={handleStopRecording}
+            onStartSession={handleStartSession}
+            onEndSession={handleEndSession}
+          />
         </div>
+
+        {/* Save Summary Modal */}
+        {showSaveModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-xl">
+              <h3 className="text-lg font-semibold mb-4">End Voice Session</h3>
+              <p className="text-gray-600 mb-6">
+                Do you want to save a summary of this conversation to this journal entry?
+              </p>
+              <div className="flex gap-3 justify-end">
+                <button
+                  onClick={() => handleConfirmEndSession(false)}
+                  className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                >
+                  No, just end session
+                </button>
+                <button
+                  onClick={() => handleConfirmEndSession(true)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                >
+                  Yes, save summary
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

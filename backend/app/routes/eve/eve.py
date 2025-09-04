@@ -86,6 +86,7 @@ async def end_voice_session(
         payload.session_id,
         current_user,
         payload.save_summary or False,  # ensure strict bool
+        payload.journal_id if hasattr(payload, "journal_id") else None,
     )
     if not result:
         raise HTTPException(status_code=404, detail="Session not found")

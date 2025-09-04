@@ -16,6 +16,8 @@ RUN . .venv/bin/activate && uv pip install -r requirements.txt
 FROM python:3.11-slim
 
 WORKDIR /app
+# Create directory for audio files
+RUN mkdir -p /audio
 
 # Copy the installed packages from builder stage
 COPY --from=builder /app/.venv /app/.venv
