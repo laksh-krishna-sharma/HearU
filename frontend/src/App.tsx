@@ -11,6 +11,7 @@ import Blogs from './pages/Blogs';
 import LandingPage from './pages/LandingPage';
 import Journal from './pages/Journal';
 import JournalEditor from './pages/JournalEditor';
+import SummaryDetailView from './components/journal/SummaryDetailView';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -88,6 +89,11 @@ function App() {
               <JournalEditor />
             </ProtectedRoute>
           } />
+          <Route path="/journal/summary/:id" element={
+              <ProtectedRoute>
+                <SummaryDetailView />
+              </ProtectedRoute>
+            } />
           
             {/* Catch all route */}
             <Route path="*" element={<Navigate to="/" replace />} />
