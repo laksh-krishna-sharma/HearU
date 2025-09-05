@@ -8,6 +8,10 @@ on:
   push:
     branches:
       - develop
+      - develop-laksh
+      - develop-rupesh
+      - develop-dhruv
+      - develop-sahil
     paths:
       - "frontend/**"
 
