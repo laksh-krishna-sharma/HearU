@@ -74,20 +74,6 @@ const LandingPage = () => {
 
         {/* Quick Actions */}
         <div ref={cardsRef} className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-          <Link 
-            to="/dashboard"
-            className="group bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-all duration-300 hover:scale-105"
-          >
-            <div className="w-16 h-16 bg-ocean-primary bg-opacity-20 rounded-full flex items-center justify-center mb-4 group-hover:bg-ocean-primary group-hover:bg-opacity-30 transition-all duration-300">
-              <svg className="w-8 h-8 text-ocean-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-semibold text-ocean-text mb-2">Dashboard</h3>
-            <p className="text-ocean-text opacity-70">
-              View your progress, track your wellness, and manage your profile
-            </p>
-          </Link>
 
           <Link 
             to="/blogs"
@@ -118,38 +104,6 @@ const LandingPage = () => {
               Get instant support and guidance from our AI wellness assistant
             </p>
           </Link>
-        </div>
-
-        {/* Wellness Stats */}
-        <div ref={statsRef} className="bg-white rounded-xl shadow-lg p-8 mb-16 opacity-0">
-          <h2 className="text-2xl font-bold text-ocean-text mb-6 text-center">
-            Your Wellness Journey
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="text-center">
-              <div ref={counter1Ref} className="text-3xl font-bold text-ocean-primary mb-2">0</div>
-              <div className="text-sm text-ocean-text opacity-70">Days Active</div>
-            </div>
-            <div className="text-center">
-              <div ref={counter2Ref} className="text-3xl font-bold text-ocean-secondary mb-2">0</div>
-              <div className="text-sm text-ocean-text opacity-70">Articles Read</div>
-            </div>
-            <div className="text-center">
-              <div ref={counter3Ref} className="text-3xl font-bold text-ocean-accent mb-2">0</div>
-              <div className="text-sm text-ocean-text opacity-70">Chat Sessions</div>
-            </div>
-            <div className="text-center">
-              <div ref={counter4Ref} className="text-3xl font-bold text-ocean-primary mb-2">0</div>
-              <div className="text-sm text-ocean-text opacity-70">Wellness Score</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Crisis Support */}
-        <div ref={crisisRef} className="p-6 bg-ocean-accent bg-opacity-10 rounded-lg border border-ocean-accent border-opacity-20 opacity-0">
-          <p className="text-center text-ocean-text">
-            <span className="font-semibold text-ocean-accent">Need immediate help?</span> Call 988 or text "HELLO" to 741741
-          </p>
         </div>
       </div>
     </div>
