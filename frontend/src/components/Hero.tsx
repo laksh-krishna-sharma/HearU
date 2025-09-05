@@ -74,15 +74,17 @@ const Hero = () => {
       </div>
 
       {/* Enhanced Buddha Image with Better Blending */}
-      <div className="absolute right-0 top-0 h-full w-1/2 sm:w-1/3 pointer-events-none z-0">
+      <div className="absolute right-0 top-0 h-full w-1/2 sm:w-1/3 pointer-events-none z-0 bg-wellness-cream">
         <img
           src="/buddhaFace3.jpg"
           alt="Buddha Face Right"
-          className="h-full w-full object-cover object-left opacity-30"
+          className="h-full w-full object-cover object-right opacity-30 translate-x-10"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-wellness-cream via-wellness-warm-white/80 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-t from-wellness-peach/10 to-transparent" />
       </div>
+
+
 
       {/* Subtle Pattern Overlay */}
       <div className="absolute inset-0 opacity-5 pointer-events-none" style={{

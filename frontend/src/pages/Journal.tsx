@@ -68,7 +68,7 @@ const Journal: React.FC = () => {
         <div className="mb-12 text-center animate-fade-in">
           <h1 className="text-4xl md:text-5xl font-bold font-display text-ocean-text mb-4">
             My{' '}
-            <span className="bg-gradient-to-r from-ocean-primary via-ocean-secondary to-wellness-sage bg-clip-text text-transparent">
+            <span className="">
               Journal
             </span>
           </h1>

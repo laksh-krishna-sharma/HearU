@@ -73,7 +73,7 @@ const LandingPage = () => {
         <div ref={welcomeRef} className="text-center mb-20 opacity-0">
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold font-display text-ocean-text mb-6 leading-tight">
             Welcome back,{' '}
-            <span className="bg-gradient-to-r from-ocean-primary via-ocean-secondary to-wellness-sage bg-clip-text text-transparent animate-pulse-soft">
+            <span className="">
               {user?.name || user?.username || 'Friend'}
             </span>!
           </h1>
