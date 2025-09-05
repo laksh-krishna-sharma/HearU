@@ -39,7 +39,7 @@ function App() {
           <GlobalEffects />
           <GlobalBackground />
         <Navbar />
-        <div className='relative z-10 pt-8'>
+        <div className='relative z-10 pt-24'>
           <PageTransition>
             <Routes>
             {/* Public Routes */}
