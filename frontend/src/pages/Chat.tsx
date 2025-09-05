@@ -9,9 +9,9 @@ export default function VoiceAssistant() {
       </div>
 
       {/* Bottom Section */}
-      <div className="flex flex-col items-center">
+      <div className="flex flex-col items-center mb-28">
         {/* Controls */}
-        <div className="flex items-center gap-6 mb-4">
+        <div className="flex items-center gap-6">
           <button className="w-14 h-14 rounded-full bg-[#2f2f2f] hover:bg-[#3a3a3a] flex items-center justify-center">
             <Mic className="w-6 h-6 text-white" />
           </button>
