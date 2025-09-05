@@ -6,8 +6,11 @@ env:
 
 on:
     push:
-        branches-ignore:
-            - main
+        branches:
+            - develop-laksh
+            - develop-rupesh
+            - develop-dhruv
+            - develop-sahil
 
 jobs:
   deploy:
