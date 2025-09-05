@@ -279,6 +279,38 @@ button:focus-visible {
   }
 }
 
+/* Global helper classes extracted from Hero so all pages share the same animations */
+@keyframes floatY {
+  0% { transform: translateY(-8px); }
+  50% { transform: translateY(10px); }
+  100% { transform: translateY(-8px); }
+}
+.float {
+  animation-name: floatY;
+  animation-duration: 6s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+.float-fast { animation-duration: 4.5s; }
+
+@keyframes glowPulse {
+  0% { filter: drop-shadow(0 0 6px rgba(255,255,255,0.04)); opacity: 0.9; }
+  50% { filter: drop-shadow(0 0 28px rgba(255,255,255,0.06)); opacity: 1; }
+  100% { filter: drop-shadow(0 0 6px rgba(255,255,255,0.04)); opacity: 0.92; }
+}
+.glow-pulse { animation: glowPulse 3.6s ease-in-out infinite; }
+
+.reveal-on-scroll.in-view {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+}
+
+.animate-slide-up { transform: translateY(6px); opacity: 0; transition: transform 520ms cubic-bezier(.2,.9,.25,1), opacity 520ms; }
+.animate-slide-up.visible { transform: translateY(0); opacity: 1; }
+
+.svg-float:hover { transform: scale(1.045) !important; transition: transform 220ms; }
+
 /* Focus indicators for better accessibility */
 .focus-visible:focus {
   outline: 2px solid var(--primary);

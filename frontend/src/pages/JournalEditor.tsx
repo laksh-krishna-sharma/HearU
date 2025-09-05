@@ -349,7 +349,7 @@ const JournalEditor: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen w-screen bg-ocean-background p-6">
+    <div className="min-h-screen w-screen p-6">
       <div className="max-w-7xl mx-auto">
         <JournalHeader
           isEditing={isEditing}

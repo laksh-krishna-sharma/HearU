@@ -10,7 +10,7 @@ import toast from 'react-hot-toast';
 const Journal: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const {entries, loading, error} = useAppSelector((state) => state.journal);
+  const { entries, loading, error } = useAppSelector((state) => state.journal);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -30,13 +30,12 @@ const Journal: React.FC = () => {
     navigate(`/journal/edit/${journalId}`);
   };
 
-
   if (loading) {
     return (
       <div className="min-h-screen bg-ocean-background p-6">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-center h-64">
-            <p className="text-ocean-text">Opening Journals...</p>
+            <p className="text-white">Opening Journals...</p>
           </div>
         </div>
       </div>
@@ -56,21 +55,11 @@ const Journal: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-wellness-cream via-wellness-warm-white to-wellness-peach/20 p-6 relative overflow-hidden">
-      {/* Floating Background Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-32 h-32 bg-wellness-mint/10 rounded-full blur-xl animate-float"></div>
-        <div className="absolute top-60 right-20 w-24 h-24 bg-wellness-lavender/10 rounded-full blur-xl animate-float" style={{animationDelay: '1s'}}></div>
-        <div className="absolute bottom-32 left-1/4 w-40 h-40 bg-wellness-sky/10 rounded-full blur-xl animate-float" style={{animationDelay: '2s'}}></div>
-      </div>
-
+    <div className="min-h-screen p-6 relative overflow-hidden">
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="mb-12 text-center animate-fade-in">
           <h1 className="text-4xl md:text-5xl font-bold font-display text-ocean-text mb-4">
-            My{' '}
-            <span className="">
-              Journal
-            </span>
+            My <span>Journal</span>
           </h1>
           <p className="text-lg text-ocean-text/70 max-w-2xl mx-auto leading-relaxed">
             Your mind's safe reset button - a sanctuary for your thoughts and reflections
@@ -108,7 +97,7 @@ const Journal: React.FC = () => {
               key={journal.id || journal.title}
               onClick={() => journal.id && handleOpenJournal(journal.id)}
               className="group cursor-pointer bg-gradient-to-br from-white/90 to-wellness-warm-white/80 backdrop-blur-sm border border-white/40 shadow-soft hover:shadow-large transition-all duration-300 transform hover:scale-105 hover:-rotate-1 min-h-[200px] animate-scale-in"
-              style={{animationDelay: `${index * 0.1}s`}}
+              style={{ animationDelay: `${index * 0.1}s` }}
             >
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-3 truncate text-ocean-text group-hover:text-ocean-primary transition-colors duration-300">
@@ -125,11 +114,13 @@ const Journal: React.FC = () => {
                 <div className="flex items-center gap-2 text-xs text-ocean-text/50 bg-wellness-cream/50 rounded-lg px-3 py-2">
                   <Calendar className="h-3 w-3 text-ocean-primary" />
                   <span className="font-medium">
-                    {journal.created_at ? new Date(journal.created_at).toLocaleDateString('en-US', {
-                      month: 'short',
-                      day: 'numeric',
-                      year: 'numeric'
-                    }) : 'N/A'}
+                    {journal.created_at
+                      ? new Date(journal.created_at).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                          year: 'numeric',
+                        })
+                      : 'N/A'}
                   </span>
                 </div>
               </CardContent>
@@ -149,7 +140,7 @@ const Journal: React.FC = () => {
             </p>
           </div>
         )}
-      </div>      
+      </div>
     </div>
   );
 };

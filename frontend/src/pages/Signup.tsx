@@ -142,15 +142,8 @@ const Signup = () => {
   const labelClass = "block text-sm font-semibold text-[#6E664E] mb-2";
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#EBE8D5] via-[#F5F3EA] to-[#DFD3B6] relative overflow-hidden">
-      {/* Background Image - Right Side */}
-      <div className="absolute right-0 top-0 h-full w-1/2 sm:w-1/3 pointer-events-none z-0">
-        <img
-            src="/buddhaFace3.jpg"
-            alt="Buddha Face Right"
-            className="h-full w-full object-cover object-left opacity-45  "
-          />
-      </div>
+    <div className="min-h-screen relative overflow-hidden">
+      
 
       {/* Content Container */}
       <div className="relative min-h-screen flex items-center justify-start px-4 sm:px-6 lg:px-8 py-8">
@@ -158,10 +151,10 @@ const Signup = () => {
           
           {/* Header */}
           <div ref={headerRef} className="text-left mb-6 opacity-0">
-            <h1 className="text-2xl sm:text-3xl font-semibold mb-2">
+            <h1 className="text-2xl sm:text-3xl font-semibold mb-2 text-white">
               Join our community
             </h1>
-            <p className="text-base max-w-md">
+            <p className="text-base max-w-md text-white/80">
               Start your mental wellness journey today
             </p>
           </div>          

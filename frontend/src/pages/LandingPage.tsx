@@ -60,18 +60,13 @@ const LandingPage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-wellness-cream via-wellness-warm-white to-wellness-peach/20 relative overflow-hidden">
-      {/* Floating Background Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-32 h-32 bg-wellness-mint/10 rounded-full blur-xl animate-float"></div>
-        <div className="absolute top-60 right-20 w-24 h-24 bg-wellness-lavender/10 rounded-full blur-xl animate-float" style={{animationDelay: '1s'}}></div>
-        <div className="absolute bottom-32 left-1/4 w-40 h-40 bg-wellness-sky/10 rounded-full blur-xl animate-float" style={{animationDelay: '2s'}}></div>
-      </div>
+    <div className="min-h-screen relative overflow-hidden">
+      
 
       <div className="max-w-7xl mx-auto px-4 py-12 relative z-10">
         {/* Welcome Section */}
         <div ref={welcomeRef} className="text-center mb-20 opacity-0">
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold font-display text-ocean-text mb-6 leading-tight">
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold font-display text-white mb-6 leading-tight">
             Welcome back,{' '}
             <span className="">
               {user?.name || user?.username || 'Friend'}

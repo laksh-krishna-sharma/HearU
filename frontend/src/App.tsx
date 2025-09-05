@@ -1,6 +1,8 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useAppSelector } from './hooks/hooks';
 import Navbar from './components/Navbar';
+import GlobalBackground from './components/GlobalBackground';
+import GlobalEffects from './components/GlobalEffects';
 import PageTransition from './components/PageTransition';
 import Home from './pages/Home';
 import Login from './pages/Login';
@@ -32,9 +34,12 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-ocean-background">
+      <div className="relative min-h-screen bg-black text-white">
+          {/* Global background & effects */}
+          <GlobalEffects />
+          <GlobalBackground />
         <Navbar />
-        <div className='pt-8'>
+        <div className='relative z-10 pt-8'>
           <PageTransition>
             <Routes>
             {/* Public Routes */}

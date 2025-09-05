@@ -52,24 +52,8 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-wellness-cream via-wellness-warm-white to-wellness-peach/20 relative overflow-hidden">
-      {/* Floating Background Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-32 h-32 bg-wellness-mint/10 rounded-full blur-xl animate-float"></div>
-        <div className="absolute top-60 right-20 w-24 h-24 bg-wellness-lavender/10 rounded-full blur-xl animate-float" style={{animationDelay: '1s'}}></div>
-        <div className="absolute bottom-32 left-1/4 w-40 h-40 bg-wellness-sky/10 rounded-full blur-xl animate-float" style={{animationDelay: '2s'}}></div>
-      </div>
-
-      {/* Enhanced Background Image - Right Side */}
-      <div className="absolute right-0 top-0 h-full w-1/2 sm:w-1/3 pointer-events-none z-0">
-        <img
-            src="/buddhaFace3.jpg"
-            alt="Buddha Face Right"
-            className="h-full w-full object-cover object-left opacity-25"
-          />
-        <div className="absolute inset-0 bg-gradient-to-r from-wellness-cream via-wellness-warm-white/80 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-wellness-peach/10 to-transparent" />
-      </div>
+    <div className="min-h-screen relative overflow-hidden">
+      
 
       {/* Content Container */}
       <div className="relative min-h-screen flex items-center justify-start px-4 sm:px-6 lg:px-8 z-10">
@@ -77,13 +61,13 @@ const Login = () => {
           
           {/* Header */}
           <div ref={headerRef} className="text-left mb-12 opacity-0">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold font-display text-ocean-text mb-4 leading-tight">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold font-display text-white mb-4 leading-tight">
               Welcome{' '}
               <span className="bg-gradient-to-r from-ocean-primary via-ocean-secondary to-wellness-sage bg-clip-text text-transparent">
                 back
               </span>
             </h1>
-            <p className="text-lg sm:text-xl text-ocean-text/70 max-w-md leading-relaxed">
+            <p className="text-lg sm:text-xl text-white/70 max-w-md leading-relaxed">
               Sign in to continue your wellness journey with compassion and care
             </p>
           </div>

@@ -2,7 +2,7 @@ import { Mic, X } from "lucide-react";
 
 export default function VoiceAssistant() {
   return (
-    <div className="min-h-screen bg-[#F5F3EA] flex flex-col justify-between items-center text-white relative">
+    <div className="min-h-screen flex flex-col justify-between items-center text-white relative\">
       {/* Center Orb */}
       <div className="flex flex-1 items-center justify-center">
         <div className="w-40 h-40 rounded-full bg-gradient-to-br from-blue-400 to-black shadow-lg shadow-blue-500/40" />
