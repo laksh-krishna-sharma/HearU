@@ -52,121 +52,145 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#EBE8D5] via-[#F5F3EA] to-[#DFD3B6] relative overflow-hidden">
-      {/* Background Image - Right Side */}
+    <div className="min-h-screen bg-gradient-to-br from-wellness-cream via-wellness-warm-white to-wellness-peach/20 relative overflow-hidden">
+      {/* Floating Background Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-32 h-32 bg-wellness-mint/10 rounded-full blur-xl animate-float"></div>
+        <div className="absolute top-60 right-20 w-24 h-24 bg-wellness-lavender/10 rounded-full blur-xl animate-float" style={{animationDelay: '1s'}}></div>
+        <div className="absolute bottom-32 left-1/4 w-40 h-40 bg-wellness-sky/10 rounded-full blur-xl animate-float" style={{animationDelay: '2s'}}></div>
+      </div>
+
+      {/* Enhanced Background Image - Right Side */}
       <div className="absolute right-0 top-0 h-full w-1/2 sm:w-1/3 pointer-events-none z-0">
         <img
             src="/buddhaFace3.jpg"
             alt="Buddha Face Right"
-            className="h-full w-full object-cover object-left opacity-45  "
+            className="h-full w-full object-cover object-left opacity-25"
           />
+        <div className="absolute inset-0 bg-gradient-to-r from-wellness-cream via-wellness-warm-white/80 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-wellness-peach/10 to-transparent" />
       </div>
 
       {/* Content Container */}
-      <div className="relative min-h-screen flex items-center justify-start px-4 sm:px-6 lg:px-8">
+      <div className="relative min-h-screen flex items-center justify-start px-4 sm:px-6 lg:px-8 z-10">
         <div className="w-full max-w-md sm:max-w-lg lg:max-w-xl xl:max-w-2xl ml-0 sm:ml-8 lg:ml-12 xl:ml-16">
           
           {/* Header */}
-          <div ref={headerRef} className="text-left mb-8 opacity-0">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-[#6E664E] mb-2">
-              Welcome back
+          <div ref={headerRef} className="text-left mb-12 opacity-0">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold font-display text-ocean-text mb-4 leading-tight">
+              Welcome{' '}
+              <span className="bg-gradient-to-r from-ocean-primary via-ocean-secondary to-wellness-sage bg-clip-text text-transparent">
+                back
+              </span>
             </h1>
-            <p className="text-base sm:text-lg text-[#6E664E]/80 max-w-md">
-              Sign in to continue your wellness journey
+            <p className="text-lg sm:text-xl text-ocean-text/70 max-w-md leading-relaxed">
+              Sign in to continue your wellness journey with compassion and care
             </p>
           </div>
 
-          {/* Login Form */}
+          {/* Enhanced Login Form */}
           <div 
             ref={formRef} 
-            className="bg-white/80 backdrop-blur-sm rounded-xl shadow-xl border border-white/20 p-6 sm:p-8 lg:p-10 opacity-0 max-w-md"
+            className="bg-gradient-to-br from-white/90 to-wellness-cream/60 backdrop-blur-md rounded-2xl shadow-large border border-white/40 p-8 sm:p-10 lg:p-12 opacity-0 max-w-lg"
           >
             <form className="space-y-6" onSubmit={handleSubmit}>
               
               {/* Email Field */}
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <label 
                   htmlFor="email" 
-                  className="block text-sm font-semibold text-[#6E664E]"
+                  className="block text-sm font-semibold text-ocean-text/80"
                 >
                   Email address
                 </label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="Enter your email"
-                  className="w-full px-4 py-3 sm:px-5 sm:py-4 border border-gray-200 rounded-lg 
-                           focus:ring-2 focus:ring-ocean-primary focus:border-ocean-primary 
-                           transition-all duration-300 outline-none text-base bg-white/70
-                           hover:bg-white/90 focus:bg-white"
-                />
+                <div className="relative">
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    required
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder="Enter your email"
+                    className="w-full px-5 py-4 border-2 border-white/40 rounded-xl 
+                             focus:ring-2 focus:ring-ocean-primary/50 focus:border-ocean-primary 
+                             transition-all duration-300 outline-none text-base bg-white/80
+                             hover:bg-white/90 focus:bg-white backdrop-blur-sm shadow-soft
+                             hover:shadow-medium focus:shadow-medium placeholder:text-ocean-text/40"
+                  />
+                  <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-ocean-primary/5 to-ocean-secondary/5 pointer-events-none opacity-0 transition-opacity duration-300 peer-focus:opacity-100"></div>
+                </div>
               </div>
 
               {/* Password Field */}
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <label 
                   htmlFor="password" 
-                  className="block text-sm font-semibold text-[#6E664E]"
+                  className="block text-sm font-semibold text-ocean-text/80"
                 >
                   Password
                 </label>
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete="current-password"
-                  required
-                  value={formData.password}
-                  onChange={handleChange}
-                  placeholder="Enter your password"
-                  className="w-full px-4 py-3 sm:px-5 sm:py-4 border border-gray-200 rounded-lg 
-                           focus:ring-2 focus:ring-ocean-primary focus:border-ocean-primary 
-                           transition-all duration-300 outline-none text-base bg-white/70
-                           hover:bg-white/90 focus:bg-white"
-                />
+                <div className="relative">
+                  <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    autoComplete="current-password"
+                    required
+                    value={formData.password}
+                    onChange={handleChange}
+                    placeholder="Enter your password"
+                    className="w-full px-5 py-4 border-2 border-white/40 rounded-xl 
+                             focus:ring-2 focus:ring-ocean-primary/50 focus:border-ocean-primary 
+                             transition-all duration-300 outline-none text-base bg-white/80
+                             hover:bg-white/90 focus:bg-white backdrop-blur-sm shadow-soft
+                             hover:shadow-medium focus:shadow-medium placeholder:text-ocean-text/40"
+                  />
+                  <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-ocean-primary/5 to-ocean-secondary/5 pointer-events-none opacity-0 transition-opacity duration-300 peer-focus:opacity-100"></div>
+                </div>
               </div>
 
               {/* Remember Me & Forgot Password */}
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <label className="flex items-center text-sm text-[#6E664E] cursor-pointer">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <label className="flex items-center text-sm text-ocean-text/70 cursor-pointer group">
                   <input
                     id="remember-me"
                     name="remember-me"
                     type="checkbox"
-                    className="h-4 w-4 text-ocean-primary focus:ring-ocean-primary 
-                             border-gray-300 rounded mr-2 cursor-pointer"
+                    className="h-4 w-4 text-ocean-primary focus:ring-ocean-primary/50 
+                             border-2 border-white/40 rounded mr-3 cursor-pointer transition-all duration-300
+                             checked:bg-ocean-primary checked:border-ocean-primary"
                   />
-                  Remember me
+                  <span className="group-hover:text-ocean-text transition-colors duration-300">Remember me</span>
                 </label>
                 <Link 
                   to="/forgot-password" 
-                  className="text-sm text-ocean-primary hover:text-ocean-primary-dark 
-                           transition-colors duration-200 font-medium"
+                  className="text-sm text-ocean-primary hover:text-ocean-secondary 
+                           transition-colors duration-300 font-medium hover:underline"
                 >
                   Forgot password?
                 </Link>
               </div>
 
-              {/* Submit Button */}
+              {/* Enhanced Submit Button */}
               <button
                 ref={submitBtnRef}
                 type="submit"
                 disabled={authState.loading}
-                className={`w-full flex justify-center py-3 sm:py-4 px-6 rounded-lg 
-                          shadow-lg text-white font-semibold text-base transform 
-                          transition-all duration-300 ${
+                className={`w-full flex justify-center py-4 px-6 rounded-xl 
+                          shadow-medium text-white font-semibold text-base transform 
+                          transition-all duration-300 relative overflow-hidden group ${
                   authState.loading
                     ? "bg-gray-400 cursor-not-allowed scale-100"
-                    : "bg-ocean-primary hover:bg-ocean-primary-dark hover:scale-[1.02] hover:shadow-xl active:scale-[0.98]"
+                    : "bg-gradient-to-r from-ocean-primary to-ocean-secondary hover:from-ocean-secondary hover:to-ocean-primary hover:scale-105 hover:shadow-large active:scale-95"
                 }`}
               >
+                {!authState.loading && (
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                )}
                 {authState.loading ? (
-                  <span className="flex items-center">
+                  <span className="flex items-center relative z-10">
                     <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -174,36 +198,41 @@ const Login = () => {
                     Signing in...
                   </span>
                 ) : (
-                  "Sign in"
+                  <span className="relative z-10">Sign in to your sanctuary</span>
                 )}
               </button>
             </form>
 
-            {/* Error Message */}
+            {/* Enhanced Error Message */}
             {authState.error && (
-              <div className="mt-6 p-4 bg-red-50 border border-red-200 text-red-700 
-                           rounded-lg text-sm font-medium">
+              <div className="mt-6 p-4 bg-gradient-to-r from-red-50/80 to-red-100/60 border-2 border-red-200/60 text-red-700 
+                           rounded-xl text-sm font-medium backdrop-blur-sm shadow-soft animate-slide-up">
                 <div className="flex items-center">
-                  <svg className="w-5 h-5 mr-2 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                  </svg>
-                  {authState.error}
+                  <div className="p-1 bg-red-100 rounded-full mr-3">
+                    <svg className="w-4 h-4 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <span>{authState.error}</span>
                 </div>
               </div>
             )}
 
-            {/* Sign Up Link */}
-            <div className="mt-8 text-center ">
-              <p className="text-sm text-[#6E664E]">
-                Don't have an account?{" "}
-                <Link
-                  to="/signup"
-                  className="text-ocean-primary hover:text-black
-                           font-semibold  duration-200 "
-                >
-                  Sign up here
-                </Link>
-              </p>
+            {/* Enhanced Sign Up Link */}
+            <div className="mt-8 text-center">
+              <div className="bg-gradient-to-r from-wellness-cream/40 to-wellness-warm-white/40 backdrop-blur-sm rounded-xl p-4 border border-white/40">
+                <p className="text-sm text-ocean-text/70">
+                  Don't have an account?{" "}
+                  <Link
+                    to="/signup"
+                    className="text-ocean-primary hover:text-ocean-secondary
+                             font-semibold transition-all duration-300 hover:underline
+                             bg-gradient-to-r from-ocean-primary to-ocean-secondary bg-clip-text hover:text-transparent"
+                  >
+                    Start your wellness journey
+                  </Link>
+                </p>
+              </div>
             </div>
           </div>
         </div>
