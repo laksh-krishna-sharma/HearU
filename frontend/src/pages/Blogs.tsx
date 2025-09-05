@@ -42,14 +42,14 @@ const Blogs = () => {
   const categories = ["All", "Mental Health", "Relationships", "Wellness", "Support"];
 
   return (
-    <div className="min-h-screen bg-ocean-background">
+    <div className="min-h-screen">
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-ocean-text mb-4">
+        <div className="text-center mb-12 text-white">
+          <h1 className="text-4xl font-bold text-white mb-4">
             Mental Wellness Blog
           </h1>
-          <p className="text-lg text-ocean-text opacity-70 max-w-2xl mx-auto">
+          <p className="text-lg text-white/80 max-w-2xl mx-auto">
             Expert insights, personal stories, and practical tips to support your mental health journey
           </p>
         </div>

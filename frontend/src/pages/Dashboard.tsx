@@ -21,7 +21,7 @@ const Dashboard = () => {
   if (loading) return <p className='text-center text-ocean-text'>Loading...</p>;
 
   return (
-    <div className="min-h-screen bg-ocean-background">
+    <div className="min-h-screen">
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="bg-white rounded-xl shadow-lg p-8">
           <h1 className="text-3xl font-bold text-ocean-text mb-6">

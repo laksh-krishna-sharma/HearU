@@ -1,57 +1,27 @@
-import { useState } from "react";
-import { Search, Mic, BarChart3 } from "lucide-react";
+import { Mic, X } from "lucide-react";
 
-export default function ChatGPTReplica() {
-  const [query, setQuery] = useState("");
-
+export default function VoiceAssistant() {
   return (
-    <div className="h-screen w-screen bg-[#1e1e1e] text-white flex flex-col">
-      {/* Top Upgrade Banner */}
-      <div className="flex justify-center p-4">
-        <button className="bg-[#2f2f2f] hover:bg-[#3a3a3a] px-4 py-2 rounded-full text-sm text-white/90">
-          + Upgrade your plan
-        </button>
+    <div className="min-h-screen flex flex-col justify-between items-center text-white relative\">
+      {/* Center Orb */}
+      <div className="flex flex-1 items-center justify-center">
+        <div className="w-40 h-40 rounded-full bg-gradient-to-br from-blue-400 to-black shadow-lg shadow-blue-500/40" />
       </div>
 
-      {/* Center Section */}
-      <div className="flex-1 flex flex-col items-center justify-center">
-        <h1 className="text-xl md:text-2xl font-medium mb-6">
-          Where should we begin?
-        </h1>
-
-        {/* Search Box */}
-        <div className="flex items-center w-[90%] md:w-[500px] bg-[#2f2f2f] rounded-full px-4 py-3">
-          <Search className="text-gray-400 w-5 h-5 mr-2" />
-          <input
-            type="text"
-            placeholder="Ask anything"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            className="bg-transparent outline-none text-white flex-1 placeholder-gray-400"
-          />
-          <Mic className="text-gray-400 w-5 h-5 mr-2 cursor-pointer hover:text-white" />
-          <BarChart3 className="text-gray-400 w-5 h-5 cursor-pointer hover:text-white" />
+      {/* Bottom Section */}
+      <div className="flex flex-col items-center">
+        {/* Controls */}
+        <div className="flex items-center gap-6 mb-4">
+          <button className="w-14 h-14 rounded-full bg-[#2f2f2f] hover:bg-[#3a3a3a] flex items-center justify-center">
+            <Mic className="w-6 h-6 text-white" />
+          </button>
+          <button className="w-14 h-14 rounded-full bg-[#2f2f2f] hover:bg-[#3a3a3a] flex items-center justify-center">
+            <X className="w-6 h-6 text-white" />
+          </button>
         </div>
-      </div>
 
-      {/* Sidebar Icons */}
-      <div className="absolute left-4 top-4 flex flex-col space-y-6">
-        <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#10a37f] to-[#1e7f64]" />
-        <div className="w-6 h-6 bg-gray-500 rounded-sm" />
-        <div className="w-6 h-6 bg-gray-500 rounded-sm" />
-        <div className="w-6 h-6 bg-gray-500 rounded-sm" />
-      </div>
-
-      {/* Bottom Left Profile (circle icon like in screenshot) */}
-      <div className="absolute bottom-4 left-4">
-        <div className="w-10 h-10 rounded-full bg-blue-500" />
-      </div>
-
-      {/* Top Right Refresh Icon */}
-      <div className="absolute top-4 right-4">
-        <div className="w-6 h-6 rounded-full border border-gray-500 flex items-center justify-center text-gray-400">
-          ⟳
-        </div>
+        {/* Subtitle */}
+        <div className="text-sm text-black">Hello I'm Eve</div>
       </div>
     </div>
   );

@@ -60,96 +60,77 @@ const LandingPage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-ocean-background">
-      <div className="max-w-7xl mx-auto px-4 py-12">
+    <div className="min-h-screen relative overflow-hidden">
+      
+
+      <div className="max-w-7xl mx-auto px-4 py-12 relative z-10">
         {/* Welcome Section */}
-        <div ref={welcomeRef} className="text-center mb-16 opacity-0">
-          <h1 className="text-4xl md:text-6xl font-bold text-ocean-text mb-6">
-            Welcome back, {user?.name || user?.username || 'Friend'}!
+        <div ref={welcomeRef} className="text-center mb-20 opacity-0">
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold font-display text-white mb-6 leading-tight">
+            Welcome back,{' '}
+            <span className="">
+              {user?.name || user?.username || 'Friend'}
+            </span>!
           </h1>
-          <p className="text-xl text-ocean-text opacity-70 max-w-2xl mx-auto">
-            Your mental wellness journey continues here. Explore resources, connect with others, and take care of yourself.
+          <p className="text-xl md:text-2xl text-ocean-text/70 max-w-3xl mx-auto leading-relaxed">
+            Your mental wellness journey continues here. Explore resources, connect with others, and take care of yourself with compassion.
           </p>
         </div>
 
         {/* Quick Actions */}
-        <div ref={cardsRef} className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+        <div ref={cardsRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
           <Link 
-            to="/dashboard"
-            className="group bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-all duration-300 hover:scale-105"
+            to="/journal"
+            className="group bg-gradient-to-br from-white/90 to-wellness-cream/60 backdrop-blur-sm border border-white/40 rounded-2xl shadow-soft hover:shadow-large p-8 transition-all duration-300 transform hover:scale-105 hover:-rotate-1"
           >
-            <div className="w-16 h-16 bg-ocean-primary bg-opacity-20 rounded-full flex items-center justify-center mb-4 group-hover:bg-ocean-primary group-hover:bg-opacity-30 transition-all duration-300">
-              <svg className="w-8 h-8 text-ocean-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            <div className="w-16 h-16 bg-gradient-to-r from-ocean-primary/20 to-ocean-secondary/20 rounded-2xl flex items-center justify-center mb-6 group-hover:from-ocean-primary/30 group-hover:to-ocean-secondary/30 transition-all duration-300 group-hover:scale-110">
+              <svg className="w-8 h-8 text-ocean-primary group-hover:text-ocean-secondary transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold text-ocean-text mb-2">Dashboard</h3>
-            <p className="text-ocean-text opacity-70">
-              View your progress, track your wellness, and manage your profile
+            <h3 className="text-xl font-semibold text-ocean-text mb-3 group-hover:text-ocean-primary transition-colors duration-300">My Journal</h3>
+            <p className="text-ocean-text/70 leading-relaxed group-hover:text-ocean-text/80 transition-colors duration-300">
+              Continue your personal wellness journey with guided journaling and reflection
             </p>
           </Link>
 
           <Link 
             to="/blogs"
-            className="group bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-all duration-300 hover:scale-105"
+            className="group bg-gradient-to-br from-white/90 to-wellness-mint/20 backdrop-blur-sm border border-white/40 rounded-2xl shadow-soft hover:shadow-large p-8 transition-all duration-300 transform hover:scale-105 hover:rotate-1"
           >
-            <div className="w-16 h-16 bg-ocean-secondary bg-opacity-20 rounded-full flex items-center justify-center mb-4 group-hover:bg-ocean-secondary group-hover:bg-opacity-30 transition-all duration-300">
-              <svg className="w-8 h-8 text-ocean-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            <div className="w-16 h-16 bg-gradient-to-r from-wellness-mint/30 to-wellness-sage/30 rounded-2xl flex items-center justify-center mb-6 group-hover:from-wellness-mint/40 group-hover:to-wellness-sage/40 transition-all duration-300 group-hover:scale-110">
+              <svg className="w-8 h-8 text-wellness-sage group-hover:text-ocean-primary transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold text-ocean-text mb-2">Mental Health Blogs</h3>
-            <p className="text-ocean-text opacity-70">
-              Read expert articles and tips for your mental wellness journey
+            <h3 className="text-xl font-semibold text-ocean-text mb-3 group-hover:text-wellness-sage transition-colors duration-300">Mental Health Blogs</h3>
+            <p className="text-ocean-text/70 leading-relaxed group-hover:text-ocean-text/80 transition-colors duration-300">
+              Read expert articles and evidence-based tips for your mental wellness journey
             </p>
           </Link>
 
           <Link 
             to="/chat"
-            className="group bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-all duration-300 hover:scale-105"
+            className="group bg-gradient-to-br from-white/90 to-wellness-sky/20 backdrop-blur-sm border border-white/40 rounded-2xl shadow-soft hover:shadow-large p-8 transition-all duration-300 transform hover:scale-105 hover:-rotate-1 md:col-span-2 lg:col-span-1"
           >
-            <div className="w-16 h-16 bg-ocean-accent bg-opacity-20 rounded-full flex items-center justify-center mb-4 group-hover:bg-ocean-accent group-hover:bg-opacity-30 transition-all duration-300">
-              <svg className="w-8 h-8 text-ocean-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-16 h-16 bg-gradient-to-r from-wellness-sky/30 to-ocean-secondary/30 rounded-2xl flex items-center justify-center mb-6 group-hover:from-wellness-sky/40 group-hover:to-ocean-secondary/40 transition-all duration-300 group-hover:scale-110">
+              <svg className="w-8 h-8 text-ocean-secondary group-hover:text-wellness-sky transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold text-ocean-text mb-2">AI Support Chat</h3>
-            <p className="text-ocean-text opacity-70">
-              Get instant support and guidance from our AI wellness assistant
+            <h3 className="text-xl font-semibold text-ocean-text mb-3 group-hover:text-ocean-secondary transition-colors duration-300">AI Support Chat</h3>
+            <p className="text-ocean-text/70 leading-relaxed group-hover:text-ocean-text/80 transition-colors duration-300">
+              Get instant, compassionate support and guidance from our AI wellness assistant
             </p>
           </Link>
         </div>
 
-        {/* Wellness Stats */}
-        <div ref={statsRef} className="bg-white rounded-xl shadow-lg p-8 mb-16 opacity-0">
-          <h2 className="text-2xl font-bold text-ocean-text mb-6 text-center">
-            Your Wellness Journey
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="text-center">
-              <div ref={counter1Ref} className="text-3xl font-bold text-ocean-primary mb-2">0</div>
-              <div className="text-sm text-ocean-text opacity-70">Days Active</div>
-            </div>
-            <div className="text-center">
-              <div ref={counter2Ref} className="text-3xl font-bold text-ocean-secondary mb-2">0</div>
-              <div className="text-sm text-ocean-text opacity-70">Articles Read</div>
-            </div>
-            <div className="text-center">
-              <div ref={counter3Ref} className="text-3xl font-bold text-ocean-accent mb-2">0</div>
-              <div className="text-sm text-ocean-text opacity-70">Chat Sessions</div>
-            </div>
-            <div className="text-center">
-              <div ref={counter4Ref} className="text-3xl font-bold text-ocean-primary mb-2">0</div>
-              <div className="text-sm text-ocean-text opacity-70">Wellness Score</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Crisis Support */}
-        <div ref={crisisRef} className="p-6 bg-ocean-accent bg-opacity-10 rounded-lg border border-ocean-accent border-opacity-20 opacity-0">
-          <p className="text-center text-ocean-text">
-            <span className="font-semibold text-ocean-accent">Need immediate help?</span> Call 988 or text "HELLO" to 741741
-          </p>
+        {/* Inspirational Quote Section */}
+        <div className="text-center bg-gradient-to-r from-white/60 to-wellness-cream/40 backdrop-blur-sm rounded-3xl p-8 md:p-12 border border-white/40 shadow-soft animate-fade-in">
+          <blockquote className="text-xl md:text-2xl font-medium text-ocean-text/80 italic mb-4 leading-relaxed">
+            "The greatest revolution of our generation is the discovery that human beings, by changing the inner attitudes of their minds, can change the outer aspects of their lives."
+          </blockquote>
+          <cite className="text-ocean-text/60 font-semibold">— William James</cite>
         </div>
       </div>
     </div>

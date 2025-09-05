@@ -4,81 +4,91 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Updated color palette for mental wellness theme */
-  --background: oklch(1 0 0); /* Soft White */
-  --foreground: oklch(0.4 0 0); /* Charcoal Gray */
-  --card: oklch(0.97 0 0); /* Light Gray */
-  --card-foreground: oklch(0.35 0.15 160); /* Warm Green */
-  --popover: oklch(1 0 0); /* Soft White */
-  --popover-foreground: oklch(0.4 0 0); /* Charcoal Gray */
-  --primary: oklch(0.55 0.15 160); /* Warm Green - emerald-600 equivalent */
-  --primary-foreground: oklch(1 0 0); /* Soft White */
-  --secondary: oklch(0.65 0.12 165); /* Gentle Aqua */
-  --secondary-foreground: oklch(1 0 0); /* Soft White */
-  --muted: oklch(0.97 0 0); /* Light Gray */
-  --muted-foreground: oklch(0.4 0 0); /* Charcoal Gray */
-  --accent: oklch(0.65 0.12 165); /* Gentle Aqua */
-  --accent-foreground: oklch(1 0 0); /* Soft White */
-  --destructive: oklch(0.65 0.2 25); /* Soft Red for alerts */
-  --destructive-foreground: oklch(1 0 0); /* Soft White */
-  --border: oklch(0.92 0 0); /* Light Gray for borders */
-  --input: oklch(1 0 0); /* Soft White for input fields */
-  --ring: oklch(0.65 0.12 165); /* Gentle Aqua for focus rings */
-  --chart-1: oklch(0.55 0.15 160); /* Warm Green */
-  --chart-2: oklch(0.65 0.12 165); /* Gentle Aqua */
-  --chart-3: oklch(0.97 0 0); /* Light Gray */
-  --chart-4: oklch(0.65 0.2 25); /* Soft Red */
-  --chart-5: oklch(0.4 0 0); /* Charcoal Gray */
-  --radius: 0.5rem; /* Rounded corners for softer feel */
-  --sidebar: oklch(0.97 0 0); /* Light Gray */
-  --sidebar-foreground: oklch(0.4 0 0); /* Charcoal Gray */
-  --sidebar-primary: oklch(0.55 0.15 160); /* Warm Green */
-  --sidebar-primary-foreground: oklch(1 0 0); /* Soft White */
-  --sidebar-accent: oklch(0.65 0.12 165); /* Gentle Aqua */
-  --sidebar-accent-foreground: oklch(1 0 0); /* Soft White */
-  --sidebar-border: oklch(0.92 0 0); /* Light Gray */
-  --sidebar-ring: oklch(0.65 0.12 165); /* Gentle Aqua */
-  --font-geist: "Geist Sans", sans-serif;
-  --font-manrope: "Manrope", serif;
+  /* Updated to gritty street art aesthetic with proper contrast ratios */
+  --background: oklch(0.15 0 0); /* Dark gray background */
+  --foreground: oklch(1 0 0); /* White text */
+  /* Fixed card colors for proper contrast */
+  --card: oklch(0.2 0 0); /* Darker gray for cards to contrast with white text */
+  --card-foreground: oklch(1 0 0); /* White text on dark cards */
+  --popover: oklch(0.4 0 0); /* Medium gray for popovers */
+  --popover-foreground: oklch(1 0 0); /* White text on popovers */
+  --primary: oklch(0.65 0.2 280); /* Purple accent */
+  --primary-foreground: oklch(0.05 0 0); /* Black text on primary for contrast */
+  /* Fixed secondary colors for proper contrast */
+  --secondary: oklch(0.25 0 0); /* Darker gray secondary */
+  --secondary-foreground: oklch(1 0 0); /* White text on secondary */
+  --muted: oklch(0.25 0 0); /* Muted dark gray */
+  --muted-foreground: oklch(0.8 0 0); /* Light gray muted text for better contrast */
+  --accent: oklch(0.65 0.2 280); /* Purple accent */
+  --accent-foreground: oklch(0.05 0 0); /* Black text on accent */
+  --destructive: oklch(0.55 0.22 25); /* Red for destructive actions */
+  --destructive-foreground: oklch(1 0 0); /* White text on destructive */
+  --border: oklch(0.3 0 0); /* Medium gray borders */
+  --input: oklch(0.2 0 0); /* Dark input background */
+  --ring: oklch(0.65 0.2 280); /* Purple focus ring */
+  --chart-1: oklch(0.55 0.22 25); /* Red chart color */
+  --chart-2: oklch(0.7 0.15 85); /* Orange chart color */
+  --chart-3: oklch(0.6 0.15 180); /* Teal chart color */
+  --chart-4: oklch(0.6 0.2 240); /* Blue chart color */
+  --chart-5: oklch(0.65 0.2 280); /* Purple chart color */
+  --radius: 0.5rem;
+  --sidebar: oklch(0.15 0 0); /* Dark sidebar */
+  --sidebar-foreground: oklch(1 0 0); /* White sidebar text */
+  --sidebar-primary: oklch(0.3 0 0); /* Medium gray sidebar primary */
+  --sidebar-primary-foreground: oklch(1 0 0); /* White text */
+  --sidebar-accent: oklch(0.65 0.2 280); /* Purple sidebar accent */
+  --sidebar-accent-foreground: oklch(1 0 0); /* White accent text */
+  --sidebar-border: oklch(0.3 0 0); /* Medium gray sidebar border */
+  --sidebar-ring: oklch(0.65 0.2 280); /* Purple sidebar ring */
+
+  /* Gritty aesthetic custom properties */
+  --grit-black: oklch(0.05 0 0); /* Pure black for backgrounds */
+  --grit-white: oklch(1 0 0); /* Pure white for contrast */
+  --grit-gray: oklch(0.4 0 0); /* Medium gray for illustrations */
+  --grit-purple: oklch(0.65 0.2 280); /* Purple accent */
+  --particle-glow: oklch(1 0 0 / 0.8); /* White particle glow */
 }
 
 .dark {
-  /* Dark mode colors for mental wellness */
-  --background: oklch(0.15 0 0); /* Dark background */
-  --foreground: oklch(0.95 0 0); /* Light text */
-  --card: oklch(0.2 0 0); /* Dark card */
-  --card-foreground: oklch(0.65 0.12 165); /* Gentle Aqua */
-  --popover: oklch(0.15 0 0); /* Dark popover */
-  --popover-foreground: oklch(0.95 0 0); /* Light text */
-  --primary: oklch(0.65 0.12 165); /* Gentle Aqua as primary in dark */
-  --primary-foreground: oklch(0.15 0 0); /* Dark text on primary */
-  --secondary: oklch(0.3 0 0); /* Dark secondary */
-  --secondary-foreground: oklch(0.95 0 0); /* Light text */
-  --muted: oklch(0.25 0 0); /* Dark muted */
-  --muted-foreground: oklch(0.7 0 0); /* Muted text */
-  --accent: oklch(0.55 0.15 160); /* Warm Green accent */
-  --accent-foreground: oklch(0.95 0 0); /* Light text */
-  --destructive: oklch(0.6 0.2 25); /* Soft Red */
-  --destructive-foreground: oklch(0.95 0 0); /* Light text */
-  --border: oklch(0.25 0 0); /* Dark border */
-  --input: oklch(0.2 0 0); /* Dark input */
-  --ring: oklch(0.65 0.12 165); /* Gentle Aqua ring */
-  --chart-1: oklch(0.65 0.12 165); /* Gentle Aqua */
-  --chart-2: oklch(0.55 0.15 160); /* Warm Green */
-  --chart-3: oklch(0.7 0.1 70); /* Warm accent */
-  --chart-4: oklch(0.6 0.2 25); /* Soft Red */
-  --chart-5: oklch(0.5 0.15 280); /* Purple accent */
-  --sidebar: oklch(0.18 0 0); /* Dark sidebar */
-  --sidebar-foreground: oklch(0.95 0 0); /* Light text */
-  --sidebar-primary: oklch(0.65 0.12 165); /* Gentle Aqua */
-  --sidebar-primary-foreground: oklch(0.15 0 0); /* Dark text */
-  --sidebar-accent: oklch(0.25 0 0); /* Dark accent */
-  --sidebar-accent-foreground: oklch(0.95 0 0); /* Light text */
-  --sidebar-border: oklch(0.25 0 0); /* Dark border */
-  --sidebar-ring: oklch(0.65 0.12 165); /* Gentle Aqua ring */
+  /* Dark mode maintains the same gritty aesthetic with proper contrast */
+  --background: oklch(0.05 0 0); /* Pure black background */
+  --foreground: oklch(1 0 0); /* White text */
+  /* Ensured dark mode cards have proper contrast */
+  --card: oklch(0.1 0 0); /* Very dark gray cards */
+  --card-foreground: oklch(1 0 0); /* White card text */
+  --popover: oklch(0.05 0 0); /* Black popover */
+  --popover-foreground: oklch(1 0 0); /* White popover text */
+  --primary: oklch(0.65 0.2 280); /* Purple primary */
+  --primary-foreground: oklch(0.05 0 0); /* Black text on primary */
+  --secondary: oklch(0.15 0 0); /* Dark gray secondary */
+  --secondary-foreground: oklch(1 0 0); /* White secondary text */
+  --muted: oklch(0.2 0 0); /* Dark muted */
+  --muted-foreground: oklch(0.8 0 0); /* Light gray muted text for better contrast */
+  --accent: oklch(0.65 0.2 280); /* Purple accent */
+  --accent-foreground: oklch(0.05 0 0); /* Black accent text */
+  --destructive: oklch(0.5 0.18 25); /* Red destructive */
+  --destructive-foreground: oklch(1 0 0); /* White destructive text */
+  --border: oklch(0.2 0 0); /* Dark border */
+  --input: oklch(0.1 0 0); /* Very dark input */
+  --ring: oklch(0.65 0.2 280 / 0.5); /* Purple ring with opacity */
+  --chart-1: oklch(0.6 0.12 160);
+  --chart-2: oklch(0.7 0.15 160);
+  --chart-3: oklch(0.75 0.18 85);
+  --chart-4: oklch(0.65 0.22 25);
+  --chart-5: oklch(0.7 0.15 45);
+  --sidebar: oklch(0.08 0 0); /* Very dark sidebar */
+  --sidebar-foreground: oklch(1 0 0); /* White sidebar text */
+  --sidebar-primary: oklch(0.65 0.2 280); /* Purple sidebar primary */
+  --sidebar-primary-foreground: oklch(0.05 0 0); /* Black text */
+  --sidebar-accent: oklch(0.15 0 0); /* Dark sidebar accent */
+  --sidebar-accent-foreground: oklch(1 0 0); /* White accent text */
+  --sidebar-border: oklch(0.2 0 0); /* Dark sidebar border */
+  --sidebar-ring: oklch(0.65 0.2 280 / 0.5); /* Purple sidebar ring */
 }
 
 @theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -115,17 +125,110 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-  /* Added font family mappings */
-  --font-sans: var(--font-geist);
-  --font-serif: var(--font-manrope);
-  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  /* Gritty aesthetic design tokens */
+  --color-grit-black: var(--grit-black);
+  --color-grit-white: var(--grit-white);
+  --color-grit-gray: var(--grit-gray);
+  --color-grit-purple: var(--grit-purple);
+  --color-particle-glow: var(--particle-glow);
 }
 
 @layer base {
+  /* Global helper classes extracted from Hero so all pages share the same animations */
+  @keyframes floatY {
+    0% { transform: translateY(-8px); }
+    50% { transform: translateY(10px); }
+    100% { transform: translateY(-8px); }
+  }
+  .float {
+    animation-name: floatY;
+    animation-duration: 6s;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+    will-change: transform;
+  }
+  .float-fast { animation-duration: 4.5s; }
+
+  @keyframes glowPulse {
+    0% { filter: drop-shadow(0 0 6px rgba(255,255,255,0.04)); opacity: 0.9; }
+    50% { filter: drop-shadow(0 0 28px rgba(255,255,255,0.06)); opacity: 1; }
+    100% { filter: drop-shadow(0 0 6px rgba(255,255,255,0.04)); opacity: 0.92; }
+  }
+  .glow-pulse { animation: glowPulse 3.6s ease-in-out infinite; }
+
+  .reveal-on-scroll.in-view {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+  }
+
+  .animate-slide-up { transform: translateY(6px); opacity: 0; transition: transform 520ms cubic-bezier(.2,.9,.25,1), opacity 520ms; }
+  .animate-slide-up.visible { transform: translateY(0); opacity: 1; }
+
+  .svg-float:hover { transform: scale(1.045) !important; transition: transform 220ms; }
+
   * {
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground font-sans;
+    @apply bg-background text-foreground;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  /* Gritty animation keyframes */
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+      transform: translateY(-20px) rotate(5deg);
+    }
+  }
+
+  @keyframes particle-drift {
+    0% {
+      transform: translateY(100vh) translateX(0);
+      opacity: 0;
+    }
+    10% {
+      opacity: 1;
+    }
+    90% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(-100px) translateX(50px);
+      opacity: 0;
+    }
+  }
+
+  @keyframes glow-pulse {
+    0%,
+    100% {
+      filter: drop-shadow(0 0 5px var(--particle-glow));
+    }
+    50% {
+      filter: drop-shadow(0 0 20px var(--particle-glow)) drop-shadow(0 0 30px var(--particle-glow));
+    }
+  }
+
+  /* Utility classes for gritty animations */
+  .float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .particle-drift {
+    animation: particle-drift 15s linear infinite;
+  }
+
+  .glow-pulse {
+    animation: glow-pulse 3s ease-in-out infinite;
+  }
+
+  .grit-bg {
+    background: radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
+      radial-gradient(circle at 40% 40%, rgba(120, 119, 198, 0.05) 0%, transparent 50%), var(--grit-black);
   }
 }

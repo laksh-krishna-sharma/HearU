@@ -49,16 +49,12 @@ const JournalEditor: React.FC = () => {
     if (isEditing && id) {
       const fetchJournalData = async () => {
         try {
-          // Fetch the main journal entry
           const result = await dispatch(getJournal(id)).unwrap();
           setTitle(result.title || '');
           setContent(result.content || '');
           setTags(result.tags || []);
           setJournalNotFound(false);
-
-          // Fetch the associated voice session summaries for this journal
           await dispatch(getVoiceSessionResponsesUsingJournalId(id)).unwrap();
-
         } catch (err: unknown) {
           console.error('Failed to load journal data:', err);
           const apiError = err as ApiError;
@@ -73,7 +69,6 @@ const JournalEditor: React.FC = () => {
           }
         }
       };
-      
       fetchJournalData();
     } else {
       setTitle('');
@@ -83,89 +78,72 @@ const JournalEditor: React.FC = () => {
     }
   }, [isEditing, id, dispatch, navigate]);
 
-  // Audio playback effect with intro handling
   useEffect(() => {
     const playAudio = (audioPath: string, isIntro: boolean = false) => {
-        if (!audioPath) return;
-        if (audioPlayerRef.current) {
-            audioPlayerRef.current.pause();
+      if (!audioPath) return;
+      if (audioPlayerRef.current) {
+        audioPlayerRef.current.pause();
+      }
+      const audioPlayer = new Audio(audioPath);
+      audioPlayerRef.current = audioPlayer;
+      
+      audioPlayer.onplay = () => {
+        setIsPlaying(true);
+        if (isIntro) setIsIntroPlaying(true);
+      };
+      
+      audioPlayer.onended = () => {
+        setIsPlaying(false);
+        if (isIntro) {
+          setIsIntroPlaying(false);
+          toast.success("Ready to record! Click the microphone to start sharing.");
+        } else if (isJournalReplyMode) {
+          setTimeout(() => {
+            dispatch(clearJournalReply());
+          }, 1000);
         }
-        const audioPlayer = new Audio(audioPath);
-        audioPlayerRef.current = audioPlayer;
-        
-        audioPlayer.onplay = () => {
-            setIsPlaying(true);
-            if (isIntro) {
-                setIsIntroPlaying(true);
-            }
-        };
-        
-        audioPlayer.onended = () => {
-            setIsPlaying(false);
-            if (isIntro) {
-                setIsIntroPlaying(false);
-                toast.success("Ready to record! Click the microphone to start sharing.");
-            } else if (isJournalReplyMode) {
-                // Journal reply finished - clear the mode
-                setTimeout(() => {
-                    dispatch(clearJournalReply());
-                }, 1000);
-            }
-        };
-        
-        audioPlayer.onerror = () => {
-            toast.error('Could not play audio response.');
-            setIsPlaying(false);
-            if (isIntro) {
-                setIsIntroPlaying(false);
-            }
-        };
-        
-        audioPlayer.play().catch(() => {
-            toast.error("Audio playback was blocked by the browser.");
-            setIsPlaying(false);
-            if (isIntro) {
-                setIsIntroPlaying(false);
-            }
-        });
+      };
+      
+      audioPlayer.onerror = () => {
+        toast.error('Could not play audio response.');
+        setIsPlaying(false);
+        if (isIntro) setIsIntroPlaying(false);
+      };
+      
+      audioPlayer.play().catch(() => {
+        toast.error("Audio playback was blocked by the browser.");
+        setIsPlaying(false);
+        if (isIntro) setIsIntroPlaying(false);
+      });
     };
 
-    // Play audio based on the current mode - COMPLETELY SEPARATE
     if (isJournalReplyMode && journalReply?.audio_path) {
-        // Journal reply mode - ONLY play journal reply audio, NO intro behavior
-        playAudio(journalReply.audio_path, false);
+      playAudio(journalReply.audio_path, false);
     } else if (session && !isJournalReplyMode) {
-        // Voice session mode - ONLY for voice assistant functionality
-        if (session.greeting_audio_path && turns.length === 0) {
-            // Play intro greeting when session starts (no turns yet)
-            playAudio(session.greeting_audio_path, true);
-        } else {
-            const lastTurn = turns.at(-1);
-            if (lastTurn?.audio_path) {
-                // Play latest response from voice turn
-                playAudio(lastTurn.audio_path, false);
-            }
+      if (session.greeting_audio_path && turns.length === 0) {
+        playAudio(session.greeting_audio_path, true);
+      } else {
+        const lastTurn = turns.at(-1);
+        if (lastTurn?.audio_path) {
+          playAudio(lastTurn.audio_path, false);
         }
+      }
     }
   }, [session?.greeting_audio_path, session, journalReply, turns, isJournalReplyMode, dispatch]);
 
-  // Cleanup effect on unmount and clear any lingering errors
   useEffect(() => {
-    // Clear any existing errors when component mounts
     dispatch(clearError());
   }, [dispatch]);
 
-  // Cleanup effect only on unmount (not when session changes)
   useEffect(() => {
     return () => {
-      // Only cleanup on component unmount, not when session changes
       const currentSession = session?.session_id;
       if (currentSession) {
         dispatch(voiceEnd({ session_id: currentSession, save_summary: false }));
       }
       dispatch(resetEveState());
     };
-  }, [dispatch, session?.session_id]); // Include dependencies
+  }, [dispatch, session?.session_id]);
 
   const handleSave = async () => {
     if (!title.trim()) {
@@ -183,7 +161,6 @@ const JournalEditor: React.FC = () => {
       } else {
         const newJournal = await dispatch(createJournalEntry(entry)).unwrap();
         toast.success('Journal created successfully!');
-        // Navigate to the new journal's edit page
         navigate(`/journal/${newJournal.id}`);
         return; 
       }
@@ -206,9 +183,7 @@ const JournalEditor: React.FC = () => {
 
   const handleDelete = async () => {
     if (!isEditing || !id) return;
-    
     if (!window.confirm('Are you sure you want to delete this journal?')) return;
-    
     try {
       await dispatch(deleteJournal(id)).unwrap();
       toast.success('Journal deleted successfully!');
@@ -223,12 +198,9 @@ const JournalEditor: React.FC = () => {
       toast.error('Please save the journal before getting an AI reply.');
       return;
     }
-    
-    // Clear any existing voice session before getting journal reply
     if (session) {
       dispatch(resetEveState());
     }
-    
     toast.loading('Getting AI reply...');
     try {
       await dispatch(getJournalReply(id)).unwrap();
@@ -241,14 +213,12 @@ const JournalEditor: React.FC = () => {
   };
   
   const handleStartRecording = async () => {
-    // Don't allow recording if session doesn't exist, already recording, or intro is still playing
     if (!session || isRecording || isIntroPlaying) {
       if (isIntroPlaying) {
         toast("Please wait for Eve to finish speaking before recording.");
       }
       return;
     }
-    
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       mediaRecorderRef.current = new MediaRecorder(stream);
@@ -292,21 +262,19 @@ const JournalEditor: React.FC = () => {
   };
   
   const handleStartSession = async () => {
-    // Clear any existing journal reply and errors before starting voice session
     if (journalReply) {
       dispatch(clearJournalReply());
     }
     dispatch(clearError());
-    
     const system_prompt = `You are Eve, a confidential, non-judgmental, and empathetic mental wellness companion designed specifically for Indian youth dealing with mental health challenges. You provide a safe, non-judgmental space for users to express their thoughts and feelings. Be empathetic, supportive, and culturally sensitive. Ask thoughtful follow-up questions and provide gentle guidance when appropriate. Keep responses conversational and warm.`;
     try {
-        toast.loading("Starting voice session...");
-        await dispatch(startVoiceSession(system_prompt)).unwrap();
-        toast.dismiss();
-        toast.success("Voice session started! Listen to Eve's introduction.");
+      toast.loading("Starting voice session...");
+      await dispatch(startVoiceSession(system_prompt)).unwrap();
+      toast.dismiss();
+      toast.success("Voice session started! Listen to Eve's introduction.");
     } catch {
-        toast.dismiss();
-        toast.error("Failed to start voice session.");
+      toast.dismiss();
+      toast.error("Failed to start voice session.");
     }
   };
   
@@ -321,25 +289,18 @@ const JournalEditor: React.FC = () => {
     if (session?.session_id) {
       try {
         toast.loading("Ending voice session...");
-        
-        // Pass journal_id when saving summary to link it to current journal
         const endSessionPayload: { session_id: string; save_summary: boolean; journal_id?: string } = { 
           session_id: session.session_id, 
           save_summary 
         };
-        
         if (save_summary && id && isEditing) {
           endSessionPayload.journal_id = id;
         }
-        
         await dispatch(voiceEnd(endSessionPayload)).unwrap();
         toast.dismiss();
-        
         if (save_summary) {
           toast.success("Session ended and summary saved! Check the notes panel.");
-          // Refetch voice session responses to show the new summary
           if (id && isEditing) {
-            // Add a small delay to ensure the backend has processed the save
             setTimeout(async () => {
               await dispatch(getVoiceSessionResponsesUsingJournalId(id));
             }, 1000);
@@ -347,8 +308,6 @@ const JournalEditor: React.FC = () => {
         } else {
           toast.success("Voice session ended.");
         }
-        
-        // Session state will be cleared by the voiceEnd.fulfilled action
       } catch {
         toast.dismiss();
         toast.error("Failed to end session properly.");
@@ -358,16 +317,16 @@ const JournalEditor: React.FC = () => {
     
   const handleDeleteVoiceSummary = async (sessionId: string) => {
     if (window.confirm('Are you sure you want to delete this voice summary?')) {
-        try {
-            toast.loading('Deleting summary...');
-            await dispatch(deleteVoiceSessionResponse(sessionId)).unwrap();
-            toast.dismiss();
-            toast.success('Summary deleted.');
-        } catch (deleteError) {
-            toast.dismiss();
-            toast.error('Failed to delete summary.');
-            console.error('Failed to delete voice summary:', deleteError);
-        }
+      try {
+        toast.loading('Deleting summary...');
+        await dispatch(deleteVoiceSessionResponse(sessionId)).unwrap();
+        toast.dismiss();
+        toast.success('Summary deleted.');
+      } catch (deleteError) {
+        toast.dismiss();
+        toast.error('Failed to delete summary.');
+        console.error('Failed to delete voice summary:', deleteError);
+      }
     }
   };
 
@@ -390,7 +349,7 @@ const JournalEditor: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-ocean-background p-6">
+    <div className="min-h-screen w-screen p-6">
       <div className="max-w-7xl mx-auto">
         <JournalHeader
           isEditing={isEditing}
@@ -403,45 +362,50 @@ const JournalEditor: React.FC = () => {
 
         {error && <ErrorDisplay error={error} />}
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          <NotesPanel 
-            voiceSummaries={voiceSessionResponses}
-            onDeleteSummary={handleDeleteVoiceSummary}
-          />
-          
-          <EditorPanel
-            title={title}
-            content={content}
-            tags={tags}
-            tagInput={tagInput}
-            isEditing={isEditing}
-            isPlaying={isPlaying}
-            eveLoading={eveLoading}
-            isSaving={isSaving}
-            onTitleChange={setTitle}
-            onContentChange={setContent}
-            onTagInputChange={setTagInput}
-            onTagInputKeyDown={handleAddTag}
-            onRemoveTag={handleRemoveTag}
-            onGetJournalReply={handleGetJournalReply}
-          />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Editor - larger left side */}
+          <div className="lg:col-span-2">
+            <EditorPanel
+              title={title}
+              content={content}
+              tags={tags}
+              tagInput={tagInput}
+              isEditing={isEditing}
+              isPlaying={isPlaying}
+              eveLoading={eveLoading}
+              isSaving={isSaving}
+              onTitleChange={setTitle}
+              onContentChange={setContent}
+              onTagInputChange={setTagInput}
+              onTagInputKeyDown={handleAddTag}
+              onRemoveTag={handleRemoveTag}
+              onGetJournalReply={handleGetJournalReply}
+            />
+          </div>
 
-          <VoiceAssistantPanel
-            session={session}
-            isRecording={isRecording}
-            isPlaying={isPlaying}
-            eveLoading={eveLoading}
-            isJournalReplyMode={isJournalReplyMode}
-            isIntroPlaying={isIntroPlaying}
-            turns={turns}
-            onStartRecording={handleStartRecording}
-            onStopRecording={handleStopRecording}
-            onStartSession={handleStartSession}
-            onEndSession={handleEndSession}
-          />
+          {/* Right column - stacked Notes and Voice Assistant */}
+          <div className="flex flex-col gap-6">
+            <NotesPanel 
+              voiceSummaries={voiceSessionResponses}
+              onDeleteSummary={handleDeleteVoiceSummary}
+            />
+
+            <VoiceAssistantPanel
+              session={session}
+              isRecording={isRecording}
+              isPlaying={isPlaying}
+              eveLoading={eveLoading}
+              isJournalReplyMode={isJournalReplyMode}
+              isIntroPlaying={isIntroPlaying}
+              turns={turns}
+              onStartRecording={handleStartRecording}
+              onStopRecording={handleStopRecording}
+              onStartSession={handleStartSession}
+              onEndSession={handleEndSession}
+            />
+          </div>
         </div>
 
-        {/* Save Summary Modal */}
         {showSaveModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
             <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-xl">
