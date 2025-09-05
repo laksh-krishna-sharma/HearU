@@ -74,10 +74,10 @@ const Signup = () => {
     }));
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] || null;
-    setFormData(prev => ({ ...prev, profileImage: file }));
-  };
+  // const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = e.target.files?.[0] || null;
+  //   setFormData(prev => ({ ...prev, profileImage: file }));
+  // };
 
   const validateStep1 = () => {
     const { firstName, lastName, username, age, gender } = formData;
@@ -138,7 +138,7 @@ const Signup = () => {
     }
   };
 
-  const inputClass = "w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-ocean-primary focus:border-ocean-primary transition-all duration-300 outline-none bg-white/70 hover:bg-white/90 focus:bg-white";
+  const inputClass = "w-full px-4 py-3 border border-gray-200 text-black rounded-lg focus:ring-2 focus:ring-ocean-primary focus:border-ocean-primary transition-all duration-300 outline-none bg-white/75 hover:bg-white/90 focus:bg-white";
   const labelClass = "block text-sm font-semibold text-[#6E664E] mb-2";
 
   return (
@@ -160,14 +160,14 @@ const Signup = () => {
           </div>          
 
           {/* Signup Form */}
-          <div ref={formRef} className="bg-white/80 backdrop-blur-sm rounded-xl shadow-xl border border-white/20 p-6 sm:p-8 opacity-0 max-w-md">
+          <div ref={formRef} className="bg-white backdrop-blur-sm rounded-xl shadow-xl border border-white/20 p-6 sm:p-8 opacity-0 max-w-md">
             
             {currentStep === 1 ? (
               /* Step 1: Personal Information */
               <form className="space-y-4" onSubmit={handleNextStep}>
                 <div className="text-center mb-6">
                   <h3 className="text-lg font-semibold text-[#6E664E]">Tell us about yourself</h3>
-                  <p className="text-sm text-[#6E664E]/70">We'll keep your information private</p>
+                  <p className="text-sm text-[#6E664E]">We'll keep your information private</p>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
@@ -312,7 +312,7 @@ const Signup = () => {
                 </div>
 
                 {/* Profile Image Upload */}
-                <div>
+                {/* <div>
                   <label className={labelClass}>Profile Picture (Optional)</label>
                   <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-ocean-primary transition-colors">
                     <input
@@ -330,7 +330,7 @@ const Signup = () => {
                       {formData.profileImage ? formData.profileImage.name : 'Choose file or drag here'}
                     </label>
                   </div>
-                </div>
+                </div> */}
 
                 {/* Terms Agreement */}
                 <div className="flex items-start">

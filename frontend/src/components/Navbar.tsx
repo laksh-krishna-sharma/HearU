@@ -4,13 +4,14 @@ import { logout } from "@/store/slices/authSlice";
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { Button } from "@/components/ui/button";
-import NavbarVoiceSession from "@/components/NavbarVoiceSession";
+// import NavbarVoiceSession from "@/components/NavbarVoiceSession";
 
-interface NavbarProps {
-  showCenterOval?: boolean;
-}
+// interface NavbarProps {
+//   showCenterOval?: boolean;
+// }
 
-const Navbar = ({ showCenterOval = true }: NavbarProps) => {
+// const Navbar = ({ showCenterOval = true }: NavbarProps) => {
+const Navbar = () => {
   const { user, access_token } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -48,11 +49,11 @@ const Navbar = ({ showCenterOval = true }: NavbarProps) => {
         </Link>
 
         {/* CENTER - Voice Assistant Oval */}
-        {showCenterOval && isAuthenticated && (
+        {/* {showCenterOval && isAuthenticated && (
           <div className="hidden md:block animate-fade-in">
             <NavbarVoiceSession />
           </div>
-        )}
+        )} */}
 
         {/* RIGHT - Buttons */}
         <div
@@ -63,11 +64,11 @@ const Navbar = ({ showCenterOval = true }: NavbarProps) => {
           {isAuthenticated ? (
             <>
               <span className="text-sm text-white/80 font-medium animate-fade-in">
-                Welcome, {user?.name || user?.username || "User"}
+                Welcome, {user?.name || user?.username}
               </span>
               <Button
                 onClick={handleLogout}
-                className="bg-gradient-to-r from-red-600 to-red-800 hover:from-red-700 hover:to-red-900 text-white shadow-soft hover:shadow-medium transition-all duration-300 transform hover:scale-105 w-full md:w-auto"
+                className="bg-gradient-to-r text-white shadow-soft hover:shadow-medium transition-all duration-300 transform hover:scale-105 w-full md:w-auto"
               >
                 Logout
               </Button>

@@ -28,7 +28,7 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
   const { access_token, user } = useAppSelector((state) => state.auth);
   const isAuthenticated = !!access_token && !!user;
   
-  return !isAuthenticated ? <>{children}</> : <Navigate to="/journal" replace />;
+  return !isAuthenticated ? <>{children}</> : <Navigate to="/landing" replace />;
 };
 
 function App() {

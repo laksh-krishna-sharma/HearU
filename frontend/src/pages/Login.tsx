@@ -51,6 +51,8 @@ const Login = () => {
     dispatch(login({ email: formData.email, password: formData.password }));
   };
 
+  const inputClass = "w-full px-4 py-3 border border-gray-200 text-black rounded-lg focus:ring-2 focus:ring-ocean-primary focus:border-ocean-primary transition-all duration-300 outline-none bg-white/75 hover:bg-white/90 focus:bg-white";
+  const labelClass = "block text-sm font-semibold text-[#6E664E] mb-2";
   return (
     <div className="min-h-screen relative overflow-hidden">
       
@@ -75,16 +77,13 @@ const Login = () => {
           {/* Enhanced Login Form */}
           <div 
             ref={formRef} 
-            className="bg-gradient-to-br from-white/90 to-wellness-cream/60 backdrop-blur-md rounded-2xl shadow-large border border-white/40 p-8 sm:p-10 lg:p-12 opacity-0 max-w-lg"
+            className="bg-white backdrop-blur-sm rounded-xl shadow-xl border border-white/20 p-6 sm:p-8 opacity-0 max-w-md"
           >
             <form className="space-y-6" onSubmit={handleSubmit}>
               
               {/* Email Field */}
               <div className="space-y-3">
-                <label 
-                  htmlFor="email" 
-                  className="block text-sm font-semibold text-ocean-text/80"
-                >
+                <label htmlFor="email" className={labelClass}>
                   Email address
                 </label>
                 <div className="relative">
@@ -97,11 +96,7 @@ const Login = () => {
                     value={formData.email}
                     onChange={handleChange}
                     placeholder="Enter your email"
-                    className="w-full px-5 py-4 border-2 border-white/40 rounded-xl 
-                             focus:ring-2 focus:ring-ocean-primary/50 focus:border-ocean-primary 
-                             transition-all duration-300 outline-none text-base bg-white/80
-                             hover:bg-white/90 focus:bg-white backdrop-blur-sm shadow-soft
-                             hover:shadow-medium focus:shadow-medium placeholder:text-ocean-text/40"
+                    className={inputClass}
                   />
                   <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-ocean-primary/5 to-ocean-secondary/5 pointer-events-none opacity-0 transition-opacity duration-300 peer-focus:opacity-100"></div>
                 </div>
@@ -109,10 +104,7 @@ const Login = () => {
 
               {/* Password Field */}
               <div className="space-y-3">
-                <label 
-                  htmlFor="password" 
-                  className="block text-sm font-semibold text-ocean-text/80"
-                >
+                <label htmlFor="password" className={labelClass}>
                   Password
                 </label>
                 <div className="relative">
@@ -125,11 +117,7 @@ const Login = () => {
                     value={formData.password}
                     onChange={handleChange}
                     placeholder="Enter your password"
-                    className="w-full px-5 py-4 border-2 border-white/40 rounded-xl 
-                             focus:ring-2 focus:ring-ocean-primary/50 focus:border-ocean-primary 
-                             transition-all duration-300 outline-none text-base bg-white/80
-                             hover:bg-white/90 focus:bg-white backdrop-blur-sm shadow-soft
-                             hover:shadow-medium focus:shadow-medium placeholder:text-ocean-text/40"
+                    className={inputClass}
                   />
                   <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-ocean-primary/5 to-ocean-secondary/5 pointer-events-none opacity-0 transition-opacity duration-300 peer-focus:opacity-100"></div>
                 </div>
@@ -137,7 +125,7 @@ const Login = () => {
 
               {/* Remember Me & Forgot Password */}
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <label className="flex items-center text-sm text-ocean-text/70 cursor-pointer group">
+                <label className={labelClass}>
                   <input
                     id="remember-me"
                     name="remember-me"
@@ -150,8 +138,7 @@ const Login = () => {
                 </label>
                 <Link 
                   to="/forgot-password" 
-                  className="text-sm text-ocean-primary hover:text-ocean-secondary 
-                           transition-colors duration-300 font-medium hover:underline"
+                  className={labelClass}
                 >
                   Forgot password?
                 </Link>
@@ -205,7 +192,7 @@ const Login = () => {
             {/* Enhanced Sign Up Link */}
             <div className="mt-8 text-center">
               <div className="bg-gradient-to-r from-wellness-cream/40 to-wellness-warm-white/40 backdrop-blur-sm rounded-xl p-4 border border-white/40">
-                <p className="text-sm text-ocean-text/70">
+                <p className={labelClass}>
                   Don't have an account?{" "}
                   <Link
                     to="/signup"
