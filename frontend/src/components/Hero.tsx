@@ -40,14 +40,8 @@ const Hero = () => {
 
     // PARALLAX + FLOAT loop
     const parallaxEls = Array.from(document.querySelectorAll<HTMLElement>("[data-parallax]"));
-    let lastScrollY = window.scrollY;
-    let t0 = performance.now();
 
     const tick = (t: number) => {
-      const scrollY = window.scrollY;
-      const dt = t - t0;
-      t0 = t;
-
       // a normalized time for sine wave movement
       const time = t / 1000;
 
@@ -74,7 +68,6 @@ const Hero = () => {
         el.style.transform += ` rotate(${rot}deg)`;
       });
 
-      lastScrollY = scrollY;
       rafRef.current = requestAnimationFrame(tick);
     };
 

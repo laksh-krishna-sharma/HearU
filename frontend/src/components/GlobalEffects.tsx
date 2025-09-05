@@ -11,11 +11,9 @@ export default function GlobalEffects() {
   useEffect(() => {
     // Parallax + float
     const parallaxEls = Array.from(document.querySelectorAll<HTMLElement>("[data-parallax]"));
-    let t0 = performance.now();
 
     const tick = (t: number) => {
       const time = t / 1000;
-      t0 = t;
 
       parallaxEls.forEach((el) => {
         const speed = Number(el.dataset.speed ?? 0.06);

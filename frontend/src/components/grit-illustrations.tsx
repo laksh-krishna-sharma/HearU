@@ -1,6 +1,6 @@
 // components/grit-illustrations.tsx
 import type React from "react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 interface IllustrationProps {
   className?: string;
@@ -123,12 +123,10 @@ export function ParticleField() {
     }));
     particlesRef.current = p;
 
-    let lastScroll = window.scrollY;
+    // Track only current scroll; previous value not needed
 
     function update() {
       const scrollY = window.scrollY;
-      const diff = scrollY - lastScroll;
-      lastScroll = scrollY;
 
       const vh = window.innerHeight;
       particlesRef.current.forEach((part) => {
