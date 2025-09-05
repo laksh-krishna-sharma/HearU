@@ -1,12 +1,12 @@
 import { useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom'; // ✅ import navigate
+import { useNavigate } from 'react-router-dom';
 import { pageTransitions, createTimeline } from '../utils/animations';
 // import { TbActivityHeartbeat } from "react-icons/tb";
 import Eve from "@/components/eve/Eve";
 
 const Hero = () => {
   const ovalRef = useRef<HTMLDivElement>(null);
-  const navigate = useNavigate(); // ✅ init navigate
+  const navigate = useNavigate();
 
     useEffect(() => {
     const tl = createTimeline({ delay: 0.2 });

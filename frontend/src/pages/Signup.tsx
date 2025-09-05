@@ -158,10 +158,10 @@ const Signup = () => {
           
           {/* Header */}
           <div ref={headerRef} className="text-left mb-6 opacity-0">
-            <h1 className="text-2xl sm:text-3xl font-semibold text-[#6E664E] mb-2">
+            <h1 className="text-2xl sm:text-3xl font-semibold mb-2">
               Join our community
             </h1>
-            <p className="text-base text-[#6E664E]/80 max-w-md">
+            <p className="text-base max-w-md">
               Start your mental wellness journey today
             </p>
           </div>          
