@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { signup } from '../store/slices/authSlice';
+import { signup, resetSignupSuccess } from '../store/slices/authSlice';
 import { useAppDispatch } from '@/hooks/hooks';
 import type { RootState } from '@/store/store';
 import { pageTransitions, createTimeline } from "../utils/animations";
@@ -43,10 +43,13 @@ const Signup = () => {
 
   // Redirect after successful signup
   useEffect(() => {
-    if (authState.user && authState.access_token) {
-      navigate('/landing');
+    if (authState.signupSuccess) {
+      navigate('/login')
+      dispatch(resetSignupSuccess()) // reset flag after redirect
     }
-  }, [authState.user, authState.access_token, navigate]);
+  }, [authState.signupSuccess, navigate, dispatch])
+
+
 
   // Animations
   useEffect(() => {
