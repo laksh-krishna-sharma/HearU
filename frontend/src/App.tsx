@@ -34,71 +34,73 @@ function App() {
     <Router>
       <div className="min-h-screen bg-ocean-background">
         <Navbar />
-        <PageTransition>
-          <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={
-            <PublicRoute>
-              <Home />
-            </PublicRoute>
-          } />
-          <Route path="/login" element={
-            <PublicRoute>
-              <Login />
-            </PublicRoute>
-          } />
-          <Route path="/signup" element={
-            <PublicRoute>
-              <Signup />
-            </PublicRoute>
-          } />
-          
-          {/* Protected Routes */}
-          <Route path="/landing" element={
-            <ProtectedRoute>
-              <LandingPage />
-            </ProtectedRoute>
-          } />
-          <Route path="/dashboard" element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          } />
-          <Route path="/blogs" element={
-            <ProtectedRoute>
-              <Blogs />
-            </ProtectedRoute>
-          } />
-          <Route path="/chat" element={
-            <ProtectedRoute>
-              <Chat />
-            </ProtectedRoute>
-          } />
-          <Route path="/journal" element={
-            <ProtectedRoute>
-              <Journal />
-            </ProtectedRoute>
-          } />
-          <Route path="/journal/new" element={
-            <ProtectedRoute>
-              <JournalEditor />
-            </ProtectedRoute>
-          } />
-          <Route path="/journal/edit/:id" element={
-            <ProtectedRoute>
-              <JournalEditor />
-            </ProtectedRoute>
-          } />
-          <Route path="/journal/summary/:id" element={
+        <div className='pt-8'>
+          <PageTransition>
+            <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={
+              <PublicRoute>
+                <Home />
+              </PublicRoute>
+            } />
+            <Route path="/login" element={
+              <PublicRoute>
+                <Login />
+              </PublicRoute>
+            } />
+            <Route path="/signup" element={
+              <PublicRoute>
+                <Signup />
+              </PublicRoute>
+            } />
+            
+            {/* Protected Routes */}
+            <Route path="/landing" element={
               <ProtectedRoute>
-                <SummaryDetailView />
+                <LandingPage />
               </ProtectedRoute>
             } />
-          
-            {/* Catch all route */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </PageTransition>
+            <Route path="/dashboard" element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/blogs" element={
+              <ProtectedRoute>
+                <Blogs />
+              </ProtectedRoute>
+            } />
+            <Route path="/chat" element={
+              <ProtectedRoute>
+                <Chat />
+              </ProtectedRoute>
+            } />
+            <Route path="/journal" element={
+              <ProtectedRoute>
+                <Journal />
+              </ProtectedRoute>
+            } />
+            <Route path="/journal/new" element={
+              <ProtectedRoute>
+                <JournalEditor />
+              </ProtectedRoute>
+            } />
+            <Route path="/journal/edit/:id" element={
+              <ProtectedRoute>
+                <JournalEditor />
+              </ProtectedRoute>
+            } />
+            <Route path="/journal/summary/:id" element={
+                <ProtectedRoute>
+                  <SummaryDetailView />
+                </ProtectedRoute>
+              } />
+            
+              {/* Catch all route */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </PageTransition>
+        </div>
       </div>
     </Router>
   );
