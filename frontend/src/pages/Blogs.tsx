@@ -39,7 +39,6 @@ const Blogs = () => {
     }
   ];
 
-  const categories = ["All", "Mental Health", "Relationships", "Wellness", "Support"];
 
   return (
     <div className="min-h-screen">
@@ -52,18 +51,6 @@ const Blogs = () => {
           <p className="text-lg text-white/80 max-w-2xl mx-auto">
             Expert insights, personal stories, and practical tips to support your mental health journey
           </p>
-        </div>
-
-        {/* Category Filter */}
-        <div className="flex flex-wrap justify-center gap-2 mb-8">
-          {categories.map((category) => (
-            <button
-              key={category}
-              className="px-4 py-2 text-sm font-medium text-ocean-text border border-ocean-primary rounded-full hover:bg-ocean-primary hover:text-white transition-all duration-300"
-            >
-              {category}
-            </button>
-          ))}
         </div>
 
         {/* Blog Posts Grid */}
@@ -108,34 +95,6 @@ const Blogs = () => {
               </div>
             </article>
           ))}
-        </div>
-
-        {/* Featured Section */}
-        <div className="bg-gradient-to-r from-ocean-primary to-ocean-secondary text-white rounded-xl p-8 text-center">
-          <h2 className="text-2xl font-bold mb-4">
-            Stay Updated with Our Newsletter
-          </h2>
-          <p className="text-lg opacity-90 mb-6">
-            Get weekly mental health tips and resources delivered to your inbox
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center max-w-md mx-auto">
-            <input
-              type="email"
-              placeholder="Enter your email"
-              className="w-full px-4 py-3 rounded-lg text-ocean-text focus:outline-none focus:ring-2 focus:ring-white"
-            />
-            <button className="w-full sm:w-auto px-6 py-3 bg-white text-ocean-primary font-medium rounded-lg hover:bg-gray-100 transition-colors">
-              Subscribe
-            </button>
-          </div>
-        </div>
-
-        {/* Crisis Support */}
-        <div className="mt-8 p-4 bg-ocean-accent bg-opacity-10 rounded-lg border border-ocean-accent border-opacity-20">
-          <p className="text-sm text-ocean-text text-center">
-            <span className="font-semibold text-ocean-accent">Crisis Support:</span> If you're in immediate danger, 
-            please call 988 (Suicide & Crisis Lifeline) or text "HELLO" to 741741
-          </p>
         </div>
       </div>
     </div>
