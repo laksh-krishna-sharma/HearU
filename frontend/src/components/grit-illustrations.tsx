@@ -23,7 +23,7 @@ function useScrollFloat(speedRange = [0.2, 0.6]) {
     }
 
     requestAnimationFrame(update);
-  }, []);
+  }, [speedRange]);
 
   return ref;
 }
