@@ -1,4 +1,3 @@
-# <img src="https://github.com/user-attachments/assets/d3a33f86-4576-40de-ae71-36db44e2d6e9" alt="HearU Logo" width="60" height="60" />
 ![logo](https://github.com/user-attachments/assets/96b7b90e-3398-4c45-a0a6-cefeed56ee54)<?xml version="1.0" encoding="UTF-8"?>
 <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="52" height="51">
 <path d="M0 0 C17.16 0 34.32 0 52 0 C52 16.83 52 33.66 52 51 C34.84 51 17.68 51 0 51 C0 34.17 0 17.34 0 0 Z " fill="#121A1D" transform="translate(0,0)"/>
