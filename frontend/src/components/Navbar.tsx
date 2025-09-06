@@ -38,7 +38,7 @@ const Navbar = () => {
       className="fixed inset-x-0 top-0 z-[99999] pointer-events-auto p-4 md:p-6 bg-black/85 backdrop-blur-md border-b border-white/10 shadow-soft w-full"
       style={{ WebkitTapHighlightColor: "transparent" }}
     >
-      <div className="max-w-6xl mx-auto flex items-center justify-between">
+      <div className="mx-auto flex items-center justify-between">
         {/* LEFT - Logo */}
         <Link
           to={isAuthenticated ? "/landing" : "/"}
