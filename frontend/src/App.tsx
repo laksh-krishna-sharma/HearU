@@ -7,7 +7,6 @@ import PageTransition from './components/PageTransition';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Signup from './pages/Signup';  
-import Chat from './pages/Chat';
 import Dashboard from './pages/Dashboard';
 import Blogs from './pages/Blogs';
 import LandingPage from './pages/LandingPage';
@@ -15,6 +14,7 @@ import Journal from './pages/Journal';
 import JournalEditor from './pages/JournalEditor';
 import SummaryDetailView from './components/journal/SummaryDetailView';
 import BlogPost from './pages/BlogPost';
+import Eve from './pages/Eve';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -83,7 +83,7 @@ function App() {
             } />
             <Route path="/chat" element={
               <ProtectedRoute>
-                <Chat />
+                <Eve />
               </ProtectedRoute>
             } />
             <Route path="/journal" element={
