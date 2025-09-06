@@ -61,8 +61,8 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:5173",
         "http://127.0.0.1:5173",
-        "https://hearu-e8zutv880-lakshs-projects-e8fa6099.vercel.app",
-        "https://hearu-proto.vercel.app",
+        settings.client_url,
+        settings.client_url2
     ],
 )
 
