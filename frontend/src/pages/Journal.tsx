@@ -32,7 +32,7 @@ const Journal: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-ocean-background p-6">
+      <div className="min-h-screen bg-black/80 p-6">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-center h-64">
             <p className="text-white">Opening Journals...</p>
@@ -44,7 +44,7 @@ const Journal: React.FC = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-ocean-background p-6">
+      <div className="min-h-screen bg-black/80 p-6">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-center h-64">
             <p className="text-red-600">Error loading journals: {error}</p>
@@ -58,10 +58,10 @@ const Journal: React.FC = () => {
     <div className="min-h-screen p-6 relative overflow-hidden">
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="mb-12 text-center animate-fade-in">
-          <h1 className="text-4xl md:text-5xl font-bold font-display text-ocean-text mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold font-display text-white mb-4">
             My <span>Journal</span>
           </h1>
-          <p className="text-lg text-ocean-text/70 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-lg text-white/70 max-w-2xl mx-auto leading-relaxed">
             Your mind's safe reset button - a sanctuary for your thoughts and reflections
           </p>
         </div>

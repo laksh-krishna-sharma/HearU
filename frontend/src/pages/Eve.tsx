@@ -5,7 +5,7 @@ import { TbActivityHeartbeat } from 'react-icons/tb';
 import { Mic, PhoneOff } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-const NavbarVoiceSession: React.FC = () => {
+const Eve: React.FC = () => {
   const dispatch = useAppDispatch();
   const eveState = useAppSelector((state) => state.eve);
   const { session, turns, loading: eveLoading } = eveState;
@@ -18,7 +18,7 @@ const NavbarVoiceSession: React.FC = () => {
   const audioChunksRef = useRef<Blob[]>([]);
   const audioPlayerRef = useRef<HTMLAudioElement | null>(null);
 
-  // Audio playbook effect - same logic as JournalEditor
+  // Audio playback effect
   useEffect(() => {
     const playAudio = (audioPath: string, isIntro: boolean = false) => {
       if (!audioPath) return;
@@ -60,7 +60,7 @@ const NavbarVoiceSession: React.FC = () => {
       });
     };
 
-    // Play audio for voice session only (no journal reply mode in navbar)
+    // Play audio for voice session
     if (session) {
       if (session.greeting_audio_path && turns.length === 0) {
         // Play intro greeting when session starts (no turns yet)
@@ -175,84 +175,72 @@ const NavbarVoiceSession: React.FC = () => {
     }
   };
 
-  // If no session, show the default Eve icon that starts session
-  if (!session) {
-    return (
-      <div className="absolute left-1/2 -translate-x-1/2 hidden md:flex">
-        <div className="w-[20rem] md:w-[30rem] h-10 md:h-12 bg-[#eae9e2] rounded-full flex items-center justify-center border">
-          <button
-            onClick={handleStartSession}
-            disabled={eveLoading}
-            className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center hover:scale-110 duration-200"
-            style={{ 
-              background: 'none',
-              border: 'none',
-              padding: 0,
-              outline: 'none'
-            }}
-          >
-            <TbActivityHeartbeat className="h-16 w-16 text-[#0b132b]" />
-          </button>
-        </div>
-      </div>
-    );
-  }
+  const handleEveClick = () => {
+    if (!session) {
+      handleStartSession();
+    }
+  };
 
-  // If session is active, show the expanded UI with mic and end call buttons
   return (
-    <div className="absolute left-1/2 -translate-x-1/2 hidden md:flex">
-      <div className="w-[20rem] md:w-[30rem] h-10 md:h-12 bg-[#eae9e2] rounded-full flex items-center justify-between px-4 border">
-        {/* Left - Eve icon (smaller) */}
-        <div className="flex items-center">
-          <TbActivityHeartbeat className="h-8 w-8 text-[#0b132b]" />
-        </div>
-
-        {/* Center - Mic button */}
+    <div className="min-h-screen flex flex-col justify-between items-center text-white relative">
+      {/* Center Orb */}
+      <div className="flex flex-1 items-center justify-center">
         <div 
-          onClick={handleRecordClick}
-          className={`w-10 h-10 mx-auto rounded-full flex items-center justify-center cursor-pointer transition-colors
-            ${isRecording ? 'bg-red-500 animate-pulse' : 'bg-gray-200 hover:bg-gray-300'}
-            ${isPlaying ? 'bg-blue-300' : ''}
-            ${!session || isPlaying || isIntroPlaying ? 'cursor-not-allowed opacity-50' : ''}
-          `}
-        >
-          <Mic className="h-6 w-6 text-black" />
-        </div>
-
-        {/* Right - End call button */}
-        <div
-          onClick={handleEndSession}
-          className={`w-10 h-10 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center cursor-pointer transition-colors ${
-            eveLoading || isRecording || isIntroPlaying ? 'opacity-50 cursor-not-allowed' : ''
+          onClick={handleEveClick}
+          className={`w-40 h-40 rounded-full bg-gradient-to-br from-blue-400 to-black shadow-lg shadow-blue-500/40 flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-105 ${
+            eveLoading ? 'animate-pulse' : ''
+          } ${
+            isPlaying ? 'shadow-blue-400/60 animate-pulse' : ''
           }`}
         >
-          <PhoneOff className="h-5 w-5 text-white" />
+          <TbActivityHeartbeat className="w-20 h-20 text-white" />
         </div>
       </div>
 
-      {/* Status indicators */}
-      {isIntroPlaying && (
-        <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-white px-3 py-1 rounded-md shadow-lg border">
-          <div className="flex items-center space-x-2">
-            <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-            <p className="text-xs text-blue-600">Eve is introducing herself...</p>
+      {/* Bottom Section */}
+      <div className="flex flex-col items-center mb-28">
+        {/* Controls - Only show when session is active */}
+        {session && (
+          <div className="flex items-center gap-6 mb-4">
+            <button 
+              onClick={handleRecordClick}
+              disabled={!session || isPlaying || isIntroPlaying}
+              className={`w-14 h-14 rounded-full flex items-center justify-center transition-colors ${
+                isRecording 
+                  ? 'bg-red-500 animate-pulse' 
+                  : 'bg-[#2f2f2f] hover:bg-[#3a3a3a]'
+              } ${
+                !session || isPlaying || isIntroPlaying ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+            >
+              <Mic className="w-6 h-6 text-white" />
+            </button>
+            <button 
+              onClick={handleEndSession}
+              disabled={eveLoading || isRecording || isIntroPlaying}
+              className={`w-14 h-14 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center transition-colors ${
+                eveLoading || isRecording || isIntroPlaying ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+            >
+              <PhoneOff className="w-6 h-6 text-white" />
+            </button>
           </div>
+        )}
+
+        {/* Status Messages */}
+        <div className="text-sm text-white text-center">
+          {!session && "Click on Eve to start a conversation"}
+          {session && isIntroPlaying && "Eve is introducing herself..."}
+          {session && isRecording && "Recording... Click mic to stop"}
+          {session && isPlaying && !isIntroPlaying && "Eve is responding..."}
+          {session && !isRecording && !isPlaying && !isIntroPlaying && "Click mic to share your thoughts"}
         </div>
-      )}
-      
-      {isRecording && (
-        <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-white px-3 py-1 rounded-md shadow-lg border">
-          <p className="text-xs text-red-600">Recording... Tap mic to stop.</p>
-        </div>
-      )}
-      
-      {isPlaying && !isIntroPlaying && (
-        <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-white px-3 py-1 rounded-md shadow-lg border">
-          <p className="text-xs text-blue-600">Eve is responding...</p>
-        </div>
-      )}
+
+        {/* Subtitle */}
+        <div className="text-lg text-white mt-2 font-semibold">Hello, I'm Eve</div>
+      </div>
     </div>
   );
 };
 
-export default NavbarVoiceSession;
+export default Eve;
