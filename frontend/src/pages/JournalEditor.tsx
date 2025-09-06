@@ -317,20 +317,6 @@ const JournalEditor: React.FC = () => {
     }
   };
     
-  // const handleDeleteVoiceSummary = async (sessionId: string) => {
-  //   if (window.confirm('Are you sure you want to delete this voice summary?')) {
-  //     try {
-  //       toast.loading('Deleting summary...');
-  //       await dispatch(deleteVoiceSessionResponse(sessionId)).unwrap();
-  //       toast.dismiss();
-  //       toast.success('Summary deleted.');
-  //     } catch (deleteError) {
-  //       toast.dismiss();
-  //       toast.error('Failed to delete summary.');
-  //       console.error('Failed to delete voice summary:', deleteError);
-  //     }
-  //   }
-  // };
 
   const handleAddTag = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && tagInput.trim()) {
