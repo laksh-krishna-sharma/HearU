@@ -137,13 +137,10 @@ const JournalEditor: React.FC = () => {
 
   useEffect(() => {
     return () => {
-      const currentSession = session?.session_id;
-      if (currentSession) {
-        dispatch(voiceEnd({ session_id: currentSession, save_summary: false }));
-      }
+      // Only cleanup state, don't automatically end sessions
       dispatch(resetEveState());
     };
-  }, [dispatch, session?.session_id]);
+  }, [dispatch]);
 
   const handleSave = async () => {
     if (!title.trim()) {
@@ -301,8 +298,13 @@ const JournalEditor: React.FC = () => {
         if (save_summary) {
           toast.success("Session ended and summary saved! Check the notes panel.");
           if (id && isEditing) {
+            // Refresh voice session responses after a short delay
             setTimeout(async () => {
-              await dispatch(getVoiceSessionResponsesUsingJournalId(id));
+              try {
+                await dispatch(getVoiceSessionResponsesUsingJournalId(id));
+              } catch (error) {
+                console.error('Failed to refresh voice session responses:', error);
+              }
             }, 1000);
           }
         } else {
