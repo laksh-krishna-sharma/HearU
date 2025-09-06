@@ -62,7 +62,7 @@ app.add_middleware(
         "http://localhost:5173",
         "http://127.0.0.1:5173",
         settings.client_url,
-        settings.client_url2,
+        settings.client_url2
     ],
 )
 
