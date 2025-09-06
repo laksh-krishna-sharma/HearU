@@ -14,6 +14,7 @@ import LandingPage from './pages/LandingPage';
 import Journal from './pages/Journal';
 import JournalEditor from './pages/JournalEditor';
 import SummaryDetailView from './components/journal/SummaryDetailView';
+import BlogPost from './pages/BlogPost';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -73,6 +74,11 @@ function App() {
             <Route path="/blogs" element={
               <ProtectedRoute>
                 <Blogs />
+              </ProtectedRoute>
+            } />
+            <Route path="/blog/:id" element={
+              <ProtectedRoute>
+                <BlogPost />
               </ProtectedRoute>
             } />
             <Route path="/chat" element={

@@ -1,5 +1,7 @@
+import { useNavigate } from "react-router-dom";
 
 const Blogs = () => {
+  const navigate = useNavigate();
   const blogPosts = [
     {
       id: 1,
@@ -124,7 +126,8 @@ const Blogs = () => {
                     </p>
                   </div>
 
-                  <button className="text-ocean-primary hover:text-ocean-primary-dark font-medium text-sm transition-colors">
+                  <button  onClick={() => navigate(`/blog/${post.id}`)} 
+                  className="text-ocean-primary hover:text-ocean-primary-dark font-medium text-sm transition-colors">
                     Read More →
                   </button>
                 </div>
