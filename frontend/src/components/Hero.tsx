@@ -178,7 +178,7 @@ const Hero = () => {
           data-speed="-0.04"
           data-amp="22"
           data-phase="0.9"
-          className="svg-float absolute top-32 right-20 float float-fast glow-pulse"
+          className="svg-float absolute top-5 right-50 float float-fast glow-pulse"
           style={{ animationDelay: "2s" }}
         />
         <SkullIcon
@@ -197,12 +197,28 @@ const Hero = () => {
           className="svg-float absolute bottom-40 left-20 float float-fast glow-pulse"
           style={{ animationDelay: "1s" }}
         />
+        <EyeIcon
+          data-parallax
+          data-speed="-0.03"
+          data-amp="18"
+          data-phase="0.4"
+          className="svg-float absolute top-70 left-2/3 float float-fast glow-pulse"
+          style={{ animationDelay: "1s" }}
+        />
         <CharacterIcon
           data-parallax
           data-speed="0.05"
           data-amp="14"
           data-phase="2.6"
           className="svg-float absolute bottom-20 right-32 float glow-pulse"
+          style={{ animationDelay: "3s" }}
+        />
+        <CharacterIcon
+          data-parallax
+          data-speed="0.05"
+          data-amp="14"
+          data-phase="2.6"
+          className="svg-float absolute top-20 left-3/8 float glow-pulse"
           style={{ animationDelay: "3s" }}
         />
         <UFOIcon
@@ -226,7 +242,7 @@ const Hero = () => {
           <h1 className="text-4xl md:text-6xl font-bold text-white tracking-wide mb-4 stagger-reveal">
             Welcome to Your Safe Space
           </h1>
-          <p className="text-white/80 text-lg leading-relaxed max-w-2xl mx-auto stagger-reveal">
+          <p className="text-white/80 text-lg bg-black/40 backdrop-blur-md leading-relaxed max-w-2xl mx-auto stagger-reveal">
             Meet Eve, your AI companion for mental wellness journaling.
             She's here to listen, understand, and support your journey with compassion and care.
           </p>
