@@ -32,7 +32,7 @@ const Journal: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-ocean-background p-6">
+      <div className="min-h-screen bg-black/80 p-6">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-center h-64">
             <p className="text-white">Opening Journals...</p>
@@ -44,7 +44,7 @@ const Journal: React.FC = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-ocean-background p-6">
+      <div className="min-h-screen bg-black/80 p-6">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-center h-64">
             <p className="text-red-600">Error loading journals: {error}</p>
@@ -58,20 +58,20 @@ const Journal: React.FC = () => {
     <div className="min-h-screen p-6 relative overflow-hidden">
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="mb-12 text-center animate-fade-in">
-          <h1 className="text-4xl md:text-5xl font-bold font-display text-ocean-text mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold font-display text-white mb-4">
             My <span>Journal</span>
           </h1>
-          <p className="text-lg text-ocean-text/70 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-lg text-white/70 max-w-2xl mx-auto leading-relaxed">
             Your mind's safe reset button - a sanctuary for your thoughts and reflections
           </p>
         </div>
 
         {/* Journals Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate-slide-up">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 ">
           {/* Plus Button Card */}
           <Card
             onClick={handleCreateNew}
-            className="group flex items-center justify-center cursor-pointer bg-gradient-to-br from-white/80 to-wellness-cream/60 backdrop-blur-sm border-2 border-dashed border-ocean-primary/30 hover:border-ocean-primary/60 shadow-soft hover:shadow-medium transition-all duration-300 transform hover:scale-105 hover:rotate-1 min-h-[200px]"
+            className="group flex items-center justify-center cursor-pointer bg-black/80 border-2 border-dashed border-ocean-primary/30 hover:border-ocean-primary/60 shadow-soft hover:shadow-medium transition-all duration-300 transform hover:scale-105 min-h-[200px]"
           >
             <CardContent className="flex flex-col items-center justify-center py-8 text-center">
               <div className="relative mb-6">
@@ -80,13 +80,13 @@ const Journal: React.FC = () => {
                   size="lg"
                   className="relative w-16 h-16 bg-gradient-to-r from-ocean-primary to-ocean-secondary text-white shadow-medium hover:shadow-glow transition-all duration-300 transform group-hover:scale-110 rounded-full border-none"
                 >
-                  <Plus className="w-8 h-8" />
+                  <Plus className="w-8 h-8 font-bold" />
                 </Button>
               </div>
-              <h3 className="font-semibold text-ocean-text group-hover:text-ocean-primary transition-colors duration-300">
+              <h3 className="font-semibold text-white group-hover:text-ocean-primary transition-colors duration-300">
                 Create New Journal
               </h3>
-              <p className="text-sm text-ocean-text/60 mt-2 group-hover:text-ocean-text/80 transition-colors duration-300">
+              <p className="text-sm text-white/60 mt-2 group-hover:text-white/80 transition-colors duration-300">
                 Start your wellness journey
               </p>
             </CardContent>
@@ -96,23 +96,23 @@ const Journal: React.FC = () => {
             <Card
               key={journal.id || journal.title}
               onClick={() => journal.id && handleOpenJournal(journal.id)}
-              className="group cursor-pointer bg-gradient-to-br from-white/90 to-wellness-warm-white/80 backdrop-blur-sm border border-white/40 shadow-soft hover:shadow-large transition-all duration-300 transform hover:scale-105 hover:-rotate-1 min-h-[200px] animate-scale-in"
+              className="group cursor-pointer bg-black/80 border border-white/40 shadow-soft hover:shadow-large transition-all duration-300 transform hover:scale-105 min-h-[200px] animate-scale-in flex flex-col"
               style={{ animationDelay: `${index * 0.1}s` }}
             >
               <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-3 truncate text-ocean-text group-hover:text-ocean-primary transition-colors duration-300">
+                <CardTitle className="flex items-center gap-3 truncate text-white group-hover:text-ocean-primary transition-colors duration-300">
                   <div className="p-2 bg-gradient-to-r from-ocean-primary/10 to-ocean-secondary/10 rounded-lg group-hover:from-ocean-primary/20 group-hover:to-ocean-secondary/20 transition-all duration-300">
                     <BookOpen className="h-5 w-5 text-ocean-primary group-hover:text-ocean-secondary transition-colors duration-300" />
                   </div>
                   <span className="truncate font-semibold">{journal.title}</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="pt-0">
-                <p className="text-ocean-text/70 text-sm line-clamp-3 mb-4 leading-relaxed">
+              <CardContent className="pt-0 flex flex-col flex-1">
+                <p className="text-white/70 text-sm line-clamp-3 mb-4 leading-relaxed">
                   {journal.content}
                 </p>
-                <div className="flex items-center gap-2 text-xs text-ocean-text/50 bg-wellness-cream/50 rounded-lg px-3 py-2">
-                  <Calendar className="h-3 w-3 text-ocean-primary" />
+                <div className="mt-auto flex items-center gap-2 text-xs text-white/50 bg-wellness-cream/50 rounded-lg px-2 py-1">
+                  <Calendar className="h-3 w-3 " />
                   <span className="font-medium">
                     {journal.created_at
                       ? new Date(journal.created_at).toLocaleDateString('en-US', {

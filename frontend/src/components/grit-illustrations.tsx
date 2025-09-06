@@ -1,15 +1,37 @@
 // components/grit-illustrations.tsx
 import type React from "react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface IllustrationProps {
   className?: string;
   style?: React.CSSProperties;
 }
 
+// Hook to apply scroll-based floating effect to all icons 
+function useScrollFloat(speedRange = [0.2, 0.6]) {
+  const ref = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const speed = speedRange[0] + Math.random() * (speedRange[1] - speedRange[0]);
+
+    function update() {
+      if (!ref.current) return;
+      const scrollY = window.scrollY;
+      const sway = Math.sin((scrollY + 37) * 0.002) * 10 * speed;
+      ref.current.style.transform = `translateY(${scrollY * speed}px) translateX(${sway}px)`;
+      requestAnimationFrame(update);
+    }
+
+    requestAnimationFrame(update);
+  }, [speedRange]);
+
+  return ref;
+}
+
 export function CloudEye({ className = "", style }: IllustrationProps) {
+  const ref = useScrollFloat();
   return (
-    <div className={`absolute ${className}`} style={style}>
+    <div ref={ref} className={`absolute ${className}`} style={style}>
       <svg width="80" height="60" viewBox="0 0 80 60" className="text-grit-white/80">
         <path
           d="M15 35c-8 0-15-7-15-15s7-15 15-15c2 0 4 0.5 5.5 1.5C23 2.5 28 0 33.5 0S44 2.5 46.5 6.5c1.5-1 3.5-1.5 5.5-1.5 8 0 15 7 15 15s-7 15-15 15H15z"
@@ -26,8 +48,9 @@ export function CloudEye({ className = "", style }: IllustrationProps) {
 }
 
 export function SkullIcon({ className = "", style }: IllustrationProps) {
+  const ref = useScrollFloat();
   return (
-    <div className={`absolute ${className}`} style={style}>
+    <div ref={ref} className={`absolute ${className}`} style={style}>
       <svg width="60" height="70" viewBox="0 0 60 70" className="text-grit-white/80">
         <path
           d="M30 5C20 5 12 13 12 23v15c0 8 4 15 10 19v8c0 2 2 4 4 4h8c2 0 4-2 4-4v-8c6-4 10-11 10-19V23c0-10-8-18-18-18z"
@@ -45,8 +68,9 @@ export function SkullIcon({ className = "", style }: IllustrationProps) {
 }
 
 export function UFOIcon({ className = "", style }: IllustrationProps) {
+  const ref = useScrollFloat();
   return (
-    <div className={`absolute ${className}`} style={style}>
+    <div ref={ref} className={`absolute ${className}`} style={style}>
       <svg width="90" height="50" viewBox="0 0 90 50" className="text-grit-white/80">
         <ellipse cx="45" cy="35" rx="40" ry="10" fill="none" stroke="currentColor" strokeWidth="2" />
         <ellipse cx="45" cy="20" rx="25" ry="15" fill="none" stroke="currentColor" strokeWidth="2" />
@@ -60,8 +84,9 @@ export function UFOIcon({ className = "", style }: IllustrationProps) {
 }
 
 export function EyeIcon({ className = "", style }: IllustrationProps) {
+  const ref = useScrollFloat();
   return (
-    <div className={`absolute ${className}`} style={style}>
+    <div ref={ref} className={`absolute ${className}`} style={style}>
       <svg width="60" height="40" viewBox="0 0 60 40" className="text-grit-white/80">
         <ellipse cx="30" cy="20" rx="25" ry="15" fill="none" stroke="currentColor" strokeWidth="2" />
         <circle cx="30" cy="20" r="8" fill="none" stroke="currentColor" strokeWidth="2" />
@@ -73,8 +98,9 @@ export function EyeIcon({ className = "", style }: IllustrationProps) {
 }
 
 export function CharacterIcon({ className = "", style }: IllustrationProps) {
+  const ref = useScrollFloat();
   return (
-    <div className={`absolute ${className}`} style={style}>
+    <div ref={ref} className={`absolute ${className}`} style={style}>
       <svg width="50" height="80" viewBox="0 0 50 80" className="text-grit-white/80">
         <circle cx="25" cy="15" r="10" fill="none" stroke="currentColor" strokeWidth="2" />
         <path d="M25 25 L25 55" stroke="currentColor" strokeWidth="2" />
@@ -108,20 +134,23 @@ export function ParticleField() {
     }>
   >([]);
   const rafRef = useRef<number | null>(null);
+  const [, setReady] = useState(false);
 
   useEffect(() => {
     const viewportH = window.innerHeight;
     // create particles
-    const particleCount = Math.max(20, Math.floor(window.innerWidth / 80)); // scale with width
+    const particleCount = Math.max(40, Math.floor(window.innerWidth / 80)); // scale with width
     const p = Array.from({ length: particleCount }, (_, i) => ({
       id: i,
       left: Math.random() * 100,
       top: Math.random() * viewportH,
       speed: 0.1 + Math.random() * 0.6, // 0.1 .. 0.7
-      size: 1 + Math.random() * 3, // px
+      size: 1 + Math.random() * 4, // px
       node: undefined as HTMLDivElement | undefined,
     }));
-    particlesRef.current = p;
+    particlesRef.current = p; 
+    setReady(true); // 👈 force React to re-render so stars show up
+
 
     // Track only current scroll; previous value not needed
 
@@ -173,7 +202,7 @@ export function ParticleField() {
 
   // render particles and attach refs so the RAF loop can mutate them directly
   return (
-    <div ref={containerRef} className="fixed inset-0 pointer-events-none overflow-hidden z-0" aria-hidden>
+    <div ref={containerRef} className="fixed inset-0 pointer-events-none overflow-hidden z-10" aria-hidden>
       {particlesRef.current.length === 0
         ? null
         : particlesRef.current.map((part) => (
@@ -189,9 +218,9 @@ export function ParticleField() {
                   el.style.width = `${part.size}px`;
                   el.style.height = `${part.size}px`;
                   el.style.borderRadius = "50%";
-                  el.style.background = "rgba(255,255,255,0.7)";
-                  el.style.opacity = String(0.5 + Math.random() * 0.8);
-                  el.style.filter = "blur(0.2px)";
+                  el.style.background = "rgba(255,255,255,1)";
+                  el.style.opacity = String(0.8 + Math.random() * 0.3);
+                  el.style.filter = "blur(0px)";
                   el.style.transition = "opacity 0.8s ease";
                   el.className = "particle-drift will-change-transform";
                 } else {

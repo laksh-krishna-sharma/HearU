@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/hooks/hooks';
 import { createJournalEntry, updateJournal, deleteJournal, getJournal } from '@/store/slices/journalSlice';
-import { getJournalReply, startVoiceSession, voiceTurn, voiceEnd, resetEveState, clearJournalReply, clearError, getVoiceSessionResponsesUsingJournalId, deleteVoiceSessionResponse } from '@/store/slices/eveSlice';
+import { getJournalReply, startVoiceSession, voiceTurn, voiceEnd, resetEveState, clearJournalReply, clearError, getVoiceSessionResponsesUsingJournalId } from '@/store/slices/eveSlice';
 import toast from 'react-hot-toast';
 import JournalHeader from '../components/journal/JournalHeader';
 import EditorPanel from '../components/journal/JournalEditorPanel';
@@ -137,13 +137,10 @@ const JournalEditor: React.FC = () => {
 
   useEffect(() => {
     return () => {
-      const currentSession = session?.session_id;
-      if (currentSession) {
-        dispatch(voiceEnd({ session_id: currentSession, save_summary: false }));
-      }
+      // Only cleanup state, don't automatically end sessions
       dispatch(resetEveState());
     };
-  }, [dispatch, session?.session_id]);
+  }, [dispatch]);
 
   const handleSave = async () => {
     if (!title.trim()) {
@@ -301,8 +298,13 @@ const JournalEditor: React.FC = () => {
         if (save_summary) {
           toast.success("Session ended and summary saved! Check the notes panel.");
           if (id && isEditing) {
+            // Refresh voice session responses after a short delay
             setTimeout(async () => {
-              await dispatch(getVoiceSessionResponsesUsingJournalId(id));
+              try {
+                await dispatch(getVoiceSessionResponsesUsingJournalId(id));
+              } catch (error) {
+                console.error('Failed to refresh voice session responses:', error);
+              }
             }, 1000);
           }
         } else {
@@ -315,20 +317,20 @@ const JournalEditor: React.FC = () => {
     }
   };
     
-  const handleDeleteVoiceSummary = async (sessionId: string) => {
-    if (window.confirm('Are you sure you want to delete this voice summary?')) {
-      try {
-        toast.loading('Deleting summary...');
-        await dispatch(deleteVoiceSessionResponse(sessionId)).unwrap();
-        toast.dismiss();
-        toast.success('Summary deleted.');
-      } catch (deleteError) {
-        toast.dismiss();
-        toast.error('Failed to delete summary.');
-        console.error('Failed to delete voice summary:', deleteError);
-      }
-    }
-  };
+  // const handleDeleteVoiceSummary = async (sessionId: string) => {
+  //   if (window.confirm('Are you sure you want to delete this voice summary?')) {
+  //     try {
+  //       toast.loading('Deleting summary...');
+  //       await dispatch(deleteVoiceSessionResponse(sessionId)).unwrap();
+  //       toast.dismiss();
+  //       toast.success('Summary deleted.');
+  //     } catch (deleteError) {
+  //       toast.dismiss();
+  //       toast.error('Failed to delete summary.');
+  //       console.error('Failed to delete voice summary:', deleteError);
+  //     }
+  //   }
+  // };
 
   const handleAddTag = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && tagInput.trim()) {
@@ -348,91 +350,88 @@ const JournalEditor: React.FC = () => {
     return <NotFoundView onBack={() => navigate('/journal')} />;
   }
 
-  return (
-    <div className="min-h-screen w-screen p-6">
-      <div className="max-w-7xl mx-auto">
-        <JournalHeader
-          isEditing={isEditing}
-          isSaving={isSaving}
-          loading={loading}
-          onBack={() => navigate('/journal')}
-          onSave={handleSave}
-          onDelete={isEditing ? handleDelete : undefined}
-        />
+ return (
+  <div className="min-h-screen w-full overflow-x-hidden p-6">
+    <div className="max-w-7xl mx-auto">
+      <JournalHeader
+        isEditing={isEditing}
+        isSaving={isSaving}
+        loading={loading}
+        onBack={() => navigate('/journal')}
+        onSave={handleSave}
+        onDelete={isEditing ? handleDelete : undefined}
+      />
 
-        {error && <ErrorDisplay error={error} />}
+      {error && <ErrorDisplay error={error} />}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Editor - larger left side */}
-          <div className="lg:col-span-2">
-            <EditorPanel
-              title={title}
-              content={content}
-              tags={tags}
-              tagInput={tagInput}
-              isEditing={isEditing}
-              isPlaying={isPlaying}
-              eveLoading={eveLoading}
-              isSaving={isSaving}
-              onTitleChange={setTitle}
-              onContentChange={setContent}
-              onTagInputChange={setTagInput}
-              onTagInputKeyDown={handleAddTag}
-              onRemoveTag={handleRemoveTag}
-              onGetJournalReply={handleGetJournalReply}
-            />
-          </div>
-
-          {/* Right column - stacked Notes and Voice Assistant */}
-          <div className="flex flex-col gap-6">
-            <NotesPanel 
-              voiceSummaries={voiceSessionResponses}
-              onDeleteSummary={handleDeleteVoiceSummary}
-            />
-
-            <VoiceAssistantPanel
-              session={session}
-              isRecording={isRecording}
-              isPlaying={isPlaying}
-              eveLoading={eveLoading}
-              isJournalReplyMode={isJournalReplyMode}
-              isIntroPlaying={isIntroPlaying}
-              turns={turns}
-              onStartRecording={handleStartRecording}
-              onStopRecording={handleStopRecording}
-              onStartSession={handleStartSession}
-              onEndSession={handleEndSession}
-            />
-          </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Editor - larger left side */}
+        <div className="lg:col-span-2">
+          <EditorPanel
+            title={title}
+            content={content}
+            tags={tags}
+            tagInput={tagInput}
+            isEditing={isEditing}
+            isPlaying={isPlaying}
+            eveLoading={eveLoading}
+            isSaving={isSaving}
+            onTitleChange={setTitle}
+            onContentChange={setContent}
+            onTagInputChange={setTagInput}
+            onTagInputKeyDown={handleAddTag}
+            onRemoveTag={handleRemoveTag}
+            onGetJournalReply={handleGetJournalReply}
+          />
         </div>
 
-        {showSaveModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-xl">
-              <h3 className="text-lg font-semibold mb-4">End Voice Session</h3>
-              <p className="text-gray-600 mb-6">
-                Do you want to save a summary of this conversation to this journal entry?
-              </p>
-              <div className="flex gap-3 justify-end">
-                <button
-                  onClick={() => handleConfirmEndSession(false)}
-                  className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
-                >
-                  No, just end session
-                </button>
-                <button
-                  onClick={() => handleConfirmEndSession(true)}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-                >
-                  Yes, save summary
-                </button>
-              </div>
+        {/* Right column */}
+        <div className="flex flex-col gap-6">
+          <NotesPanel voiceSummaries={voiceSessionResponses} />
+          <VoiceAssistantPanel
+            session={session}
+            isRecording={isRecording}
+            isPlaying={isPlaying}
+            eveLoading={eveLoading}
+            isJournalReplyMode={isJournalReplyMode}
+            isIntroPlaying={isIntroPlaying}
+            turns={turns}
+            onStartRecording={handleStartRecording}
+            onStopRecording={handleStopRecording}
+            onStartSession={handleStartSession}
+            onEndSession={handleEndSession}
+          />
+        </div>
+      </div>
+
+      {showSaveModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-xl">
+            <h3 className="text-lg font-semibold mb-4">End Voice Session</h3>
+            <p className="text-gray-600 mb-6">
+              Do you want to save a summary of this conversation to this journal entry?
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => handleConfirmEndSession(false)}
+                className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+              >
+                No, just end session
+              </button>
+              <button
+                onClick={() => handleConfirmEndSession(true)}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              >
+                Yes, save summary
+              </button>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
-  );
+  </div>
+);
+
 };
 
 export default JournalEditor;

@@ -38,7 +38,7 @@ const Navbar = () => {
       className="fixed inset-x-0 top-0 z-[99999] pointer-events-auto p-4 md:p-6 bg-black/85 backdrop-blur-md border-b border-white/10 shadow-soft w-full"
       style={{ WebkitTapHighlightColor: "transparent" }}
     >
-      <div className="max-w-6xl mx-auto flex items-center justify-between">
+      <div className="mx-auto flex items-center justify-between">
         {/* LEFT - Logo */}
         <Link
           to={isAuthenticated ? "/landing" : "/"}
@@ -48,6 +48,31 @@ const Navbar = () => {
           <span className="text-white">HearU</span>
         </Link>
 
+        {/* MIDDLE - Links */}
+        {isAuthenticated && (
+          <>
+            <div className="hidden md:flex md:items-center md:justify-center md:gap-4 lg:gap-6 xl:gap-8 text-xl ml-[160px] ">
+              <Link
+                to="/journal"
+                onClick={() => setIsMenuOpen(false)}
+                className="px-4 py-2 rounded-lg text-white hover:!text-white/80 font-semibold transform transition"
+              >Journal
+            </Link>
+            <Link
+              to="/blogs"
+                onClick={() => setIsMenuOpen(false)}
+                className="px-4 py-2 rounded-lg text-white hover:!text-white/80 font-semibold transform transition"
+              >Blogs
+            </Link>
+            <Link
+              to="/chat"
+                onClick={() => setIsMenuOpen(false)}
+                className="px-4 py-2 rounded-lg text-white hover:!text-white/80 font-semibold transform transition"
+              >Eve
+            </Link>
+            </div>
+          </>
+        )}
         {/* CENTER - Voice Assistant Oval */}
         {/* {showCenterOval && isAuthenticated && (
           <div className="hidden md:block animate-fade-in">
@@ -57,9 +82,8 @@ const Navbar = () => {
 
         {/* RIGHT - Buttons */}
         <div
-          className={`${
-            isMenuOpen ? "flex" : "hidden"
-          } absolute top-full left-0 w-full flex-col items-start bg-black/80 backdrop-blur-md border border-white/10 rounded-lg shadow-medium p-4 gap-3 md:static md:flex md:flex-row md:items-center md:w-auto md:p-0 md:bg-transparent md:backdrop-blur-none md:border-none md:shadow-none md:rounded-none`}
+          className={`${isMenuOpen ? "flex" : "hidden"
+            } absolute top-full left-0 w-full flex-col items-center justify-center bg-black/80 backdrop-blur-md border border-white/10 rounded-lg shadow-medium p-4 gap-3 md:static md:flex md:flex-row md:items-center md:justify-center  md:w-auto md:p-0 md:bg-transparent md:backdrop-blur-none md:border-none md:shadow-none md:rounded-none`}
         >
           {isAuthenticated ? (
             <>

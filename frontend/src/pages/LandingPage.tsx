@@ -64,7 +64,7 @@ const LandingPage = () => {
         <div ref={cardsRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
           <Link 
             to="/journal"
-            className="group bg-gradient-to-br from-blue-400 to-black rounded-2xl shadow-lg shadow-blue-500/40 p-8 transition-all duration-300 transform hover:scale-105 hover:-rotate-1"
+            className="group bg-black/80  border border-gray-500 rounded-2xl shadow-lg shadow-blue-500/40 p-8 transition-all duration-300 transform hover:scale-105 hover:-rotate-1 "
           >
             <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-black rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 shadow-md shadow-blue-500/30">
               <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -79,7 +79,7 @@ const LandingPage = () => {
 
           <Link 
             to="/blogs"
-            className="group bg-gradient-to-br from-blue-400 to-black rounded-2xl shadow-lg shadow-blue-500/40 p-8 transition-all duration-300 transform hover:scale-105 hover:rotate-1"
+            className="group bg-black/80 border border-gray-500  rounded-2xl shadow-lg shadow-blue-500/40 p-8 transition-all duration-300 transform hover:scale-105 hover:rotate-1"
           >
             <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-black rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 shadow-md shadow-blue-500/30">
               <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -94,14 +94,14 @@ const LandingPage = () => {
 
           <Link 
             to="/chat"
-            className="group bg-gradient-to-br from-blue-400 to-black rounded-2xl shadow-lg shadow-blue-500/40 p-8 transition-all duration-300 transform hover:scale-105 hover:-rotate-1 md:col-span-2 lg:col-span-1"
+            className="group bg-black/80 border border-gray-500  rounded-2xl shadow-lg shadow-blue-500/40 p-8 transition-all duration-300 transform hover:scale-105 hover:-rotate-1 md:col-span-2 lg:col-span-1"
           >
             <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-black rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 shadow-md shadow-blue-500/30">
               <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold text-white mb-3">AI Support Chat</h3>
+            <h3 className="text-xl font-semibold text-white mb-3">Meet Eve</h3>
             <p className="text-white/70 leading-relaxed">
               Get instant, compassionate support and guidance from our AI wellness assistant
             </p>
@@ -109,7 +109,7 @@ const LandingPage = () => {
         </div>
 
         {/* Inspirational Quote Section */}
-        <div className="text-center bg-gradient-to-br from-blue-400 to-black rounded-3xl p-8 md:p-12 shadow-lg shadow-blue-500/40 animate-fade-in">
+        <div className="text-center  rounded-3xl p-8 md:p-12 shadow-lg animate-fade-in">
           <blockquote className="text-xl md:text-2xl font-medium text-white/80 italic mb-4 leading-relaxed">
             "The greatest revolution of our generation is the discovery that human beings, by changing the inner attitudes of their minds, can change the outer aspects of their lives."
           </blockquote>

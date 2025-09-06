@@ -50,9 +50,7 @@ a {
   font-weight: 500;
   text-decoration: inherit;
 }
-a:hover {
-  color: black
-}
+
 
 body {
   margin: 0;
@@ -69,21 +67,17 @@ h1 {
 
 button {
   border-radius: 8px;
-  border: 1px solid transparent;
+  border: 1px solid var(--gray-800);
   padding: 0.6em 1.2em;
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #334155;
+  background-color: #000000;
   cursor: pointer;
   transition: border-color 0.25s;
   color: white;
 }
-button:hover {
-  border-color: black;
-  color: rgb(254 243 199);
 
-}
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
