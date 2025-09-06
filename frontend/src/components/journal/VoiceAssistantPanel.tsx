@@ -116,7 +116,7 @@ const VoiceAssistantPanel: React.FC<VoiceAssistantPanelProps> = ({
                 {eveLoading ? 'Starting...' : 'Start Voice Session'}
               </Button>
               <p className="text-xs text-gray-400">
-                Start a voice conversation with Eve, your mental wellness companion.
+                Eve your mental wellness companion.
               </p>
             </div>
           )}

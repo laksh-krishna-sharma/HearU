@@ -51,7 +51,7 @@ const Navbar = () => {
         {/* MIDDLE - Links */}
         {isAuthenticated && (
           <>
-            <div className="hidden md:flex md:items-center md:justify-center md:gap-4 lg:gap-6 xl:gap-8 text-xl   ">
+            <div className="hidden md:flex md:items-center md:justify-center md:gap-4 lg:gap-6 xl:gap-8 text-xl ml-[160px] ">
               <Link
                 to="/journal"
                 onClick={() => setIsMenuOpen(false)}

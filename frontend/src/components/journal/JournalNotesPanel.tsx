@@ -1,12 +1,12 @@
 import React, { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Bot, Clock, ArrowLeft, Trash2 } from 'lucide-react'
+import { Bot, Clock, ArrowLeft } from 'lucide-react'
 import type { VoiceSessionResponse } from '@/store/slices/eveSlice'
 
 interface NotesPanelProps {
   voiceSummaries: VoiceSessionResponse[]
-  onDeleteSummary: (sessionId: string) => void
+  // onDeleteSummary: (sessionId: string) => void
 }
 
 const formatDate = (timestamp: string) =>
@@ -17,7 +17,7 @@ const formatDate = (timestamp: string) =>
     minute: '2-digit',
   })
 
-const NotesPanel: React.FC<NotesPanelProps> = ({ voiceSummaries, onDeleteSummary }) => {
+const NotesPanel: React.FC<NotesPanelProps> = ({ voiceSummaries }) => {
   const [selectedSummary, setSelectedSummary] = useState<VoiceSessionResponse | null>(null)
 
   const handleSummaryClick = (summary: VoiceSessionResponse) => {
@@ -28,12 +28,12 @@ const NotesPanel: React.FC<NotesPanelProps> = ({ voiceSummaries, onDeleteSummary
     setSelectedSummary(null)
   }
 
-  const handleDelete = () => {
-    if (selectedSummary) {
-      onDeleteSummary(selectedSummary.session_id)
-      setSelectedSummary(null)
-    }
-  }
+  // const handleDelete = () => {
+  //   if (selectedSummary) {
+  //     onDeleteSummary(selectedSummary.session_id)
+  //     setSelectedSummary(null)
+  //   }
+  // }
 
   return (
     <div className="lg:col-span-1">
@@ -70,7 +70,7 @@ const NotesPanel: React.FC<NotesPanelProps> = ({ voiceSummaries, onDeleteSummary
                     <h3 className="font-semibold text-gray-200 mt-3 mb-1">Full Notes</h3>
                     <p className="text-gray-300 whitespace-pre-wrap">{selectedSummary.notes_content}</p>
                   </div>
-                  <Button
+                  {/* <Button
                     variant="destructive"
                     size="sm"
                     onClick={handleDelete}
@@ -78,7 +78,7 @@ const NotesPanel: React.FC<NotesPanelProps> = ({ voiceSummaries, onDeleteSummary
                   >
                     <Trash2 className="h-4 w-4 mr-2" />
                     Delete Note
-                  </Button>
+                  </Button> */}
                 </div>
               </div>
             ) : (

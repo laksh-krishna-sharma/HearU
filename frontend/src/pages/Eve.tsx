@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/hooks/hooks';
 import { startVoiceSession, voiceTurn, voiceEnd, resetEveState, clearError } from '@/store/slices/eveSlice';
 import { TbActivityHeartbeat } from 'react-icons/tb';
-import { Mic, PhoneOff } from 'lucide-react';
+import { Mic, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const Eve: React.FC = () => {
@@ -222,7 +222,7 @@ const Eve: React.FC = () => {
                 eveLoading || isRecording || isIntroPlaying ? 'opacity-50 cursor-not-allowed' : ''
               }`}
             >
-              <PhoneOff className="w-6 h-6 text-white" />
+              <X className="w-6 h-6 text-white" />
             </button>
           </div>
         )}
@@ -237,7 +237,7 @@ const Eve: React.FC = () => {
         </div>
 
         {/* Subtitle */}
-        <div className="text-lg text-white mt-2 font-semibold">Hello, I'm Eve</div>
+        {/* <div className="text-lg text-white mt-2 font-semibold">Hello, I'm Eve</div> */}
       </div>
     </div>
   );
