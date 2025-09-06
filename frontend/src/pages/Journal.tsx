@@ -96,7 +96,7 @@ const Journal: React.FC = () => {
             <Card
               key={journal.id || journal.title}
               onClick={() => journal.id && handleOpenJournal(journal.id)}
-              className="group cursor-pointer bg-black/80 border border-white/40 shadow-soft hover:shadow-large transition-all duration-300 transform hover:scale-105 min-h-[200px] animate-scale-in"
+              className="group cursor-pointer bg-black/80 border border-white/40 shadow-soft hover:shadow-large transition-all duration-300 transform hover:scale-105 min-h-[200px] animate-scale-in flex flex-col"
               style={{ animationDelay: `${index * 0.1}s` }}
             >
               <CardHeader className="pb-3">
@@ -107,12 +107,12 @@ const Journal: React.FC = () => {
                   <span className="truncate font-semibold">{journal.title}</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="pt-0">
+              <CardContent className="pt-0 flex flex-col flex-1">
                 <p className="text-white/70 text-sm line-clamp-3 mb-4 leading-relaxed">
                   {journal.content}
                 </p>
-                <div className="flex items-end translate-x-0 gap-2 text-xs text-white/50 bg-wellness-cream/50 rounded-lg px-0 py-2">
-                  <Calendar className="h-3 w-3 text-ocean-primary" />
+                <div className="mt-auto flex items-center gap-2 text-xs text-white/50 bg-wellness-cream/50 rounded-lg px-2 py-1">
+                  <Calendar className="h-3 w-3 " />
                   <span className="font-medium">
                     {journal.created_at
                       ? new Date(journal.created_at).toLocaleDateString('en-US', {

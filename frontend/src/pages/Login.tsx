@@ -202,8 +202,7 @@ const Login = () => {
                 Don't have an account?{" "}
                 <Link
                   to="/signup"
-                  className="text-ocean-primary hover:text-ocean-secondary
-                             font-semibold transition-all duration-300 hover:underline"
+                  className="text-white font-semibold hover:text-white/80"
                 >
                   Start your wellness journey
                 </Link>
