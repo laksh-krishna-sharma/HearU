@@ -205,14 +205,6 @@ const Hero = () => {
           className="svg-float absolute bottom-20 right-32 float glow-pulse"
           style={{ animationDelay: "3s" }}
         />
-        <CloudEye
-          data-parallax
-          data-speed="-0.02"
-          data-amp="26"
-          data-phase="4.2"
-          className="svg-float absolute top-[20rem] left-1/3 float glow-pulse"
-          style={{ animationDelay: "5s" }}
-        />
         <UFOIcon
           data-parallax
           data-speed="0.03"
@@ -260,7 +252,7 @@ const Hero = () => {
       </section>
 
       {/* About Mental Wellness Section */}
-      <section className="py-20 px-6 sm:px-12 lg:px-24 bg-gradient-to-b from-black via-[#111] to-black text-left reveal-on-scroll">
+      <section className="relative overflow-hidden py-20 px-6 sm:px-12 lg:px-24 bg-gradient-to-b from-black via-[#111] to-black text-left reveal-on-scroll">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-5xl sm:text-6xl font-extrabold mb-8 text-primary">Why Mental Wellness Matters</h2>
           <p className="text-lg sm:text-xl text-white/80 leading-relaxed">
@@ -270,6 +262,27 @@ const Hero = () => {
             lifelong practice—a fundamental commitment to living a full, vibrant, and resilient life.
           </p>
         </div>
+        <CloudEye
+          data-parallax
+          data-speed="0.025"
+          data-amp="14"
+          data-phase="1.1"
+          className="svg-float absolute top-8 left-8 float glow-pulse"
+        />
+        <UFOIcon
+          data-parallax
+          data-speed="-0.03"
+          data-amp="18"
+          data-phase="2.2"
+          className="svg-float absolute top-12 right-16 float glow-pulse"
+        />
+        <EyeIcon
+          data-parallax
+          data-speed="0.02"
+          data-amp="16"
+          data-phase="3.3"
+          className="svg-float absolute top-1 right-1/4 float glow-pulse"
+        />
       </section>
 
       {/* Journaling Benefits */}
