@@ -88,7 +88,7 @@ const Blogs = () => {
           {blogPosts.map((post) => (
             <article
               key={post.id}
-              className="bg-black/40 backdrop-blur-md border border-gray-900 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 hover:scale-105"
+              className="bg-black/80 border border-gray-500 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 hover:scale-105"
             >
               <div className="p-6">
                 <div className="flex items-center justify-between mb-3">
@@ -105,19 +105,19 @@ const Blogs = () => {
                   {post.excerpt}
                 </p>
 
-                <div className="flex items-center justify-between">
-                  <div>
+                <div className="flex items-end justify-between">
+                  {/* <div>
                     <p className="text-sm font-medium text-white/60">
                       {post.author}
                     </p>
                     <p className="text-xs text-white/60 opacity-60">
                       {new Date(post.date).toLocaleDateString()}
                     </p>
-                  </div>
+                  </div> */}
 
                   <button  onClick={() => navigate(`/blog/${post.id}`)} 
-                  className="text-ocean-primary hover:text-ocean-primary-dark font-medium text-sm transition-colors">
-                    Read More →
+                  className="font-medium text-sm translate-x-58 flex items-end transition-colors">
+                    Read More
                   </button>
                 </div>
               </div>

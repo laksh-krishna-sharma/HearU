@@ -178,7 +178,6 @@ export const hoverAnimations = {
         scale: 1.02,
         duration: DURATION.fast,
         ease: EASING.smooth,
-        boxShadow: "0 0px 0px rgba(0,0,0,0)"
       });
     });
 
@@ -187,8 +186,7 @@ export const hoverAnimations = {
         y: 0,
         scale: 1,
         duration: DURATION.fast,
-        ease: EASING.smooth,
-        boxShadow: "0 0px 0px rgba(0,0,0,0)"
+        ease: EASING.smooth,        
       });
     });
   },

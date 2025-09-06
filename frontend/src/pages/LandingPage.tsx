@@ -64,7 +64,7 @@ const LandingPage = () => {
         <div ref={cardsRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
           <Link 
             to="/journal"
-            className="group bg-black/40 backdrop-blur-md border border-gray-900 rounded-2xl shadow-lg shadow-blue-500/40 p-8 transition-all duration-300 transform hover:scale-105 hover:-rotate-1 "
+            className="group bg-black/80  border border-gray-500 rounded-2xl shadow-lg shadow-blue-500/40 p-8 transition-all duration-300 transform hover:scale-105 hover:-rotate-1 "
           >
             <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-black rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 shadow-md shadow-blue-500/30">
               <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -79,7 +79,7 @@ const LandingPage = () => {
 
           <Link 
             to="/blogs"
-            className="group bg-black/40 backdrop-blur-md border border-gray-900  rounded-2xl shadow-lg shadow-blue-500/40 p-8 transition-all duration-300 transform hover:scale-105 hover:rotate-1"
+            className="group bg-black/80 border border-gray-500  rounded-2xl shadow-lg shadow-blue-500/40 p-8 transition-all duration-300 transform hover:scale-105 hover:rotate-1"
           >
             <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-black rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 shadow-md shadow-blue-500/30">
               <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -94,7 +94,7 @@ const LandingPage = () => {
 
           <Link 
             to="/chat"
-            className="group bg-black/40 backdrop-blur-md border border-gray-900  rounded-2xl shadow-lg shadow-blue-500/40 p-8 transition-all duration-300 transform hover:scale-105 hover:-rotate-1 md:col-span-2 lg:col-span-1"
+            className="group bg-black/80 border border-gray-500  rounded-2xl shadow-lg shadow-blue-500/40 p-8 transition-all duration-300 transform hover:scale-105 hover:-rotate-1 md:col-span-2 lg:col-span-1"
           >
             <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-black rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 shadow-md shadow-blue-500/30">
               <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
