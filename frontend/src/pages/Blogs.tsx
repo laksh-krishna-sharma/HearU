@@ -5,7 +5,7 @@ const Blogs = () => {
       id: 1,
       title: "Understanding Anxiety: A Guide for Young Adults",
       excerpt: "Learn about the signs, symptoms, and coping strategies for managing anxiety in your daily life.",
-      author: "Dr. Sarah Johnson",
+      author: "Sarah Johnson",
       date: "2024-01-15",
       readTime: "5 min read",
       category: "Mental Health"
@@ -14,7 +14,7 @@ const Blogs = () => {
       id: 2,
       title: "Building Healthy Relationships During Difficult Times",
       excerpt: "Discover how to maintain and build meaningful connections while prioritizing your mental health.",
-      author: "Dr. Michael Chen",
+      author: "Michael Chen",
       date: "2024-01-12",
       readTime: "7 min read",
       category: "Relationships"
@@ -32,11 +32,47 @@ const Blogs = () => {
       id: 4,
       title: "When to Seek Professional Help",
       excerpt: "Understanding the signs that indicate it's time to reach out to a mental health professional.",
-      author: "Dr. Emily Watson",
+      author: "Emily Watson",
       date: "2024-01-08",
       readTime: "6 min read",
       category: "Support"
-    }
+    },
+    {
+      id: 5,
+      title: "Overcoming Sleep Challenges Naturally",
+      excerpt: "Explore practical tips and techniques to improve your sleep without relying on medication.",
+      author: "Kevin Lee",
+      date: "2024-01-05",
+      readTime: "5 min read",
+      category: "Wellness"
+    },
+    {
+      id: 6,
+      title: "Coping with Work-Related Stress",
+      excerpt: "Learn strategies to manage stress at work and maintain a healthy work-life balance.",
+      author: "Jessica Martinez, PhD",
+      date: "2024-01-03",
+      readTime: "6 min read",
+      category: "Mental Health"
+    },
+    {
+      id: 7,
+      title: "Boosting Self-Esteem in Challenging Times",
+      excerpt: "Practical advice to strengthen self-confidence and build resilience in daily life.",
+      author: "Amanda Green",
+      date: "2024-01-01",
+      readTime: "5 min read",
+      category: "Personal Development"
+    },
+    {
+      id: 8,
+      title: "Nutrition Tips for a Healthy Mind",
+      excerpt: "Discover how diet impacts mental health and simple changes to support your wellbeing.",
+      author: "Samuel Ortiz",
+      date: "2023-12-30",
+      readTime: "4 min read",
+      category: "Wellness"
+    },
   ];
 
 
@@ -69,15 +105,15 @@ const Blogs = () => {
                     {post.readTime}
                   </span>
                 </div>
-                
+
                 <h2 className="text-xl font-semibold text-ocean-text mb-3 hover:text-ocean-primary transition-colors cursor-pointer">
                   {post.title}
                 </h2>
-                
+
                 <p className="text-ocean-text opacity-70 mb-4 line-clamp-3">
                   {post.excerpt}
                 </p>
-                
+
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-ocean-text">
@@ -87,7 +123,7 @@ const Blogs = () => {
                       {new Date(post.date).toLocaleDateString()}
                     </p>
                   </div>
-                  
+
                   <button className="text-ocean-primary hover:text-ocean-primary-dark font-medium text-sm transition-colors">
                     Read More →
                   </button>
