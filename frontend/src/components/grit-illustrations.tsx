@@ -139,13 +139,13 @@ export function ParticleField() {
   useEffect(() => {
     const viewportH = window.innerHeight;
     // create particles
-    const particleCount = Math.max(30, Math.floor(window.innerWidth / 80)); // scale with width
+    const particleCount = Math.max(40, Math.floor(window.innerWidth / 80)); // scale with width
     const p = Array.from({ length: particleCount }, (_, i) => ({
       id: i,
       left: Math.random() * 100,
       top: Math.random() * viewportH,
       speed: 0.1 + Math.random() * 0.6, // 0.1 .. 0.7
-      size: 1 + Math.random() * 3, // px
+      size: 1 + Math.random() * 4, // px
       node: undefined as HTMLDivElement | undefined,
     }));
     particlesRef.current = p; 
@@ -220,7 +220,7 @@ export function ParticleField() {
                   el.style.borderRadius = "50%";
                   el.style.background = "rgba(255,255,255,1)";
                   el.style.opacity = String(0.8 + Math.random() * 0.3);
-                  el.style.filter = "blur(1px)";
+                  el.style.filter = "blur(0px)";
                   el.style.transition = "opacity 0.8s ease";
                   el.className = "particle-drift will-change-transform";
                 } else {
