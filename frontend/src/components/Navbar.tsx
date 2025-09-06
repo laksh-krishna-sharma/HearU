@@ -48,7 +48,7 @@ const Navbar = () => {
           <span className="text-white">HearU</span>
         </Link>
 
-        {/* CENTER - Voice Assistant Oval  */}
+        {/* CENTER - Voice Assistant Oval */}
         {/* {showCenterOval && isAuthenticated && (
           <div className="hidden md:block animate-fade-in">
             <NavbarVoiceSession />
