@@ -15,6 +15,8 @@ class Settings(BaseSettings):
     gemini_api_key: str = Field(..., env="GEMINI_API_KEY")
     root_path: str = Field("", env="ROOT_PATH")
     logging_level: str = Field("INFO", env="LOGGING_LEVEL")
+    client_url: str = Field(..., env="CLIENT_URL")
+    client_url2: str = Field(..., env="CLIENT_URL2")
 
     # TTS/STT settings
     tts_model: str = Field("gemini-2.5-flash-preview-tts", env="TTS_MODEL")
