@@ -352,7 +352,7 @@ const JournalEditor: React.FC = () => {
 
  return (
   <div className="min-h-screen w-full overflow-x-hidden p-6">
-    <div className="max-w-7xl mx-auto">
+    <div className="max-w-8xl mx-auto">
       <JournalHeader
         isEditing={isEditing}
         isSaving={isSaving}
@@ -386,8 +386,11 @@ const JournalEditor: React.FC = () => {
         </div>
 
         {/* Right column */}
-        <div className="flex flex-col gap-6">
-          <NotesPanel voiceSummaries={voiceSessionResponses} />
+        <div className="flex flex-col h-full gap-6">
+          <div className='basis-1/2 min-h-0 overflow-auto '>
+            <NotesPanel voiceSummaries={voiceSessionResponses} />
+          </div>
+          <div className='basis-1/2 min-h-0 overflow-y-auto'>
           <VoiceAssistantPanel
             session={session}
             isRecording={isRecording}
@@ -401,6 +404,7 @@ const JournalEditor: React.FC = () => {
             onStartSession={handleStartSession}
             onEndSession={handleEndSession}
           />
+          </div>
         </div>
       </div>
 

@@ -2,7 +2,7 @@ import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Bot } from 'lucide-react';
+
 
 interface EditorPanelProps {
   title: string;
@@ -90,7 +90,6 @@ const EditorPanel: React.FC<EditorPanelProps> = ({
             className="flex items-center gap-2 border-gray-500 bg-black/80 text-white shadow-sm"
             disabled={!isEditing || eveLoading || isSaving || isPlaying}
           >
-            <Bot className="h-4 w-4" />
             {isPlaying ? 'Playing...' : 'Get AI Reply'}
           </Button>
         </div>
