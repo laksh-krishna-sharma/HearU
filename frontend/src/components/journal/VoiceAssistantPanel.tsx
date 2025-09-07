@@ -1,7 +1,8 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Mic, Bot } from 'lucide-react';
+import { Mic } from 'lucide-react';
+import { TbActivityHeartbeat } from 'react-icons/tb';
 
 interface VoiceAssistantPanelProps {
   session: unknown;
@@ -38,8 +39,8 @@ const VoiceAssistantPanel: React.FC<VoiceAssistantPanelProps> = ({
             <Mic className="h-4 w-4 text-white" /> Voice Assistant
           </CardTitle>
         </CardHeader>
-        <CardContent className="flex-1 flex flex-col justify-center">
-          
+        <CardContent className="flex-1 flex flex-col justify-center overflow-hidden">
+
           {/* Active session & not in journal reply mode */}
           {session && !isJournalReplyMode ? (
             <div className="text-center space-y-4">
@@ -53,7 +54,7 @@ const VoiceAssistantPanel: React.FC<VoiceAssistantPanelProps> = ({
               >
                 <Mic className="h-10 w-10 text-white" />
               </div>
-              
+
               {isIntroPlaying && (
                 <div className="space-y-2">
                   <div className="flex items-center justify-center space-x-2">
@@ -63,7 +64,7 @@ const VoiceAssistantPanel: React.FC<VoiceAssistantPanelProps> = ({
                   <p className="text-xs text-gray-400">Please wait for the introduction to finish</p>
                 </div>
               )}
-              
+
               {isRecording && <p className="text-sm text-red-400">Recording... Tap mic to stop.</p>}
               {isPlaying && !isIntroPlaying && <p className="text-sm text-blue-400">Eve is responding...</p>}
               {!isRecording && !isPlaying && !isIntroPlaying && (
@@ -73,7 +74,7 @@ const VoiceAssistantPanel: React.FC<VoiceAssistantPanelProps> = ({
                     : "Tap mic to share your thoughts."}
                 </p>
               )}
-              
+
               <Button
                 variant="destructive"
                 className="w-full bg-red-600 hover:bg-red-700 text-white"
@@ -86,9 +87,13 @@ const VoiceAssistantPanel: React.FC<VoiceAssistantPanelProps> = ({
           ) : isJournalReplyMode ? (
             // Journal reply mode
             <div className="text-center space-y-6">
-              <div className="w-24 h-24 mx-auto bg-black/80 border border-gray-500 rounded-full flex items-center justify-center">
-                <Bot className="h-10 w-10 text-white" />
+              <div
+                className={`w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-blue-400 to-black shadow-lg shadow-blue-500/40 flex items-center justify-center transition-all duration-300 ${eveLoading ? 'animate-pulse' : ''
+                  } ${isPlaying ? 'shadow-blue-400/60 animate-pulse' : ''}`}
+              >
+                <TbActivityHeartbeat className="w-10 h-10 text-white" />
               </div>
+
               <div className="space-y-2">
                 <p className="text-sm font-medium text-gray-200">Journal Reply</p>
                 <p className="text-xs text-gray-400">AI has responded to your journal entry.</p>
@@ -104,9 +109,13 @@ const VoiceAssistantPanel: React.FC<VoiceAssistantPanelProps> = ({
           ) : (
             // Default state
             <div className="text-center space-y-6">
-              <div className="w-24 h-24 mx-auto bg-black/80 border border-gray-500 rounded-full flex items-center justify-center">
-                <Bot className="h-10 w-10 text-white" />
+              <div
+                className={`w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-blue-400 to-black shadow-lg shadow-blue-500/40 flex items-center justify-center transition-all duration-300 ${eveLoading ? 'animate-pulse' : ''
+                  } ${isPlaying ? 'shadow-blue-400/60 animate-pulse' : ''}`}
+              >
+                <TbActivityHeartbeat className="w-10 h-10 text-white" />
               </div>
+
               <Button
                 variant="outline"
                 className="w-full border-gray-500 text-white hover:bg-gray-700"
