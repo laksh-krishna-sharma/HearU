@@ -1,11 +1,6 @@
-![logo](https://github.com/user-attachments/assets/96b7b90e-3398-4c45-a0a6-cefeed56ee54)<?xml version="1.0" encoding="UTF-8"?>
-<svg version="1.1" xmlns="http://www.w3.org/2000/svg" alt="HearU Logo" width="60" height="60" >
-<path d="M0 0 C17.16 0 34.32 0 52 0 C52 16.83 52 33.66 52 51 C34.84 51 17.68 51 0 51 C0 34.17 0 17.34 0 0 Z " fill="#121A1D" transform="translate(0,0)"/>
-<path d="M0 0 C4.8046547 2.40232735 8.65631038 5.75275009 10.75 10.8125 C10.8325 11.534375 10.915 12.25625 11 13 C11.144375 14.2375 11.28875 15.475 11.4375 16.75 C11.37819353 22.03815989 8.54829582 25.3162084 5 29 C1.5170497 31.93301078 -1.38394789 32.48758993 -5.94921875 32.28125 C-10.96858315 31.59288002 -14.61953586 29.75264279 -17.875 25.9375 C-21.47675075 20.95860926 -21.67107526 17.05831835 -21 11 C-16.40290834 1.80581668 -9.77977013 -1.08329761 0 0 Z " fill="#4D7267" transform="translate(31,9)"/>
-<path d="M0 0 C5.23724692 2.96387807 8.8638854 7.84165621 10.75 13.5 C11.48188105 20.25490217 10.99389476 26.00997547 6.75 31.5 C0.98589731 36.82338659 -3.77424678 38.89517218 -11.62109375 38.76953125 C-16.79158687 38.23942126 -20.51658488 36.37692225 -24.04296875 32.55859375 C-28.85158968 26.35650073 -30.05024766 21.3053141 -29.25 13.5 C-27.40431724 6.81086948 -23.09305037 2.96743646 -17.25 -0.5 C-11.59165621 -2.3861146 -5.51345061 -2.41147069 0 0 Z M-22.5625 9.125 C-25.87098774 13.78139015 -25.87082623 17.89531877 -25.25 23.5 C-22.84767265 28.3046547 -19.49724991 32.15631038 -14.4375 34.25 C-13.715625 34.3325 -12.99375 34.415 -12.25 34.5 C-11.0125 34.644375 -9.775 34.78875 -8.5 34.9375 C-3.21184011 34.87819353 0.0662084 32.04829582 3.75 28.5 C6.68301078 25.0170497 7.23758993 22.11605211 7.03125 17.55078125 C6.34288002 12.53141685 4.50264279 8.88046414 0.6875 5.625 C-7.56564286 -0.34535866 -15.99184246 1.66641576 -22.5625 9.125 Z " fill="#313B39" transform="translate(35.25,6.5)"/>
-<path d="M0 0 C1.3303125 0.00773437 1.3303125 0.00773437 2.6875 0.015625 C3.574375 0.01046875 4.46125 0.0053125 5.375 0 C7.6875 0.265625 7.6875 0.265625 9.6875 2.265625 C10.1875 4.515625 10.1875 4.515625 9.6875 7.265625 C7.88293184 9.49510601 5.85284275 11.39028351 3.6875 13.265625 C0.3153951 11.82043719 -2.01130363 10.14212047 -4.3125 7.265625 C-4.6875 4.640625 -4.6875 4.640625 -4.3125 2.265625 C-2.3125 0.265625 -2.3125 0.265625 0 0 Z " fill="#F8F9F9" transform="translate(23.3125,17.734375)"/>
-</svg>
+# HearU
 
+HearU is a voice/chat application with a Python backend and a Bun + Vercel frontend. This repository includes deployment configuration, CI workflows, a Bruno API test collection, and Kubernetes deployment notes.
 
 ## Overview
 MindSpace is an AI-powered, confidential, and empathetic mental wellness companion designed for Indian youth. It provides a safe platform where young individuals can openly share their thoughts, seek guidance, and access resources without fear of stigma or judgment. Leveraging Google Cloud's Generative AI, MindSpace offers intelligent support, mental wellness insights, and a community-driven space to promote emotional well-being.
@@ -16,7 +11,7 @@ Mental health continues to be a significant taboo in India, particularly among y
 ## Objectives
 - Provide a confidential AI-powered mental wellness companion.
 - Offer empathetic conversations through a Generative AI chatbot.
-- Create a safe space for youth to express themselves via blogs and community features.
+- Create a safe space for youth to express themselves via journals.
 - Promote mental wellness awareness and destigmatization.
 
 ## Key Features
@@ -24,28 +19,85 @@ Mental health continues to be a significant taboo in India, particularly among y
    - Secure sign-up and login system.
    - Confidential user profiles.
 
-2. **User Dashboard**
-   - Personalized dashboard for wellness tracking.
-   - Access to resources and activity history.
-
-3. **AI Wellness Chatbot**
+2. **AI Wellness Chatbot**
    - Confidential and empathetic conversations.
    - Guidance and suggestions powered by Google Cloud Generative AI.
 
-4. **Blog & Journaling**
-   - Users can post blogs or personal journals.
+3. **Journaling**
+   - Users can post personal journals.
    - A safe space to express emotions and thoughts.
 
-5. **Resource Center**
+4. **Resource Center**
    - Curated wellness articles, guides, and self-help material.
    - Localized resources tailored for Indian youth.
 
-6. **Community Features (Future Milestones)**
-   - Anonymous peer support groups.
-   - Moderated discussions to maintain safety.
 
-7. **Emergency Support**
-   - Quick access to helplines and professional help resources.
+## Repository layout
+- [backend/](backend) — Python backend, Dockerfile, deployment config, and Kubernetes guide. See [backend/pyproject.toml](backend/pyproject.toml) and [backend/deployment.md](backend/deployment.md).
+- [frontend/](frontend) — Bun-based frontend and Vercel deployment setup. CI/CD is defined in [.github/workflows/preview.yaml](.github/workflows/preview.yaml) and [.github/workflows/production.yaml](.github/workflows/production.yaml).
+- [HearU_api/](HearU_api) — Bruno collection and instructions for API testing. See [HearU_api/README.md](HearU_api/README.md).
+- CI & deployment configs: [.github/workflows/preview.yaml](.github/workflows/preview.yaml), [.github/workflows/production.yaml](.github/workflows/production.yaml).
+- Repo-level ignores and environment notes: [.gitignore](.gitignore), [backend/.dockerignore](backend/.dockerignore).
+
+## Quick start
+
+Prerequisites (typical)
+- Python >= 3.13
+- Bun (frontend) — used by CI and local frontend dev
+- Docker (optional for images/local Kubernetes)
+- Minikube (optional for local k8s)
+
+Backend (local)
+1. Open the backend folder:
+   - [backend/](backend)
+2. Create and activate a Python venv, install dependencies (project contains [backend/requirements.txt](backend/requirements.txt)):
+   - Example (typical):
+     - python -m venv .venv
+     - source .venv/bin/activate
+     - pip install -r backend/requirements.txt
+3. See the API test/run instructions in [HearU_api/README.md](HearU_api/README.md).
+
+Frontend (local)
+1. Open the frontend folder:
+   - [frontend/](frontend)
+2. Install dependencies using Bun (CI uses `bun install --frozen-lockfile`). See the Vercel workflows:
+   - [.github/workflows/preview.yaml](.github/workflows/preview.yaml)
+   - [.github/workflows/production.yaml](.github/workflows/production.yaml)
+
+Deployment
+- Dockerfile and docker-compose are available under [backend/](backend). See [backend/Dockerfile](backend/Dockerfile) and [backend/docker-compose.yaml](backend/docker-compose.yaml).
+- Kubernetes/minikube deployment steps are documented in [backend/deployment.md](backend/deployment.md).
+- CI deploys the frontend to Vercel via the GitHub Actions workflows at:
+  - [.github/workflows/preview.yaml](.github/workflows/preview.yaml)
+  - [.github/workflows/production.yaml](.github/workflows/production.yaml)
+
+Environment
+- Environment variables are expected in a `.env` file (root). Note that `.gitignore` and [backend/.dockerignore](backend/.dockerignore) already exclude environment files: [.gitignore](.gitignore), [backend/.dockerignore](backend/.dockerignore).
+
+Testing
+- API tests and example requests are stored as a Bruno collection in [HearU_api/README.md](HearU_api/README.md).
+
+Project configuration
+- Python project metadata: [backend/pyproject.toml](backend/pyproject.toml)
+- Backend linting & type tools configured in the repo (see [backend/pyproject.toml](backend/pyproject.toml) and [backend/mypy.ini](backend/mypy.ini) if present).
+
+Useful files
+- Root README (this file): [README.md](README.md)
+- Backend deployment guide: [backend/deployment.md](backend/deployment.md)
+- API Bruno collection: [HearU_api/README.md](HearU_api/README.md)
+- Workflow configs: [.github/workflows/preview.yaml](.github/workflows/preview.yaml), [.github/workflows/production.yaml](.github/workflows/production.yaml)
+- Backend project config: [backend/pyproject.toml](backend/pyproject.toml)
+- Backend Docker ignore: [backend/.dockerignore](backend/.dockerignore)
+- Repo .gitignore: [.gitignore](.gitignore)
+- Backend Dockerfile: [backend/Dockerfile](backend/Dockerfile)
+- Backend docker-compose: [backend/docker-compose.yaml](backend/docker-compose.yaml)
+- Backend requirements: [backend/requirements.txt](backend/requirements.txt)
+- Frontend package manifest: [frontend/package.json](frontend/package.json)
+- Frontend bun lock: [frontend/bun.lock](frontend/bun.lock)
+
+Notes
+- Do not commit any secrets or `.env` files. The repository already excludes `.env` in [.gitignore](.gitignore) and [backend/.dockerignore](backend/.dockerignore).
+- For Kubernetes-specific instructions, follow [backend/deployment.md](backend/deployment.md)
 
 ## Vision
 To break the stigma around mental health for Indian youth by creating an accessible, AI-powered safe space that offers support, guidance, and community-driven healing.
