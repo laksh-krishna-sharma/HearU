@@ -123,7 +123,7 @@ const JournalEditor: React.FC = () => {
         if (lastTurn?.audio_path) playAudio(lastTurn.audio_path, false);
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [session?.greeting_audio_path, session, journalReply, turns, isJournalReplyMode, dispatch]);
 
   useEffect(() => {
