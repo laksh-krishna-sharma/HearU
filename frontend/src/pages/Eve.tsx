@@ -183,6 +183,7 @@ const Eve: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col justify-between items-center text-white relative">
+      <h1 className='text-2xl font-bold mb-4 mt-8'>Hello I'm Eve</h1>
       {/* Center Orb */}
       <div className="flex flex-1 items-center justify-center">
         <div 
