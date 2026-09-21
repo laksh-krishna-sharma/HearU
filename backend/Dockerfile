@@ -1,18 +1,19 @@
-FROM python:3.13-slim AS builder
+FROM python:3.11-slim AS builder
 
 WORKDIR /app
 
 # Install uv
 RUN pip install --no-cache-dir uv
 
-# Copy project metadata and lockfile
-COPY pyproject.toml uv.lock ./
+# Copy requirements file
+COPY requirements.txt .
 
-# Install production deps (uv sync creates .venv)
-RUN uv sync --frozen --no-dev --no-install-project
+# Use uv to install dependencies into a virtual environment
+RUN uv venv
+RUN . .venv/bin/activate && uv pip install -r requirements.txt
 
 # Final stage
-FROM python:3.13-slim
+FROM python:3.11-slim
 
 WORKDIR /app
 # Create directory for audio files

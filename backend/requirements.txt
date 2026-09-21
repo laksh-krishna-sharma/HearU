@@ -1,0 +1,16 @@
+fastapi
+uvicorn[standard]
+passlib[bcrypt]
+sqlalchemy
+pydantic_settings
+pydantic
+asyncpg
+pydantic[email]
+PyJWT
+google-genai
+httpx
+google-generativeai
+sqlmodel
+python-multipart
+gunicorn
+python-dotenv

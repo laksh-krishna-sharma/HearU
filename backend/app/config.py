@@ -19,8 +19,8 @@ class Settings(BaseSettings):
     client_url2: str = Field(..., env="CLIENT_URL2")
 
     # TTS/STT settings
-    tts_model: str = Field("gemini-2.5-flash-preview-tts", env="TTS_MODEL")
-    stt_model: str = Field("gemini-2.5-flash", env="STT_MODEL")
+    tts_model: str = Field("gemini-3.1-flash-tts-preview", env="TTS_MODEL")
+    stt_model: str = Field("gemini-3.1-flash-lite", env="STT_MODEL")
 
 
 settings = Settings()
